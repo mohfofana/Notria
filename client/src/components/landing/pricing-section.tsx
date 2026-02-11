@@ -1,47 +1,42 @@
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const plans = [
+type Plan = {
+  name: string;
+  price: string;
+  description: string;
+  features: string[];
+  highlighted: boolean;
+  cta: string;
+  badge?: string;
+};
+
+const plans: Plan[] = [
   {
-    name: "Gratuit",
+    name: "Gratuit (Beta)",
     price: "0",
-    description: "Pour découvrir Prof Ada",
+    description: "Tout est gratuit pour le lancement",
     features: [
-      "5 messages/jour avec Prof Ada",
-      "2 exercices/jour",
-      "Historique limité",
-    ],
-    highlighted: false,
-    cta: "Commencer",
-  },
-  {
-    name: "Standard",
-    price: "2,000",
-    description: "Pour progresser sérieusement",
-    badge: "Populaire",
-    features: [
-      "100 messages/jour avec Prof Ada",
-      "20 exercices/jour",
-      "Programme d'étude complet",
-      "Planning personnalisé",
-      "Suivi de progression détaillé",
+      "Chat avec Prof Ada",
+      "Exercices et corrections",
+      "Programme + planning (bientôt)",
     ],
     highlighted: true,
-    cta: "Essayer 7 jours gratuit",
+    cta: "Commencer gratuitement",
+    badge: "100% gratuit",
   },
   {
     name: "Premium",
-    price: "3,500",
-    description: "Pour viser la mention",
+    price: "Bientôt",
+    description: "On l'ajoutera plus tard si besoin",
     features: [
-      "Messages et exercices illimités",
-      "Tout le plan Standard",
       "Dashboard parent",
       "Devoirs adaptatifs avancés",
+      "Limites d'usage plus élevées",
       "Support prioritaire",
     ],
     highlighted: false,
-    cta: "Essayer 7 jours gratuit",
+    cta: "Me prévenir",
   },
 ];
 
@@ -52,14 +47,14 @@ export function PricingSection() {
         <div className="text-center mb-16">
           <p className="text-sm font-semibold text-amber-600 uppercase tracking-wide mb-3">Tarifs</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-            Un prix accessible pour tous
+            Gratuit pour le lancement
           </h2>
           <p className="text-slate-600 text-lg">
-            7 jours d&apos;essai gratuit sur tous les plans payants. Sans carte bancaire.
+            On se concentre sur le produit. Premium viendra plus tard.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {plans.map((plan, index) => (
             <div
               key={index}
@@ -89,7 +84,7 @@ export function PricingSection() {
                   {plan.price}
                 </span>
                 <span className={`text-sm ml-1 ${plan.highlighted ? "text-slate-400" : "text-slate-500"}`}>
-                  FCFA/mois
+                  {plan.price === "0" ? "FCFA" : null}
                 </span>
               </div>
 
@@ -105,6 +100,7 @@ export function PricingSection() {
               </ul>
 
               <Button
+                disabled={plan.name === "Premium"}
                 className={`w-full h-12 font-semibold rounded-xl ${
                   plan.highlighted
                     ? "bg-amber-500 hover:bg-amber-600 text-white"
@@ -118,7 +114,7 @@ export function PricingSection() {
         </div>
 
         <p className="text-center text-sm text-slate-500 mt-8">
-          Annulation à tout moment. Aucun engagement.
+          Aucun paiement n'est requis pour l'instant.
         </p>
       </div>
     </section>
