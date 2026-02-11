@@ -4,10 +4,12 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 
-dotenv.config();
+import { authRouter } from "./routes/auth.routes";
+
+dotenv.config({ path: "../.env" });
 
 const app = express();
-const PORT = process.env.SERVER_PORT || 3001;
+const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 3001);
 
 // Middleware
 app.use(helmet());
@@ -17,6 +19,8 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+
+app.use("/api/auth", authRouter);
 
 // Health check
 app.get("/health", (req, res) => {
