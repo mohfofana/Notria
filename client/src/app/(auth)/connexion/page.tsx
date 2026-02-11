@@ -22,7 +22,7 @@ export default function ConnexionPage() {
   function formatPhone(raw: string) {
     const digits = raw.replace(/\D/g, "");
     const local = digits.startsWith("225") ? digits.slice(3) : digits;
-    const trimmed = local.slice(0, 8);
+    const trimmed = local.slice(0, 10);
     const parts = trimmed.match(/.{1,2}/g);
     return parts ? parts.join(" ") : "";
   }
@@ -40,8 +40,8 @@ export default function ConnexionPage() {
     setError("");
 
     const phoneDigits = phone.replace(/\s/g, "");
-    if (phoneDigits.length !== 8) {
-      setError("Numéro de téléphone invalide (8 chiffres requis)");
+    if (phoneDigits.length !== 10) {
+      setError("Numéro de téléphone invalide (10 chiffres requis)");
       return;
     }
     if (password.length < 6) {
@@ -84,7 +84,7 @@ export default function ConnexionPage() {
             <Input
               id="phone"
               type="tel"
-              placeholder="07 08 09 10"
+              placeholder="07 08 09 10 11"
               className="rounded-l-none"
               value={phone}
               onChange={(e) => handlePhoneChange(e.target.value)}

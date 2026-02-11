@@ -29,8 +29,8 @@ export default function InscriptionPage() {
     const digits = raw.replace(/\D/g, "");
     // Remove leading 225 if the user typed it (we add the prefix ourselves)
     const local = digits.startsWith("225") ? digits.slice(3) : digits;
-    // Format as XX XX XX XX (8 digits max for Ivory Coast)
-    const trimmed = local.slice(0, 8);
+    // Format as XX XX XX XX XX (10 digits for Ivory Coast)
+    const trimmed = local.slice(0, 10);
     const parts = trimmed.match(/.{1,2}/g);
     return parts ? parts.join(" ") : "";
   }
@@ -50,8 +50,8 @@ export default function InscriptionPage() {
     const fullPhone = getFullPhone();
     // Basic validation
     const phoneDigits = form.phone.replace(/\s/g, "");
-    if (phoneDigits.length !== 8) {
-      setError("Numéro de téléphone invalide (8 chiffres requis)");
+    if (phoneDigits.length !== 10) {
+      setError("Numéro de téléphone invalide (10 chiffres requis)");
       return;
     }
     if (!form.firstName.trim() || !form.lastName.trim()) {
@@ -153,7 +153,7 @@ export default function InscriptionPage() {
             <Input
               id="phone"
               type="tel"
-              placeholder="07 08 09 10"
+              placeholder="07 08 09 10 11"
               className="rounded-l-none"
               value={form.phone}
               onChange={(e) => handlePhoneChange(e.target.value)}

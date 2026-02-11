@@ -3,6 +3,7 @@ dist/
 .next/
 .env
 .env.local
+*.tsbuildinfo
 *.log
 .DS_Store
 Thumbs.db
