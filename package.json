@@ -1,0 +1,15 @@
+{
+  "name": "notria",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:client": "pnpm --filter @notria/client dev",
+    "dev:server": "pnpm --filter @notria/server dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "db:generate": "pnpm --filter @notria/server drizzle-kit generate",
+    "db:migrate": "pnpm --filter @notria/server drizzle-kit migrate",
+    "db:push": "pnpm --filter @notria/server drizzle-kit push",
+    "db:studio": "pnpm --filter @notria/server drizzle-kit studio"
+  }
+}
