@@ -69,15 +69,113 @@ export const SVT_TOPICS_BAC_CD = [
   "Évolution",
 ] as const;
 
+export const FRENCH_TOPICS_BAC = [
+  "Commentaire composé",
+  "Dissertation littéraire",
+  "Résumé et discussion",
+  "Textes argumentatifs",
+  "Textes narratifs",
+  "Analyse stylistique",
+  "Littérature africaine",
+  "Littérature française",
+] as const;
+
+export const FRENCH_TOPICS_BEPC = [
+  "Grammaire",
+  "Conjugaison",
+  "Orthographe",
+  "Expression écrite",
+  "Compréhension de texte",
+  "Vocabulaire",
+  "Résumé de texte",
+  "Dictée et réécriture",
+] as const;
+
+export const PHILO_TOPICS_BAC = [
+  "La conscience",
+  "L'inconscient",
+  "La liberté",
+  "Le devoir",
+  "La justice",
+  "La vérité",
+  "La raison",
+  "L'art",
+] as const;
+
+export const HISTORY_GEO_TOPICS_BAC = [
+  "Décolonisation en Afrique",
+  "La Guerre Froide",
+  "Le monde contemporain",
+  "L'Afrique depuis 1960",
+  "Géographie de la Côte d'Ivoire",
+  "Géographie de l'Afrique",
+  "Population et développement",
+  "Mondialisation",
+] as const;
+
+export const HISTORY_GEO_TOPICS_BEPC = [
+  "Histoire de la Côte d'Ivoire",
+  "Colonisation et décolonisation",
+  "Géographie de la Côte d'Ivoire",
+  "Population et démographie",
+  "Les ressources naturelles",
+  "Les grandes civilisations africaines",
+] as const;
+
+export const ENGLISH_TOPICS_BAC = [
+  "Reading comprehension",
+  "Essay writing",
+  "Grammar and tenses",
+  "Vocabulary in context",
+  "Letter and email writing",
+  "Oral communication",
+] as const;
+
+export const ENGLISH_TOPICS_BEPC = [
+  "Grammar basics",
+  "Reading comprehension",
+  "Vocabulary",
+  "Verb tenses",
+  "Writing paragraphs",
+  "Everyday English",
+] as const;
+
+export const PHYSICS_TOPICS_BEPC = [
+  "Mécanique simple",
+  "Électricité de base",
+  "Optique géométrique",
+  "Chimie des solutions",
+  "Matière et transformations",
+  "Énergie",
+] as const;
+
+export const SVT_TOPICS_BEPC = [
+  "Le corps humain",
+  "La reproduction",
+  "La nutrition",
+  "L'environnement",
+  "Les êtres vivants",
+  "La cellule",
+] as const;
+
 export const TOPICS_BY_SUBJECT: Record<string, readonly string[]> = {
   "Mathématiques_BAC": MATH_TOPICS_BAC_CD,
   "Mathématiques_BEPC": MATH_TOPICS_BEPC,
   "Physique-Chimie_BAC": PHYSICS_TOPICS_BAC_CD,
+  "Physique-Chimie_BEPC": PHYSICS_TOPICS_BEPC,
   "SVT_BAC": SVT_TOPICS_BAC_CD,
+  "SVT_BEPC": SVT_TOPICS_BEPC,
+  "Français_BAC": FRENCH_TOPICS_BAC,
+  "Français_BEPC": FRENCH_TOPICS_BEPC,
+  "Philosophie_BAC": PHILO_TOPICS_BAC,
+  "Histoire-Géographie_BAC": HISTORY_GEO_TOPICS_BAC,
+  "Histoire-Géographie_BEPC": HISTORY_GEO_TOPICS_BEPC,
+  "Anglais_BAC": ENGLISH_TOPICS_BAC,
+  "Anglais_BEPC": ENGLISH_TOPICS_BEPC,
 };
 
 export const SUBSCRIPTION_LIMITS = {
-  gratuit: { messagesPerDay: 5, exercisesPerDay: 2, hasStudyPlan: false, hasParentDashboard: false },
+  gratuit: { messagesPerDay: Infinity, exercisesPerDay: Infinity, hasStudyPlan: true, hasParentDashboard: true },
   standard: { messagesPerDay: 100, exercisesPerDay: 20, hasStudyPlan: true, hasParentDashboard: false },
   premium: { messagesPerDay: Infinity, exercisesPerDay: Infinity, hasStudyPlan: true, hasParentDashboard: true },
 } as const;

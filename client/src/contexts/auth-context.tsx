@@ -21,13 +21,31 @@ interface AuthUser {
   role: UserRole;
 }
 
+interface StudentData {
+  id: number;
+  userId: number;
+  examType: string;
+  grade: string;
+  series?: string | null;
+  school?: string | null;
+  targetScore?: number | null;
+  prioritySubjects?: string[] | null;
+  dailyTime?: string | null;
+  onboardingCompleted: boolean;
+  assessmentCompleted: boolean;
+  currentStreak: number;
+  longestStreak: number;
+}
+
 interface AuthContextValue {
   user: AuthUser | null;
+  student: StudentData | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (phone: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
+  refreshMe: () => Promise<void>;
 }
 
 interface RegisterData {
@@ -42,6 +60,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [student, setStudent] = useState<StudentData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Try to restore session on mount via refresh token cookie
@@ -57,8 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data: meData } = await api.get("/auth/me");
         if (cancelled) return;
         setUser(meData.user);
+        setStudent(meData.student ?? null);
       } catch {
-        // No valid session, stay logged out
         setAccessToken(null);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -71,38 +90,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const refreshMe = useCallback(async () => {
+    try {
+      const { data } = await api.get("/auth/me");
+      setUser(data.user);
+      setStudent(data.student ?? null);
+    } catch {
+      // Ignore errors
+    }
+  }, []);
+
   const login = useCallback(async (phone: string, password: string) => {
     const { data } = await api.post("/auth/login", { phone, password });
     setAccessToken(data.accessToken);
     setUser(data.user);
+    // Fetch full /me to get student data
+    try {
+      const { data: meData } = await api.get("/auth/me");
+      setStudent(meData.student ?? null);
+    } catch {
+      // Continue
+    }
   }, []);
 
   const register = useCallback(async (registerData: RegisterData) => {
     const { data } = await api.post("/auth/register", registerData);
     setAccessToken(data.accessToken);
     setUser(data.user);
+    setStudent(null); // New user, no student record yet
   }, []);
 
   const logout = useCallback(async () => {
     try {
       await api.post("/auth/logout");
     } catch {
-      // Continue even if server call fails
+      // Continue
     }
     setAccessToken(null);
     setUser(null);
+    setStudent(null);
   }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
+      student,
       isLoading,
       isAuthenticated: !!user,
       login,
       register,
       logout,
+      refreshMe,
     }),
-    [user, isLoading, login, register, logout]
+    [user, student, isLoading, login, register, logout, refreshMe]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -4,7 +4,10 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 
-import { authRouter } from "./routes/auth.routes";
+import { authRouter } from "./routes/auth.routes.js";
+import { studentRouter } from "./routes/student.routes.js";
+import { studyPlanRouter } from "./routes/studyplan.routes.js";
+import { scheduleRouter } from "./routes/schedule.routes.js";
 
 dotenv.config({ path: "../.env" });
 
@@ -21,6 +24,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
+app.use("/api/students", studentRouter);
+app.use("/api/study-plans", studyPlanRouter);
+app.use("/api/schedules", scheduleRouter);
 
 // Health check
 app.get("/health", (req, res) => {

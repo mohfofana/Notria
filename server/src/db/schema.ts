@@ -24,6 +24,8 @@ export const students = pgTable("students", {
   series: varchar("series", { enum: ["A1", "A2", "C", "D"] }),
   school: varchar("school", { length: 255 }),
   targetScore: integer("target_score"),
+  prioritySubjects: jsonb("priority_subjects"),
+  dailyTime: varchar("daily_time", { length: 10 }),
   onboardingCompleted: boolean("onboarding_completed").default(false).notNull(),
   assessmentCompleted: boolean("assessment_completed").default(false).notNull(),
   currentStreak: integer("current_streak").default(0).notNull(),

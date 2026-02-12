@@ -72,7 +72,7 @@ export default function InscriptionPage() {
         password: form.password,
         role: form.role,
       });
-      router.push("/dashboard");
+      router.push(form.role === "student" ? "/onboarding/step-1" : "/dashboard");
     } catch (err: any) {
       const msg = err?.response?.data?.error;
       if (msg === "Phone already in use") {

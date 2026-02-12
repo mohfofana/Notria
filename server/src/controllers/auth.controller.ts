@@ -1,11 +1,8 @@
 import type { Request, Response } from "express";
-import bcrypt from "bcryptjs";
-import { and, eq, gt } from "drizzle-orm";
 
 import { loginSchema, registerSchema } from "@notria/shared";
 
-import { db, schema } from "../db";
-import { JWTService } from "../utils/jwt";
+import { AuthService } from "../services/auth.service.js";
 
 const REFRESH_COOKIE_NAME = "notria_refresh";
 
@@ -32,43 +29,15 @@ export const AuthController = {
 
     const { firstName, lastName, phone, password, role } = parsed.data;
 
-    const existing = await db.query.users.findFirst({ where: eq(schema.users.phone, phone) });
-    if (existing) {
-      return res.status(409).json({ error: "Phone already in use" });
+    const result = await AuthService.register({ firstName, lastName, phone, password, role });
+    if (!result.ok) {
+      if (result.error === "PHONE_IN_USE") return res.status(409).json({ error: "Phone already in use" });
+      return res.status(500).json({ error: "Internal error" });
     }
 
-    const passwordHash = await bcrypt.hash(password, 12);
+    setRefreshCookie(res, result.refreshToken);
 
-    const [user] = await db
-      .insert(schema.users)
-      .values({
-        firstName,
-        lastName,
-        phone,
-        role,
-        passwordHash,
-        email: null,
-      })
-      .returning();
-
-    const accessToken = JWTService.signAccessToken({ userId: user.id, role: user.role as any, phone: user.phone });
-
-    const refreshToken = JWTService.generateOpaqueToken();
-    const refreshTokenHash = JWTService.hashToken(refreshToken);
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-    await db.insert(schema.refreshTokens).values({
-      userId: user.id,
-      tokenHash: refreshTokenHash,
-      expiresAt,
-    });
-
-    setRefreshCookie(res, refreshToken);
-
-    return res.status(201).json({
-      user: { id: user.id, firstName: user.firstName, lastName: user.lastName, phone: user.phone, role: user.role },
-      accessToken,
-    });
+    return res.status(201).json({ user: result.user, accessToken: result.accessToken });
   },
 
   async login(req: Request, res: Response) {
@@ -79,58 +48,34 @@ export const AuthController = {
 
     const { phone, password } = parsed.data;
 
-    const user = await db.query.users.findFirst({ where: eq(schema.users.phone, phone) });
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    const result = await AuthService.login({ phone, password });
+    if (!result.ok) {
+      if (result.error === "INVALID_CREDENTIALS") return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(500).json({ error: "Internal error" });
+    }
 
-    const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+    setRefreshCookie(res, result.refreshToken);
 
-    const accessToken = JWTService.signAccessToken({ userId: user.id, role: user.role as any, phone: user.phone });
-
-    const refreshToken = JWTService.generateOpaqueToken();
-    const refreshTokenHash = JWTService.hashToken(refreshToken);
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-    await db.insert(schema.refreshTokens).values({
-      userId: user.id,
-      tokenHash: refreshTokenHash,
-      expiresAt,
-    });
-
-    setRefreshCookie(res, refreshToken);
-
-    return res.json({
-      user: { id: user.id, firstName: user.firstName, lastName: user.lastName, phone: user.phone, role: user.role },
-      accessToken,
-    });
+    return res.json({ user: result.user, accessToken: result.accessToken });
   },
 
   async refresh(req: Request, res: Response) {
     const token = req.cookies?.[REFRESH_COOKIE_NAME] as string | undefined;
     if (!token) return res.status(401).json({ error: "Missing refresh token" });
 
-    const tokenHash = JWTService.hashToken(token);
-    const now = new Date();
+    const result = await AuthService.refresh(token);
+    if (!result.ok) {
+      if (result.error === "INVALID_REFRESH") return res.status(401).json({ error: "Invalid refresh token" });
+      return res.status(500).json({ error: "Internal error" });
+    }
 
-    const existing = await db.query.refreshTokens.findFirst({
-      where: and(eq(schema.refreshTokens.tokenHash, tokenHash), gt(schema.refreshTokens.expiresAt, now)),
-    });
-
-    if (!existing) return res.status(401).json({ error: "Invalid refresh token" });
-
-    const user = await db.query.users.findFirst({ where: eq(schema.users.id, existing.userId) });
-    if (!user) return res.status(401).json({ error: "Invalid refresh token" });
-
-    const accessToken = JWTService.signAccessToken({ userId: user.id, role: user.role as any, phone: user.phone });
-
-    return res.json({ accessToken });
+    return res.json({ accessToken: result.accessToken });
   },
 
   async logout(req: Request, res: Response) {
     const token = req.cookies?.[REFRESH_COOKIE_NAME] as string | undefined;
     if (token) {
-      const tokenHash = JWTService.hashToken(token);
-      await db.delete(schema.refreshTokens).where(eq(schema.refreshTokens.tokenHash, tokenHash));
+      await AuthService.logout(token);
     }
 
     clearRefreshCookie(res);
@@ -140,11 +85,9 @@ export const AuthController = {
   async me(req: Request, res: Response) {
     if (!req.user) return res.status(401).json({ error: "Unauthorized" });
 
-    const user = await db.query.users.findFirst({ where: eq(schema.users.id, req.user.userId) });
-    if (!user) return res.status(404).json({ error: "Not found" });
+    const response = await AuthService.getMe(req.user.userId);
+    if (!response) return res.status(404).json({ error: "Not found" });
 
-    return res.json({
-      user: { id: user.id, firstName: user.firstName, lastName: user.lastName, phone: user.phone, role: user.role },
-    });
+    return res.json(response);
   },
 };
