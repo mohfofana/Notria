@@ -40,6 +40,8 @@ interface StudentData {
 interface AuthContextValue {
   user: AuthUser | null;
   student: StudentData | null;
+  hasStudyPlan: boolean;
+  hasSchedule: boolean;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (phone: string, password: string) => Promise<void>;
@@ -61,6 +63,8 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [student, setStudent] = useState<StudentData | null>(null);
+  const [hasStudyPlan, setHasStudyPlan] = useState(false);
+  const [hasSchedule, setHasSchedule] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Try to restore session on mount via refresh token cookie
@@ -77,6 +81,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         setUser(meData.user);
         setStudent(meData.student ?? null);
+        setHasStudyPlan(!!meData.hasStudyPlan);
+        setHasSchedule(!!meData.hasSchedule);
       } catch {
         setAccessToken(null);
       } finally {
@@ -95,6 +101,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data } = await api.get("/auth/me");
       setUser(data.user);
       setStudent(data.student ?? null);
+      setHasStudyPlan(!!data.hasStudyPlan);
+      setHasSchedule(!!data.hasSchedule);
     } catch {
       // Ignore errors
     }
@@ -108,6 +116,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data: meData } = await api.get("/auth/me");
       setStudent(meData.student ?? null);
+      setHasStudyPlan(!!meData.hasStudyPlan);
+      setHasSchedule(!!meData.hasSchedule);
     } catch {
       // Continue
     }
@@ -118,6 +128,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAccessToken(data.accessToken);
     setUser(data.user);
     setStudent(null); // New user, no student record yet
+    setHasStudyPlan(false);
+    setHasSchedule(false);
   }, []);
 
   const logout = useCallback(async () => {
@@ -129,12 +141,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAccessToken(null);
     setUser(null);
     setStudent(null);
+    setHasStudyPlan(false);
+    setHasSchedule(false);
   }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
       student,
+      hasStudyPlan,
+      hasSchedule,
       isLoading,
       isAuthenticated: !!user,
       login,
@@ -142,7 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout,
       refreshMe,
     }),
-    [user, student, isLoading, login, register, logout, refreshMe]
+    [user, student, hasStudyPlan, hasSchedule, isLoading, login, register, logout, refreshMe]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

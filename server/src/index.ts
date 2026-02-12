@@ -8,6 +8,7 @@ import { authRouter } from "./routes/auth.routes.js";
 import { studentRouter } from "./routes/student.routes.js";
 import { studyPlanRouter } from "./routes/studyplan.routes.js";
 import { scheduleRouter } from "./routes/schedule.routes.js";
+import { chatRouter } from "./routes/chat.routes.js";
 
 dotenv.config({ path: "../.env" });
 
@@ -27,6 +28,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/students", studentRouter);
 app.use("/api/study-plans", studyPlanRouter);
 app.use("/api/schedules", scheduleRouter);
+app.use("/api/chat", chatRouter);
 
 // Health check
 app.get("/health", (req, res) => {

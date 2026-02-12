@@ -5,16 +5,21 @@ import { useRouter } from "next/navigation";
 import { GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
+import { getNextOnboardingPath } from "@/lib/onboarding";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user, student, hasSchedule } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace("/dashboard");
+      if (user?.role === "student") {
+        router.replace(getNextOnboardingPath({ student, hasSchedule }));
+      } else {
+        router.replace("/dashboard");
+      }
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, user, student, hasSchedule, router]);
 
   if (isLoading) {
     return (
