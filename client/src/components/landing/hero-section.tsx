@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -29,13 +30,17 @@ export function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-white h-14 px-8 text-base font-semibold rounded-xl shadow-lg shadow-amber-500/25">
-                Commencer gratuitement
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-              <Button size="lg" variant="outline" className="h-14 px-8 text-base rounded-xl border-slate-300 text-slate-700">
-                Voir la démo
-              </Button>
+              <Link href="/inscription">
+                <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-white h-14 px-8 text-base font-semibold rounded-xl shadow-lg shadow-amber-500/25">
+                  Commencer gratuitement
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+              <a href="#comment-ca-marche">
+                <Button size="lg" variant="outline" className="h-14 px-8 text-base rounded-xl border-slate-300 text-slate-700">
+                  Voir comment ça marche
+                </Button>
+              </a>
             </div>
 
             <div className="flex items-center gap-6 justify-center lg:justify-start text-sm text-slate-500">

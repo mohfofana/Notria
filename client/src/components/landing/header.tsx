@@ -26,12 +26,16 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" className="text-slate-600 hidden sm:inline-flex">
-            Connexion
-          </Button>
-          <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg">
-            Commencer
-          </Button>
+          <Link href="/connexion">
+            <Button variant="ghost" size="sm" className="text-slate-600 hidden sm:inline-flex">
+              Connexion
+            </Button>
+          </Link>
+          <Link href="/inscription">
+            <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg">
+              Commencer
+            </Button>
+          </Link>
         </div>
       </div>
     </header>

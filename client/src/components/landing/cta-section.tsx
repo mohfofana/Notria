@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -16,10 +17,12 @@ export function CTASection() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-white h-14 px-8 text-base font-semibold rounded-xl">
-            Commencer gratuitement
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
+          <Link href="/inscription">
+            <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-white h-14 px-8 text-base font-semibold rounded-xl">
+              Commencer gratuitement
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+          </Link>
         </div>
 
         <p className="text-sm text-slate-500 mt-6">
