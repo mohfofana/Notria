@@ -21,11 +21,11 @@ export function NewConversationDialog({ open, onClose, onCreate }: NewConversati
   if (!open || !student) return null;
 
   const subjects = getSubjectsForStudent(
-    student.examType as "BAC" | "BEPC",
-    student.series as "A1" | "A2" | "C" | "D" | undefined
+    "BEPC",
+    undefined
   );
 
-  const examType = student.examType as "BAC" | "BEPC";
+  const examType = "BEPC";
   const topics = subject ? getTopicsForSubject(subject, examType) : [];
 
   async function handleCreate() {

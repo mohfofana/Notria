@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { GraduationCap } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/contexts/auth-context";
 import { getNextOnboardingPath } from "@/lib/onboarding";
 
@@ -43,13 +44,25 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <span className="text-xl font-bold">Notria</span>
         </Link>
 
-        <div className="space-y-4">
-          <blockquote className="text-lg leading-relaxed">
-            &ldquo;Avec Notria, j&apos;ai eu 16/20 en maths au BAC alors que je
-            galérais en début d&apos;année. Prof Ada m&apos;explique tout
-            clairement.&rdquo;
-          </blockquote>
-          <p className="font-medium">Fatou K., Terminale D, Abidjan</p>
+        <div className="space-y-6">
+          <div className="relative mx-auto w-full max-w-sm">
+            <div className="pointer-events-none absolute -inset-4 rounded-[2rem] border-2 border-dashed border-white/55 rotate-[-2deg]" />
+            <div className="pointer-events-none absolute -inset-1 rounded-[1.7rem] border border-white/60 rotate-[1.5deg]" />
+            <div className="relative overflow-hidden rounded-[1.5rem] border-4 border-white/70 shadow-2xl">
+              <Image
+                src="/illustrations/fatou.png"
+                alt="Photo d'une eleve Notria"
+                width={900}
+                height={1200}
+                className="h-auto w-full object-cover"
+                priority
+              />
+            </div>
+          </div>
+
+          <p className="text-center text-sm font-medium text-primary-foreground/90">
+            Fatou, eleve BEPC - \"Avec Prof Ada, je comprends enfin mes cours.\"
+          </p>
         </div>
 
         <p className="text-sm opacity-80">

@@ -19,8 +19,8 @@ export default function OnboardingStep2() {
   // Get available subjects based on student profile
   const subjects = student
     ? getSubjectsForStudent(
-        student.examType as "BEPC" | "BAC",
-        student.series ?? undefined
+        "BEPC",
+        undefined
       )
     : [];
 
