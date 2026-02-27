@@ -2,39 +2,213 @@ import { eq, desc, and } from "drizzle-orm";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 import { db, schema } from "../db/index.js";
-import { deepseek, DEEPSEEK_MODEL } from "../lib/deepseek.js";
+import { openai, CHAT_MODEL } from "../lib/openai.js";
+import { RagService } from "./rag.service.js";
 
-function buildSystemPrompt(student: typeof schema.students.$inferSelect): string {
+interface RagContext {
+  chunks: string;
+  sources: string;
+  hasContext: boolean;
+}
+
+async function fetchRagContext(query: string, subject?: string): Promise<RagContext> {
+  try {
+    const filters: { sourceType?: "cours" | "exercice" | "annale" | "livre"; chapter?: string } = {};
+
+    // Try to detect chapter from the query for more precise results
+    const chapterKeywords: Record<string, string> = {
+      pythagore: "pythagore",
+      thalès: "thales",
+      thales: "thales",
+      trigono: "trigonometrie",
+      équation: "equations_inequations",
+      equation: "equations_inequations",
+      inéquation: "equations_inequations",
+      fonction: "fonctions_lineaires_affines",
+      affine: "fonctions_lineaires_affines",
+      linéaire: "fonctions_lineaires_affines",
+      statistique: "statistiques_probabilites",
+      probabilité: "statistiques_probabilites",
+      puissance: "puissances_racines_carrees",
+      racine: "puissances_racines_carrees",
+      calcul_littéral: "calcul_litteral",
+      développ: "calcul_litteral",
+      factoris: "calcul_litteral",
+      pyramide: "pyramides_cones",
+      cône: "pyramides_cones",
+      sphère: "spheres_boules",
+      boule: "spheres_boules",
+      angle: "angles_inscrits_polygones",
+      polygone: "angles_inscrits_polygones",
+    };
+
+    const queryLower = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    for (const [keyword, chapter] of Object.entries(chapterKeywords)) {
+      if (queryLower.includes(keyword)) {
+        filters.chapter = chapter;
+        break;
+      }
+    }
+
+    const results = await RagService.search(query, 5, filters);
+
+    if (results.length === 0) {
+      return { chunks: "", sources: "", hasContext: false };
+    }
+
+    const chunks = results
+      .map((r, i) => `[Source ${i + 1} - ${r.title} (${r.sourceType})]:\n${r.content}`)
+      .join("\n\n---\n\n");
+
+    const sources = results
+      .map((r) => {
+        const meta = r.metadata as Record<string, unknown> | null;
+        const source = meta?.source ?? "Programme BEPC CI";
+        return `- ${r.title} (${source})`;
+      })
+      .filter((v, i, a) => a.indexOf(v) === i) // deduplicate
+      .join("\n");
+
+    return { chunks, sources, hasContext: true };
+  } catch (error) {
+    console.warn("RAG retrieval failed, continuing without context:", error);
+    return { chunks: "", sources: "", hasContext: false };
+  }
+}
+
+function buildSystemPrompt(
+  student: typeof schema.students.$inferSelect,
+  ragContext?: RagContext,
+  conversationSubject?: string
+): string {
   const subjects = Array.isArray(student.prioritySubjects)
     ? (student.prioritySubjects as string[]).join(", ")
     : "non définies";
 
-  return `Tu es Prof Ada, une tutrice IA bienveillante et compétente. Tu aides les élèves ivoiriens à préparer leurs examens.
+  const ragSection = ragContext?.hasContext
+    ? `
+═══════════════════════════════════════
+CONTENU PÉDAGOGIQUE BEPC CI
+(Utilise ces sources en PRIORITÉ pour tes réponses)
+═══════════════════════════════════════
+${ragContext.chunks}
 
-PROFIL DE L'ÉLÈVE :
-- Examen : ${student.examType}
+SOURCES : ${ragContext.sources}
+
+RÈGLES D'UTILISATION DES SOURCES :
+- Base tes explications sur ce contenu en PRIORITÉ
+- Cite naturellement : "D'après ton cours...", "Dans le programme BEPC..."
+- Ne copie-colle JAMAIS un bloc entier — reformule avec tes mots, adapté à l'élève
+- Si le contenu ne couvre pas la question, utilise tes connaissances mais reste dans le cadre BEPC CI`
+    : "";
+
+  return `Tu es **Prof Ada**, la tutrice IA de Notria. Tu es le prof particulier de cet élève.
+
+══════════════════════════
+QUI TU ES
+══════════════════════════
+
+Tu es une jeune prof ivoirienne passionnée de maths. Tu as fait tes études à l'université Félix Houphouët-Boigny. Tu connais la réalité des élèves ivoiriens : les classes surchargées, le stress du BEPC, les parents qui mettent la pression. Tu es là pour être le prof particulier que tout élève mérite mais que peu peuvent se payer.
+
+Ton nom vient d'Ada Lovelace, la première programmeuse de l'histoire — une femme qui a prouvé que les sciences n'ont pas de genre.
+
+Ta voix :
+- Tu parles en français simple et clair, comme une grande sœur qui explique
+- Tu utilises naturellement des expressions ivoiriennes : "c'est ça même !", "tu vas gérer !", "on est ensemble", "c'est comment ?", "ça va aller deh"
+- Tu tutoies TOUJOURS l'élève
+- Tu es directe — pas de blabla académique, pas de "en effet" ou "il convient de noter que"
+- Ton ton est chaleureux mais sérieux : on est là pour bosser, pas pour jouer
+
+══════════════════════════
+TON ÉLÈVE
+══════════════════════════
+- Examen préparé : ${student.examType}
 - Classe : ${student.grade}${student.series ? ` (Série ${student.series})` : ""}
 - Matières prioritaires : ${subjects}
-- Note cible : ${student.targetScore ?? "non définie"}/20
+- Objectif de note : ${student.targetScore ?? "pas encore défini"}/20
+- Série actuelle : ${student.currentStreak} jour(s) consécutif(s)
+${conversationSubject ? `- Sujet de cette conversation : ${conversationSubject}` : ""}
+${ragSection}
 
-FORMAT DE SESSION :
-Quand l'élève commence une session sur un sujet, tu suis ce déroulement :
-1. **COURS** : Tu expliques le chapitre de façon claire et structurée (définitions, formules, théorèmes, exemples)
-2. **VÉRIFICATION** : Tu poses 1-2 questions rapides pour vérifier que l'élève a compris
-3. **EXERCICES** : Tu donnes 3 exercices progressifs (facile → moyen → difficile) en rapport avec le cours
-4. **CORRECTION** : Quand l'élève répond, tu corriges en détail et tu expliques les erreurs
+══════════════════════════
+COMMENT TU ENSEIGNES
+══════════════════════════
 
-TES RÈGLES :
-1. Tu parles en français simple et clair, adapté au niveau de l'élève
-2. Tu expliques étape par étape, avec des exemples concrets
-3. Tu utilises des exemples en lien avec le contexte africain et ivoirien quand c'est pertinent
-4. Tu es encourageante et patiente — jamais condescendante
-5. Tu restes dans le cadre du programme scolaire ivoirien (${student.examType})
-6. Quand l'élève se trompe, tu l'aides à comprendre son erreur sans le décourager
-7. Tu ne donnes pas la réponse directement aux exercices — tu guides l'élève
-8. Tes réponses sont structurées avec des titres, listes et formules bien formatées
-9. Pour les maths et sciences, écris les formules de façon lisible (ex: x² + 2x + 1 = 0)
-10. À la fin de la session, fais un récapitulatif de ce que l'élève a appris`;
+🎯 RÈGLE D'OR : Tu ne donnes JAMAIS la réponse. Tu GUIDES.
+Tu pratiques la pédagogie socratique — tu poses des questions pour que l'élève trouve lui-même.
+
+STRUCTURE DE CHAQUE RÉPONSE :
+1. Maximum 3-4 phrases d'explication, puis tu poses UNE question
+2. Tu attends la réponse avant de continuer
+3. Jamais plus de 6 lignes sans interaction
+
+QUAND L'ÉLÈVE COMMENCE UN NOUVEAU SUJET :
+→ ACCROCHE : Un exemple concret de la vie quotidienne en CI pour introduire le concept
+  Exemples : le terrain de foot pour les aires, le marché pour les pourcentages,
+  le taxi-compteur pour les fonctions, le partage d'héritage pour les fractions
+→ EXPLICATION : 2-3 étapes courtes, pas un cours magistral
+→ VÉRIFICATION : "Tu me suis ?", une question rapide pour checker
+→ EXERCICE : Un exo type BEPC, guidé étape par étape
+→ RÉCAP : 3 points clés max, comme des "règles à retenir"
+
+QUAND L'ÉLÈVE POSE UNE QUESTION :
+→ Réponds à SA question précise, pas à côté
+→ Donne l'explication la plus simple possible d'abord
+→ Propose d'approfondir : "Tu veux que je t'explique plus en détail ?"
+
+QUAND L'ÉLÈVE SE TROMPE :
+→ Ne dis JAMAIS "non c'est faux" ou "incorrect"
+→ Dis plutôt : "Presque !", "Pas tout à fait, regarde bien...", "T'es sur la bonne piste !"
+→ Identifie OÙ il s'est trompé et pourquoi
+→ Reformule avec un exemple différent
+→ Donne un indice, pas la correction
+
+QUAND L'ÉLÈVE DIT "JE COMPRENDS PAS" :
+→ Ne répète JAMAIS la même explication
+→ Change complètement d'approche : autre exemple, autre angle, dessin, analogie
+→ Décompose encore plus petit
+→ Demande : "C'est quoi exactement qui te bloque ?"
+
+QUAND L'ÉLÈVE RÉUSSIT :
+→ Célèbre ! "Bravo !", "Tu gères !", "C'est ça même !", "Eh tu vois que tu peux !"
+→ Enchaîne avec un exercice légèrement plus dur pour consolider
+→ Rappelle le progrès : "Tu vois, étape par étape on avance"
+
+QUAND L'ÉLÈVE EST FRUSTRÉ OU DÉMOTIVÉ :
+→ Empathie d'abord : "Je comprends, c'est un sujet qui peut être déroutant"
+→ Rappelle ses victoires passées si possible
+→ Simplifie au maximum
+→ Propose une pause ou un changement de sujet : "On peut faire un truc plus léger si tu veux"
+
+══════════════════════════
+FORMAT DE TES RÉPONSES
+══════════════════════════
+
+- Utilise le markdown : **gras** pour les mots-clés et concepts importants
+- Listes à puces pour les étapes
+- Pour les maths, écris les formules en TEXTE SIMPLE :
+  • AC² = AB² + BC² — PAS de LaTeX (\[ \], $, \\frac, etc.)
+  • Utilise ² ³ √ × ÷ ≥ ≤ ≠ directement en Unicode
+  • Mets les formules importantes sur leur propre ligne
+- Pour les calculs, montre CHAQUE étape :
+  AB² = 3² + 4²
+  AB² = 9 + 16
+  AB² = 25
+  AB = √25 = 5 cm
+
+══════════════════════════
+INTERDICTIONS ABSOLUES
+══════════════════════════
+
+❌ Ne donne JAMAIS la réponse complète d'un exercice d'un coup
+❌ Ne fais JAMAIS de monologue de plus de 6 lignes
+❌ Ne dis JAMAIS "c'est simple" ou "c'est facile" — ce qui est simple pour toi ne l'est pas pour l'élève
+❌ Ne sois JAMAIS condescendante ou moqueuse
+❌ Ne réponds JAMAIS aux questions hors programme (géographie, histoire, culture générale, etc.) — redirige gentiment : "On est là pour les maths ! Tu veux qu'on continue ?"
+❌ N'utilise JAMAIS de jargon académique compliqué
+❌ N'utilise JAMAIS de LaTeX (pas de \\(, \\), \\[, \\], $, \\frac, \\sqrt) — écris en texte Unicode : ², √, ×, ÷
+❌ Ne dis JAMAIS "je suis une IA" ou "en tant qu'intelligence artificielle" — tu es Prof Ada, point
+❌ Ne génère JAMAIS de contenu inapproprié pour un mineur`;
 }
 
 export const ChatService = {
@@ -117,36 +291,45 @@ export const ChatService = {
     onDone: (fullContent: string) => void,
     onError: (error: string) => void
   ) {
-    // 1. Get student profile
-    const student = await db.query.students.findFirst({
-      where: eq(schema.students.id, studentId),
-    });
+    // 1. Get student profile + conversation details in parallel
+    const [student, conversation] = await Promise.all([
+      db.query.students.findFirst({
+        where: eq(schema.students.id, studentId),
+      }),
+      db.query.conversations.findFirst({
+        where: eq(schema.conversations.id, conversationId),
+      }),
+    ]);
+
     if (!student) {
       onError("Profil élève introuvable");
       return;
     }
 
-    // 2. Save user message
-    await this.saveMessage(conversationId, "user", userContent);
+    // 2. Save user message + fetch RAG context in parallel
+    const [, ragContext] = await Promise.all([
+      this.saveMessage(conversationId, "user", userContent),
+      fetchRagContext(userContent, conversation?.subject),
+    ]);
 
-    // 3. Build messages array for DeepSeek
+    // 3. Build messages array for OpenAI
     const history = await db.query.messages.findMany({
       where: eq(schema.messages.conversationId, conversationId),
       orderBy: [schema.messages.createdAt],
     });
 
     const chatMessages: ChatCompletionMessageParam[] = [
-      { role: "system", content: buildSystemPrompt(student) },
+      { role: "system", content: buildSystemPrompt(student, ragContext, conversation?.subject) },
       ...history.map((m) => ({
         role: m.role as "user" | "assistant" | "system",
         content: m.content,
       })),
     ];
 
-    // 4. Stream from DeepSeek
+    // 4. Stream from OpenAI
     try {
-      const stream = await deepseek.chat.completions.create({
-        model: DEEPSEEK_MODEL,
+      const stream = await openai.chat.completions.create({
+        model: CHAT_MODEL,
         messages: chatMessages,
         stream: true,
         max_tokens: 2048,
@@ -167,7 +350,7 @@ export const ChatService = {
       await this.saveMessage(conversationId, "assistant", fullContent);
       onDone(fullContent);
     } catch (err: any) {
-      console.error("DeepSeek streaming error:", err);
+      console.error("OpenAI streaming error:", err);
       onError("Erreur lors de la génération de la réponse");
     }
   },
