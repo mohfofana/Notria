@@ -1,0 +1,2080 @@
+{
+  "summary": {
+    "totalUrls": 258,
+    "downloaded": 93,
+    "skippedExisting": 165,
+    "failed": 0,
+    "downloadedBySourceType": {
+      "cours": 0,
+      "exercice": 48,
+      "annale": 28,
+      "livre": 17
+    }
+  },
+  "items": [
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc?start=20",
+      "title": "...",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/document_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc?start=45",
+      "title": "10",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/10_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc?start=5",
+      "title": "2",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/2_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc?start=10",
+      "title": "3",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/3_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc?start=15",
+      "title": "4",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/4_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc?start=25",
+      "title": "6",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/6_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc?start=30",
+      "title": "7",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/7_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc?start=35",
+      "title": "8",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/8_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc?start=40",
+      "title": "9",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/9_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc",
+      "title": "bepc",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/bepc_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc?start=105",
+      "title": "bepc",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/bepc_bepc.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc/epreuve-bepc-2021-mathematiques-zone-1-cote-d-ivoire?Itemid=",
+      "title": "EPREUVE BEPC 2021 MATHEMATIQUES Zone-1 COTE D'IVOIRE",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/epreuve_bepc_2021_mathematiques_zone_1_cote_d_ivoire_epreuve_bepc_2021_mathematiques_zone_1_cote_d_ivoire.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc/epreuve-bepc-2021-mathematiques-zone-2-cote-d-ivoire?Itemid=",
+      "title": "EPREUVE BEPC 2021 MATHEMATIQUES Zone-2 COTE D'IVOIRE",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/epreuve_bepc_2021_mathematiques_zone_2_cote_d_ivoire_epreuve_bepc_2021_mathematiques_zone_2_cote_d_ivoire.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc/epreuves-et-corriges-bepc-2021-cote-d-ivoire",
+      "title": "EPREUVES ET CORRIGES BEPC 2021 COTE D'IVOIRE",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/epreuves_et_corriges_bepc_2021_cote_d_ivoire_epreuves_et_corriges_bepc_2021_cote_d_ivoire.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/cote-d-ivoire/bepc#top",
+      "title": "Haut de page",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/haut_de_page_bepc.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/39710-epreuve-et-corrige-de-sciences-de-la-vie-et-de-la-terre-bepc-session-2025-zone-1/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/39714-compilation-complete-sujets-et-corriges-de-mathematiques-bepc-session-2025-zones-1-2-et-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/41851-mathematiques-bepc-blanc-interne-janvier-2026-groupe-scolaire-ayewa-drena-abidjan-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/39712-epreuve-et-corrige-de-sciences-de-la-vie-et-de-la-terre-bepc-session-2025-zone-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/42003-sujet-et-corrige-mathematiques-bepc-blanc-regional-drena-gagnoa-fevrier-2026-sujet-d-entrainement/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/39715-compilation-complete-sujets-et-corriges-d-orthographe-bepc-session-2025-zones-1-2-et-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/41390-sujet-bepc-blanc-interne-2025-mathematiques-cp-cevenol-cote-d-ivoire-decembre-2025/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/41948-mathematiques-examen-blanc-local-bepc-session-fevrier-2026-drena-san-pedro/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/39711-epreuve-et-corrige-de-sciences-de-la-vie-et-de-la-terre-bepc-session-2025-zone-2/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/39717-compilation-complete-sujets-et-corriges-de-sciences-de-la-vie-et-de-la-terre-bepc-session-2025-zones-1-2-et-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/42004-sujet-et-corrige-mathematiques-bepc-blanc-regional-drena-yamoussoukro-fevrier-2026-sujet-d-entrainement/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2023-maths-zone-1/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2023-mathematiques-zone-1/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2023-education-aux-droits-de-lhomme-et-a-la-citoyennete-zone-1/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/communication-ecrite-examen-blanc-interne-bepc-2026-avec-corrige-college-prive-nlm-entrainement-scolaire/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-blanc-2023-maths-regional/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-blanc-2023-maths-regional-de-guiglo/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-blanc-2023-maths-college-monajoce-yopougon/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-blanc-2023-composition-dorthographe-regional/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/pct-examen-blanc-interne-bepc-2026-avec-corrige-entrainement-scolaire-college-prive-nlm/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-bepc-2023-maths-zone-1/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-blanc-2022-pct-regional-de-korhogo/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-blanc-2022-mathematiques-regional-de-korhogo/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2018-zone1-orthographe/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2018-pc-zone-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2018-pc-zone-2/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2018-mathematiques-zone-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2018-mathematiques-zone-2/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2018-mathematiques-zone-1/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-dorthographe-bepc-2024-zone-1-rci/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-dorthographe-bepc-2024-zone-3-rci/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-de-mathematiques-bepc-2024-zone-3-rci/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-de-mathematiques-bepc-2024-zone-1-rci/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-de-mathematiques-bepc-2024-zone-2-rci/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/prepa-bepc-2024-sujet-mathematiques-troisieme-rci/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/evaluation-bepc-blanc-2024-orthographe-regional-bouafle/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/evaluation-bepc-blanc-2024-mathematiques-regional-ferkesseguedou/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-blanc-2024-mathematiques-regional-guiglo/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-blanc-2022-pct-regional-de-boundiali/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2021-mathematiques-zone-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2021-mathematiques-zone-2/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-et-corrige-bepc-2023-orthographe-zone-2/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-et-corrige-bepc-2023-maths-zone-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-et-corrige-bepc-2023-maths-zone-2/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-et-corrige-bepc-2023-maths-zone-1-2/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-et-corrige-bepc-2023-maths-zone-1/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-blanc-2022-education-musicale-regional-de-korhogo/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-blanc-2022-education-aux-droits-de-lhomme-et-la-citoyennete-regional-de-korhogo/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2022-mathematiques-zone-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2022-mathematiques-zone-2/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-bepc-2022-mathematiques-zone-1/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-ditalien-lv2-bepc-2024/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-detude-de-texte-du-bepc-2024/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-bepc-2024-dessin-dart/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-deducation-a-la-citoyennete-bepc-2024-session-de-juin/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-de-mathematiques-bepc-2024-session-de-juin/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-de-expression-ecrite-bepc-2024-session-de-juin/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/epreuve-bepc-2024-blanc-mathematiques/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-et-corrige-bepc-blanc-2023-maths-regional-zone-1-abidjan/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/sujet-et-corrige-bepc-blanc-2023-maths-regional-san-pedro/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5867-sujet-corrige-et-bareme-de-mathematique-bepc-2018-zone-1/file",
+      "title": "Télécharger ( 1.02 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_1_02_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5866-sujet-corrige-et-bareme-de-mathematique-bepc-2018-zone-2/file",
+      "title": "Télécharger ( 1.12 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_1_12_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/7934-tous-les-sujets-du-bepc-blanc-direction-regionale-boundiali-session-avril-2022/file",
+      "title": "Télécharger ( 1.34 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_1_34_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5507-sujet-corrige-et-bareme-de-mathematique-bepc-2017-zone-3/file",
+      "title": "Télécharger ( 1.48 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_1_48_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5509-sujet-corrige-et-bareme-de-mathematique-bepc-2017-zone-1/file",
+      "title": "Télécharger ( 1.91 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_1_91_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5087-sujet-corrige-et-bareme-de-mathematique-bepc-2016-zone-1/file",
+      "title": "Télécharger ( 10.66 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_10_66_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/3775-sujet-corrige-de-mathematique-bepc-2015-zone-2/file",
+      "title": "Télécharger ( 1022 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_1022_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5085-sujet-corrige-et-bareme-de-mathematique-bepc-2016-zone-3/file",
+      "title": "Télécharger ( 11.71 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_11_71_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/3903-sujet-de-mathematique-bepc-2015-zone-1/file",
+      "title": "Télécharger ( 118 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_118_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/3826-sujet-de-mathematique-bepc-2015-zone-3/file",
+      "title": "Télécharger ( 122 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_122_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5086-sujet-corrige-et-bareme-de-mathematique-bepc-2016-zone-2/file",
+      "title": "Télécharger ( 13.37 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_13_37_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/663-corrige-de-mathematique-bepc-2012-zone-1/file",
+      "title": "Télécharger ( 136 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_136_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/641-corrige-de-mathematique-bepc-2010-zone-1/file",
+      "title": "Télécharger ( 136 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_136_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/676-sujet-de-mathematique-bepc-2013-zone-1/file",
+      "title": "Télécharger ( 146 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_146_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/674-sujet-de-mathematique-bepc-2013-zone-3/file",
+      "title": "Télécharger ( 151 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_151_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/660-sujet-de-mathematique-bepc-2012-zone-3/file",
+      "title": "Télécharger ( 151 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_151_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/675-sujet-de-mathematique-bepc-2013-zone-2/file",
+      "title": "Télécharger ( 154 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_154_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/678-sujet-de-mathematique-bepc-2014-zone-2/file",
+      "title": "Télécharger ( 177 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_177_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/679-sujet-de-mathematique-bepc-2014-zone-1/file",
+      "title": "Télécharger ( 181 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_181_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/677-sujet-de-mathematique-bepc-2014-zone-3/file",
+      "title": "Télécharger ( 196 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_196_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5508-sujet-corrige-et-bareme-de-mathematique-bepc-2017-zone-2/file",
+      "title": "Télécharger ( 2.54 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_2_54_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/12014-devoir-3eme-trimestre-terminale-d/file",
+      "title": "Télécharger ( 2.55 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_2_55_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/664-sujet-de-mathematique-bepc-2012-zone-1/file",
+      "title": "Télécharger ( 202 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_202_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/642-sujet-de-mathematique-bepc-2010-zone-1/file",
+      "title": "Télécharger ( 202 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_202_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/659-corrige-de-mathematique-bepc-2012-zone-3/file",
+      "title": "Télécharger ( 209 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_209_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/8409-sujet-de-maths-bepc-2022-zone-2/file",
+      "title": "Télécharger ( 235 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_235_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/638-sujet-de-mathematique-bepc-2010-zone-3/file",
+      "title": "Télécharger ( 25 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_25_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/640-sujet-de-mathematique-bepc-2010-zone-2/file",
+      "title": "Télécharger ( 26 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_26_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/5889-compil-de-tous-les-sujets-de-bepc-2017-zone-1-2-3/file",
+      "title": "Télécharger ( 26.11 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_26_11_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/12015-compil-des-sujets-de-bepc-2023/file",
+      "title": "Télécharger ( 26.93 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_26_93_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/656-sujet-de-mathematique-bepc-2011-zone-2/file",
+      "title": "Télécharger ( 28 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_28_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/658-sujet-de-mathematique-bepc-2011-zone-1/file",
+      "title": "Télécharger ( 29 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_29_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/6210-sujet-de-mathematique-bepc-2021-zone-2/file",
+      "title": "Télécharger ( 299 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_299_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/7554-tous-les-sujets-du-bepc-blanc-regional-korhogo-session-fevrier-2022/file",
+      "title": "Télécharger ( 3.33 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_3_33_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/636-sujet-de-mathematique-bepc-2009-zone-1/file",
+      "title": "Télécharger ( 30 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_30_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/631-corrige-de-mathematique-bepc-2008-zone-2/file",
+      "title": "Télécharger ( 32 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_32_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/654-sujet-de-mathematique-bepc-2011-zone-3/file",
+      "title": "Télécharger ( 33 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_33_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/662-sujet-de-mathematique-bepc-2012-zone-2/file",
+      "title": "Télécharger ( 333 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_333_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/632-sujet-de-mathematique-bepc-2008-zone-2/file",
+      "title": "Télécharger ( 333 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_333_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/639-corrige-de-mathematique-bepc-2010-zone-2/file",
+      "title": "Télécharger ( 34 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_34_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/655-corrige-de-mathematique-bepc-2011-zone-2/file",
+      "title": "Télécharger ( 35 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_35_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/673-corrige-de-mathematique-bepc-2013-zone-3/file",
+      "title": "Télécharger ( 360 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_360_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/633-corrige-de-mathematique-bepc-2008-zone-1/file",
+      "title": "Télécharger ( 44 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_44_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/657-corrige-de-mathematique-bepc-2011-zone-1/file",
+      "title": "Télécharger ( 47 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_47_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/8408-proposition-de-correction-du-sujet-de-maths-bepc-2022-zone-1/file",
+      "title": "Télécharger ( 488 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_488_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/635-corrige-de-mathematique-bepc-2009-zone-1/file",
+      "title": "Télécharger ( 52 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_52_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5953-sujet-corrige-de-mathematique-bepc-2020-zone-3/file",
+      "title": "Télécharger ( 550 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_550_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/653-corrige-de-mathematique-bepc-2011-zone-3/file",
+      "title": "Télécharger ( 56 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_56_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/10191-nouvelle-correction-et-bareme-up11-maths-3ieme-provincial-by-tehua-pdf/file",
+      "title": "Télécharger ( 561 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_561_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/634-sujet-de-mathematique-bepc-2008-zone-1/file",
+      "title": "Télécharger ( 58 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_58_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/26404-devoir-maths-et-pc-3eme-pmk-2021-2022-by-tehua/file",
+      "title": "Télécharger ( 6.30 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_6_30_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/7702-tous-les-sujets-du-bepc-blanc-direction-regionale-abidjan-4-session-2022/file",
+      "title": "Télécharger ( 6.87 MB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_6_87_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/637-corrige-de-mathematique-bepc-2010-zone-3/file",
+      "title": "Télécharger ( 62 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_62_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/11912-bepc-blanc-2023-bondoukou-ci-pdf/file",
+      "title": "Télécharger ( 623 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_623_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/10118-maths-3ieme-essai-provincial-by-tehua-pdf/file",
+      "title": "Télécharger ( 640 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_640_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/6091-sujet-de-mathematique-bepc-2020-zone-1/file",
+      "title": "Télécharger ( 645 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_645_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/8519-sujet-corr-maths-bepc-2022-zone-1-2-et-3-by-m-tehua-1/file",
+      "title": "Télécharger ( 675 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_675_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/4921-compil-des-corriges-des-sujets-de-maths-du-bepc-de-2002-a-2006/file",
+      "title": "Télécharger ( 907 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_907_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/661-corrige-de-mathematique-bepc-2012-zone-2/file",
+      "title": "Télécharger ( 91 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_91_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/8410-sujet-de-maths-bepc-2022-zone-3/file",
+      "title": "Télécharger ( 920 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_920_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5952-sujet-de-mathematique-bepc-2020-zone-2/file",
+      "title": "Télécharger ( 93 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_93_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/bepc/sujets-de-maths-3eme/anciens-sujets-de-mathematique-du-bepc/5865-sujet-corrige-et-bareme-de-mathematique-bepc-2018-zone-3/file",
+      "title": "Télécharger ( 956 KB )",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/t_l_charger_956_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/epreuve-bepc-2021-mathematiques-zone-1-cote-d-ivoire/viewdocument/2214?Itemid=",
+      "title": "Voir",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/voir_2214.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.banquedesepreuves.com/index.php/component/edocman/epreuve-bepc-2021-mathematiques-zone-2-cote-d-ivoire/viewdocument/2215?Itemid=",
+      "title": "Voir",
+      "sourceType": "annale",
+      "file": "data/pdfs/annales/voir_2215.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4741-theoreme-de-thales-et-sa-reciproque-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 1.05 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_1_05_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/26646-6-support-de-cours-maths-3ieme-lecon-12-equations-et-inequations-dans-rxr/file",
+      "title": "Télécharger ( 1.09 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_1_09_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/24124-bepc-2024-soro-maths-revision-by-tehua/file",
+      "title": "Télécharger ( 1.11 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_1_11_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/26647-7-support-de-cours-maths-3ieme-lecon-13-applications-affines/file",
+      "title": "Télécharger ( 1.25 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_1_25_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4727-spheres-et-boules-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 1.27 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_1_27_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/24102-recueil-de-maths-niveau-3ieme-by-tehua/file",
+      "title": "Télécharger ( 1.60 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_1_60_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/14193-cours-de-maths-3e-simple-num-2020-2021-md/file",
+      "title": "Télécharger ( 1.70 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_1_70_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/19608-cours-maths-applications-affines-3e-by-tehua/file",
+      "title": "Télécharger ( 1.71 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_1_71_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4740-systemes-d-equations-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 106 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_106_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4728-statistiques-cours-maths-niveau-3eme/file",
+      "title": "Télécharger ( 107 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_107_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4731-puissances-cours-maths-niveau-3eme/file",
+      "title": "Télécharger ( 110 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_110_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4730-racine-carree-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 117 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_117_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4737-calcul-litteral-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 138 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_138_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4736-equations-inequations-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 145 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_145_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4732-probabilite-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 149 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_149_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4733-nombres-entiers-et-rationnels-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 166 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_166_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/3072-formulaire-de-mathematiques-niveau-3eme-2nd/file",
+      "title": "Télécharger ( 174 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_174_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/297-unites-de-mesures/file",
+      "title": "Télécharger ( 188 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_188_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/26648-8-support-de-cours-maths-3ieme-lecon-14-pyramides-et-cones/file",
+      "title": "Télécharger ( 2.05 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_2_05_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/24100-collection-la-solution-maths-burkina-niveau-3ieme-by-tehua/file",
+      "title": "Télécharger ( 2.29 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_2_29_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/9032-cours-complet-maths-3e-apc-by-tehua-pdf/file",
+      "title": "Télécharger ( 2.99 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_2_99_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4739-trigonometrie-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 201 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_201_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/22810-cours-de-maths-3ieme-lecon-1-calcul-litteral-by-tehua/file",
+      "title": "Télécharger ( 227 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_227_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4208-comment-demontrer-qu-un-triangle-est-rectangle/file",
+      "title": "Télécharger ( 254 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_254_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4735-fonctions-lineaires-et-fonctions-affines-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 264 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_264_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/24101-cours-de-maths-niveau-3ieme-by-tehua/file",
+      "title": "Télécharger ( 3.39 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_3_39_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/16639-support-de-cours-pyramide-et-cone-3ieme-by-tehua/file",
+      "title": "Télécharger ( 351 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_351_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/18115-cours-de-maths-3eme-mc-by-tehua/file",
+      "title": "Télécharger ( 4.16 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_4_16_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/20855-support-de-cours-maths-3ieme-provincial-2024-2025-by-tehua/file",
+      "title": "Télécharger ( 4.34 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_4_34_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/27-fiche-de-maths-pour-preparer-le-bepc/file",
+      "title": "Télécharger ( 526 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_526_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/26642-2-support-de-cours-maths-3ieme-lecon-8-equations-et-inequations-dans-r/file",
+      "title": "Télécharger ( 529 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_529_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/19656-table-trigonometrique-byb-tehua/file",
+      "title": "Télécharger ( 56 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_56_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/26644-4-support-de-cours-maths-3ieme-lecon-10-equations-de-droites/file",
+      "title": "Télécharger ( 595 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_595_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/18472-cours-3ieme-et-exercices-babacar-diarra-by-tehua/file",
+      "title": "Télécharger ( 6.67 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_6_67_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4738-angles-inscrits-angles-au-centre-polygones-reguliers-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 643 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_643_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/26641-1-support-de-cours-maths-3ieme-lecon-7-vecteurs-edited-20260221-143051/file",
+      "title": "Télécharger ( 672 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_672_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/9167-cours-maths-3ieme-apc-ecole-online-by-tehua-pdf/file",
+      "title": "Télécharger ( 7.09 MB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_7_09_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4734-grandeurs-composees-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 70 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_70_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/19607-cours-maths-calcul-litteral-3e-by-tehua/file",
+      "title": "Télécharger ( 726 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_726_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/26643-3-support-de-cours-maths-3ieme-lecon-9-coordonnees-dun-vecteur/file",
+      "title": "Télécharger ( 749 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_749_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/26645-5-support-de-cours-maths-3ieme-lecon-11-statistique/file",
+      "title": "Télécharger ( 789 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_789_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/19606-cours-maths-equations-et-inequations-dans-r-3e-by-tehua/file",
+      "title": "Télécharger ( 840 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_840_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/6783-cours-de-maths-3eme-triangle-rectangle/file",
+      "title": "Télécharger ( 851 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_851_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/26-quelques-regles-de-divisibilite-maths-3eme/file",
+      "title": "Télécharger ( 86 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_86_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/4729-sections-de-solides-par-un-plan-cours-de-maths-3eme/file",
+      "title": "Télécharger ( 890 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_890_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/19610-cours-maths-trigonometrie-dans-le-triangle-rectangle-3e-by-tehua/file",
+      "title": "Télécharger ( 891 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_891_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/19609-cours-maths-thales-dans-le-triangle-3e-by-tehua/file",
+      "title": "Télécharger ( 895 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_895_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/cours/secondaire/3eme/maths/19605-cours-maths-equations-et-inequarions-dans-rxr-3e-by-tehua/file",
+      "title": "Télécharger ( 983 KB )",
+      "sourceType": "exercice",
+      "file": "data/pdfs/exercices/t_l_charger_983_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/25748-fascicule-pc-3ieme-2026-by-tehua/file",
+      "title": "Télécharger ( 1.09 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_09_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/22785-fascicule-de-maths-3ieme-le-pythagore-by-tehua/file",
+      "title": "Télécharger ( 1.10 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_10_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/23083-document-de-travaux-diriges-maths-3ieme-reussir-en-maths-fasomaths-by-tehua/file",
+      "title": "Télécharger ( 1.13 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_13_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/15612-doc-maths-3ieme-pytagore-by-tehua/file",
+      "title": "Télécharger ( 1.13 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_13_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/22628-livre-rappels-des-cours-exercices-et-epreuves-maths-3e-by-tehua/file",
+      "title": "Télécharger ( 1.21 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_21_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/21794-fascicule-de-pc-niveau-3ieme-2025-by-tehua/file",
+      "title": "Télécharger ( 1.27 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_27_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/21771-bepc-en-pratique-maths-collection-bepc-pratique-by-tehua/file",
+      "title": "Télécharger ( 1.45 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_45_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13687-support-de-cours-maths-3ieme-toutes-les-lecons-apc-cote-divoire/file",
+      "title": "Télécharger ( 1.48 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_48_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13726-collection-phare-habilete-maths-3ieme/file",
+      "title": "Télécharger ( 1.66 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_66_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13683-maths-3e-bepc-blanc-23-0mega/file",
+      "title": "Télécharger ( 1.81 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_81_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/25741-document-dappui-cours-de-maths-3ieme-by-tehua/file",
+      "title": "Télécharger ( 1.82 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_82_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/15611-doc-cours-maths-3ieme-by-tehua/file",
+      "title": "Télécharger ( 1.98 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1_98_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/14181-new-activity-maths-3e-acobries/file",
+      "title": "Télécharger ( 1007 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1007_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/16603-fascicule-3ieme-pc-by-tehua/file",
+      "title": "Télécharger ( 1015 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_1015_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/9728-super-nova-3ieme-by-tehua-pdf/file",
+      "title": "Télécharger ( 102.26 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_102_26_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13684-doc-maths-3eme/file",
+      "title": "Télécharger ( 11.78 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_11_78_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/22323-livre-mathematiques-classe-de-3ieme-pour-ceux-qui-veulent-comprendre-by-tehua/file",
+      "title": "Télécharger ( 17.06 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_17_06_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/22626-livre-maths-classe-de-3e-y-tehua/file",
+      "title": "Télécharger ( 17.08 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_17_08_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13682-fernand-nathan-3eme-maths-by-tehua/file",
+      "title": "Télécharger ( 17.59 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_17_59_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/22034-mathematiques-3e-collection-excellence-by-tehua-1/file",
+      "title": "Télécharger ( 18.06 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_18_06_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/23082-fascicule-dactivites-numeriques-maths-niveau-3ieme-by-tehua/file",
+      "title": "Télécharger ( 2 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_2_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20801-fascicule-pc-3eme-collection-mpc-family-by-tehua/file",
+      "title": "Télécharger ( 2.00 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_2_00_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/6603-maths-bepc/file",
+      "title": "Télécharger ( 2.05 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_2_05_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/11879-cours-informatiques-3eme-tres-bon-by-tehua-pdf/file",
+      "title": "Télécharger ( 2.26 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_2_26_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13678-edition-coly-fascicule-pc-3ieme/file",
+      "title": "Télécharger ( 2.37 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_2_37_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/9558-doc-20-sur-20-en-pc-3eme-by-tehua-pdf/file",
+      "title": "Télécharger ( 2.56 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_2_56_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/19189-adem-fascicule-maths-3e-by-tehua/file",
+      "title": "Télécharger ( 2.58 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_2_58_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13681-fascicule-mathematiques-3eme/file",
+      "title": "Télécharger ( 2.58 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_2_58_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20989-fascicule-de-pc-3ieme-le-bepc-en-poche-boussole-by-tehua/file",
+      "title": "Télécharger ( 2.66 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_2_66_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/8838-transmath-3e-livre-de-l-eleve-nouveau-programme-nouveau-brevet-by-joel-malaval/file",
+      "title": "Télécharger ( 20.62 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_20_62_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20802-fascicule-pc-3ieme-apc-by-tehua/file",
+      "title": "Télécharger ( 270 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_270_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/8999-document-de-maths-3e-gabon-pdf/file",
+      "title": "Télécharger ( 3.17 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_3_17_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13679-edition-coly-fascicule-pc-3ieme-tome-2/file",
+      "title": "Télécharger ( 3.20 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_3_20_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13677-edition-coly-fascicule-maths-3e/file",
+      "title": "Télécharger ( 3.35 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_3_35_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20991-livre-mathex-3eme-by-tehua/file",
+      "title": "Télécharger ( 3.57 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_3_57_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13676-collection-namo-maths-3eme/file",
+      "title": "Télécharger ( 30.97 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_30_97_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13673-antiflash-pc-3ieme-by-tehua/file",
+      "title": "Télécharger ( 36.38 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_36_38_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/12783-sujets-de-maths-befem-3ieme/file",
+      "title": "Télécharger ( 383 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_383_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20937-annale-pc-3ieme-burina-faso-by-tehua/file",
+      "title": "Télécharger ( 4.07 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_4_07_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20752-annales-pc-3ieme-bf-by-tehua/file",
+      "title": "Télécharger ( 4.07 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_4_07_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/18267-mathematiques-3eme-formation-en-ligne-by-tehua/file",
+      "title": "Télécharger ( 4.23 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_4_23_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20910-livre-syn-en-to-maths-3eme-togo-by-tehua/file",
+      "title": "Télécharger ( 4.27 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_4_27_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20803-fascicule-prepa-le-valideur-pc-3ieme-by-tehua/file",
+      "title": "Télécharger ( 4.32 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_4_32_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/11373-le-guide-de-bepc-maths-avec-corrige-by-tehua-pdf/file",
+      "title": "Télécharger ( 4.51 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_4_51_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/11154-support-de-cours-fin-dannee-maths-3ieme-pdf/file",
+      "title": "Télécharger ( 4.85 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_4_85_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20753-annales-maths-3ieme-bf-by-tehua/file",
+      "title": "Télécharger ( 4.89 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_4_89_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/12103-annales-maths-3e/file",
+      "title": "Télécharger ( 4.89 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_4_89_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20747-annales-bepc-maths-congo-by-tehua/file",
+      "title": "Télécharger ( 404 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_404_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/24847-fascicule-exos-maths-3ieme-by-tehua/file",
+      "title": "Télécharger ( 417 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_417_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/24349-fascicule-sujet-de-bfem-maths-niveau-3ieme-by-tehua/file",
+      "title": "Télécharger ( 417 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_417_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13672-anti-flash-maths-3ieme-by-tehua/file",
+      "title": "Télécharger ( 44.00 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_44_00_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/21651-repbepc-2025-toutes-les-matieres-by-tehua/file",
+      "title": "Télécharger ( 44.68 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_44_68_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20764-collection-namo-pc-3eme-niger-by-tehua/file",
+      "title": "Télécharger ( 44.91 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_44_91_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/19190-adem-fascicule-pc-3e-by-tehua/file",
+      "title": "Télécharger ( 5.21 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_5_21_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/22602-livre-travaux-diriges-maths-college-classe-3ieme-by-tehua/file",
+      "title": "Télécharger ( 5.22 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_5_22_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/11625-mathematiques-3e-factorisation-pdf/file",
+      "title": "Télécharger ( 540 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_540_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13675-collection-caiman-maths-3ieme/file",
+      "title": "Télécharger ( 59.43 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_59_43_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20990-fascicule-maths-3ieme-182-sujets-et-50-corriges-by-tehua/file",
+      "title": "Télécharger ( 6.05 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_6_05_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13632-3e-maths-fascicule-exos-babacar-diarra/file",
+      "title": "Télécharger ( 6.05 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_6_05_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20599-mathematiques-3ieme-collection-cargo-by-tehua/file",
+      "title": "Télécharger ( 64.64 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_64_64_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/22625-livre-maths-cargo-college-classe-3ieme-by-tehua/file",
+      "title": "Télécharger ( 64.66 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_64_66_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/13686-reussir-en-maths-3ieme-resume-de-cours-plus-exercices/file",
+      "title": "Télécharger ( 7.39 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_7_39_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/19223-fascicule-maths-3ieme-exercices-non-corriges-by-tehua/file",
+      "title": "Télécharger ( 713 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_713_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/6455-livre-de-mathematiques-collection-ciam-3e/file",
+      "title": "Télécharger ( 74.19 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_74_19_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/21795-fascicule-de-maths-3e-2012-2013-by-tehua/file",
+      "title": "Télécharger ( 834 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_834_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/18268-guide-etincelle-manuel-maths-3ieme-by-tehua/file",
+      "title": "Télécharger ( 9.45 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_9_45_mb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/22113-fascicule-pc-3eme-senegal-by-tehua/file",
+      "title": "Télécharger ( 9.63 MB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_9_63_mb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20936-annale-maths-les-autoroutes-du-brevet-2006-by-tehua/file",
+      "title": "Télécharger ( 919 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_919_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/20746-annales-les-autoroutes-du-brevet-maths-3eme-by-tehua/file",
+      "title": "Télécharger ( 919 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_919_kb.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/21796-fascicule-de-pc-3eme-beye-by-tehua/file",
+      "title": "Télécharger ( 975 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_975_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://www.fomesoutra.com/les-livres/livres-et-annales-de-la-troisieme/21793-fascicule-de-pc-3e-by-tehua/file",
+      "title": "Télécharger ( 980 KB )",
+      "sourceType": "livre",
+      "file": "data/pdfs/livres/t_l_charger_980_kb.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    }
+  ]
+}

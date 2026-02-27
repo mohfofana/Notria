@@ -9,3 +9,7 @@ dist/
 Thumbs.db
 .turbo/
 coverage/
+server/data/pdfs/
+server/data/extracted/
+__pycache__/
+*.pyc

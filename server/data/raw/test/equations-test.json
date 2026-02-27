@@ -1,0 +1,12 @@
+{
+  "sourceType": "cours",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": "equations_1er_degre",
+  "title": "equations du premier degre - test",
+  "content": "Une equation du premier degre est une egalite avec une inconnue de la forme ax + b = 0, avec a different de zero. Pour resoudre, on isole x en deplacant les termes: ax = -b puis x = -b/a. Exemple: 2x + 6 = 0 donne 2x = -6 puis x = -3. Quand il y a des fractions, on multiplie tous les membres par le denominateur commun pour simplifier. Dans les problemes du quotidien, on peut traduire une situation par une equation: par exemple partage de depenses, calcul de distance ou quantite vendue. Au BEPC, il faut aussi verifier la solution en remplacant x dans l'equation initiale.",
+  "metadata": {
+    "source": "test",
+    "pages": "3-4"
+  }
+}

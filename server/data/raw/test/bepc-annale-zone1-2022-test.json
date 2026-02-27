@@ -1,0 +1,14 @@
+{
+  "sourceType": "annale",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": null,
+  "title": "bepc 2022 zone 1 - test",
+  "content": "Exercice 1: On considere la fonction f definie par f(x) = 2x - 3. Calculer l'image de 4 et l'antecedent de 5. Exercice 2: Dans le triangle ABC rectangle en A, AB = 6 cm et AC = 8 cm. Calculer BC. Exercice 3: Une serie statistique donne les notes de 20 eleves. Determiner la moyenne et representer les effectifs sur un diagramme en batons. Exercice 4: Resoudre dans R l'equation 3x - 7 = 11 puis interpreter le resultat dans un probleme de partage. L'epreuve dure 2 heures et l'eleve doit rediger clairement les etapes de calcul.",
+  "metadata": {
+    "source": "BEPC Officiel",
+    "year": 2022,
+    "zone": "1"
+  }
+}
+

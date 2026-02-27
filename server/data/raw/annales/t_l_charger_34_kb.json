@@ -1,0 +1,15 @@
+{
+  "sourceType": "annale",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": null,
+  "title": "t l charger 34 kb",
+  "content": "CORRECTION MATHS BEPC 2010 ZONE 2\n\nEXERCICE 1\n\n1. E = ]-1 ; 2]\n\n2. AB = xB\n\nxA\n\nyA\n\nyA\n\n2- (-1)\n\n2 + 1\n\n3 Donc AB = 3\n\nEXERCICE 2\n\n1. Soit a le coefficient directeur de (AB)\n\na\n\na\n\nyA\n\nyB\n\nxB\n\nxA\n\nxA\n\nxA\n\n5 - 0\n\n0 - 4\n\n- 4\n\n- 4\n\n- 4\n\n- 4\n\n- 4\n\n;\n\n2. f est une fonction affine f\n\nf\n\n(x)\n\n(x)\n\nx\n\nx\n\nb\n\nb\n\nb\n\nDéterminons b\n\nA , f < >\n\n< >\n\n0\n\nx 4\n\nEXERCICE 3\n\n1.a. AB\n\nAB\n\nSA\n\nSA\n\nSA\n\nOA\n\nAB\n\nAC\n\nAC\n\nAC\n\nSO\n\n9\n\n25\n\n25\n\n25\n\n;\n\n;\n\n16\n\n9 + 16\n\nor\n\n, donc\n\nLe triangle ABC est rectangle en A d’après la réciproque de la propriété de Pythagore.\n\nb. ABC est un triangle rectangle en A.\n\nsin ABC\n\nsin ABC\n\nsin ABC\n\nAC\n\n;\n\n2.\n\n.0,8\n\n< >\n\nmes ABC\n\n0,799 < 0,8 < 0,809\n\n<\n\n<\n\n53°\n\n54°\n\nEXERCICE 4\n\n1.a. SO est la hauteur du cône.\n\nDonc (SO) (AB) et le triangle SOA est rectangle en O.\n\nD’après la propriété de Pythagore, on a :\n\n16\n\n9\n\n25 < >\n\n100 , donc\n\n%25\n\nb. Soit P le périmètre de la base. P = 2\n\nx OA = 2x3x3 = 18, donc P = 18 cm.\n\n2. Constructions du patron en dimension réelle avec SA = SB = 5 cm et le rayon du cercle est de 3 cm.\n\ndonc b = 5.\n\nPROBLEME\n\n1. BA = OB, or le point A appartient au cercle , donc OA = OB.\n\nFinalement BA = OB = OA et le triangle OBA est équilatéral.\n\n2. Le triangle AOB est équilatéral, donc mes AOB\n\nmes AEB\n\nmes AEB\n\nmes AEB\n\nmes AOB\n\nAEB\n\nAOB\n\n= 60°\n\nest un angle aigu inscrit dans le cercle qui intercepte le même arc que l’angle au centre\n\nAB\n\n,donc\n\n1\n\n1\n\n1\n\n1\n\n1\n\n1\n\n1\n\nx 60°\n\n30°\n\n30°\n\n;\n\n3. BO\n\nOI\n\nOC\n\net\n\nOn sait que BI = BO + OI, donc BI\n\nBI\n\n;\n\n4. Les triangles BKI et BAC sont en situation de Thalès.\n\nD’après la propriété de Thalès, on a :\n\nBK\n\nBK\n\nBK\n\nBA\n\nBA\n\nBA\n\nBI\n\nAC\n\nAC\n\nAC\n\nBI\n\n, or\n\n, donc\n\net\n\n5.a. Le point A appartient au cercle, donc OC = OA.\n\nLe point C appartient au cercle, I est le milieu de [OC], et (IK) (AC) donc F est le milieu de [OA] car\n\n“ dans un triangle, si une droite passe par le milieu d’un côté et est parallèle au support du deuxième côté,\n\nalors elle passe par le milieu du troisième côté.”\n\nFinalement : FA = FO = OI =IC et donc FA = IC.\n\nb. Le quadrilatère AFIC est un trapèze car (AC) (IF) et comme AF = IC, alors AFIC est un trapèze isocèle.\n\n6. Le point A appartient au cercle de diamètre [BC], donc le triangle ABC est rectangle en A.\n\nsin ABC\n\nsin 60°\n\nsin 60°\n\n< >\n\n< >\n\nx\n\nx\n\n%3\n\n%3",
+  "metadata": {
+    "source": "fomesoutra",
+    "pdfFile": "t_l_charger_34_kb.pdf",
+    "year": 2010,
+    "zone": "2",
+    "hasCorrection": true
+  }
+}

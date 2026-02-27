@@ -6,6 +6,7 @@ import { Loader2, CalendarDays, Clock, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { api } from "@/lib/api";
+import { getNextOnboardingPath } from "@/lib/onboarding";
 
 const DAYS = [
   { value: 1, label: "Lun" },
@@ -30,7 +31,7 @@ const DURATION_OPTIONS = [
 ];
 
 export default function OnboardingStep4() {
-  const { refreshMe } = useAuth();
+  const { student, refreshMe } = useAuth();
   const router = useRouter();
 
   const [selectedDays, setSelectedDays] = useState<number[]>([]);
@@ -66,7 +67,8 @@ export default function OnboardingStep4() {
         durationMinutes: duration,
       });
       await refreshMe();
-      router.push("/dashboard");
+      const next = getNextOnboardingPath({ student, hasSchedule: true });
+      router.push(next);
     } catch (err: any) {
       setError(err?.response?.data?.error || "Une erreur est survenue");
     } finally {

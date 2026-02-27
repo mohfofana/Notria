@@ -1,0 +1,15 @@
+{
+  "sourceType": "annale",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": null,
+  "title": "t l charger 35 kb",
+  "content": "CORRECTION MATHS BEPC 2011 ZONE 2\n\n%\n\n%2\n\n%2\n\n1. Donnons un encadrement de 3a\n\n6 < 3a < 3\n\n1 < a < 2\n\n2. Justifions que 5 < b 3a < 3 +\n\nb 3a = b + ( 3a)\n\n%2\n\n1< b <\n\n3\n\n6 < 3a <\n\n8\n\nDonc 1 6 < b 3a < 3 +\n\nCe qui donne 5 < b 3a < 3 +\n\nEXERCICE 2\n\nRésolution graphique du système.\n\nTraçons les droites d’équations :\n\n2x y + 1 = 0\n\nx\n\nx\n\ny\n\ny\n\n0\n\n0\n\n1\n\n-1\n\n1\n\n3\n\n3\n\nx + y 3 = 0\n\n0\n\n1\n\n3\n\n4\n\n5\n\n6\n\n-1\n\n-2\n\n-3\n\n-4\n\n-5\n\n-6\n\n1\n\n3\n\n4\n\n5\n\n6\n\n-1\n\n-2\n\n-3\n\n-4\n\n-5\n\n-6\n\nS = (2 ; 5)\n\nEXERCICE 3\n\n1. La marchandise la plus vendue est les chaussures.\n\n2. Complétons le tableau :\n\nMarchandises\n\nQuantité en tonnes\n\nAngle\n\nChaussures\n\nBassines\n\nChaises\n\nSeaux\n\nTOTAL\n\n30000\n\n50000\n\n45000\n\n25000\n\n150000\n\n72°\n\n120°\n\n108°\n\n60°\n\n360°\n\n150000\n\n360\n\nx\n\nEXERCICE 4\n\n1. Démontrons que SH = 5%10\n\nLe triangle SBH est rectangle en H. D’après la propriété de Pythagore = +\n\nSB2\n\nBH\n\nSH\n\ndonc\n\n3 x 2 <\n\na <\n\n3x\n\n3x (-1)\n\nOn a :\n\nLe triangle BGF est rectangle en B. Donc SinBGF = BF\n\nFG\n\n%250\n\n%25 x 10\n\n%11\n\n%3\n\n%10\n\n(5 ) = + SH 275 = 25 + SH\n\n(10\n\nSH = 275 - 25 = 250\n\nDonc SH = = = 5\n\n2. Calculons l’aire latérale A.\n\n%\n\n%\n\n48\n\nA = = = = 100\n\nP x a\n\n4 x AB x SH\n\n%10\n\n%10\n\n%10\n\n4 x 10 x 5\n\nA = 100\n\ncm2\n\nPROBLEME\n\n1. A) Justifions que B appartient à (C).\n\n%\n\n%\n\n%\n\nyA\n\nyB\n\nxA\n\nxB\n\nAB = ( ) + ( ) = ( 2 2 ) + (0 0 ) = ( 4 )\n\n%16\n\nAB = = 4 donc B C (A; 4)\n\n,\n\nB) Le point B appartient au cercle de diamètre [FG] donc le triangle BFG est rectangle en B.\n\n%3\n\n2. Démontrons que BG = 4\n\nLe triangle BGF est rectangle en B, d’après la propriété de Pythagore,\n\nFG = +\n\nBF\n\nBG\n\nBG = FG + BF\n\n(FG = 2x AF = 8, BF = 4 )\n\nBG = 8 4 = 64 16 = 48\n\nDonc BG = = 16x3 = 4\n\n3. Démontrons que mesBGF = 30°\n\nSinBGF = =\n\n4\n\n8\n\n1\n\nDonc mesBGF = 30°\n\nDémontrons que le quadrilatère BFAE est un losange.\n\nUn quadrilatère qui a ses 4 côtés de même longueur est un losange.\n\nAE = AF = 4 rayon de (C)\n\nBE = BF = 4 rayon de (C’)\n\nAlors AE = AF = BE = BF = 4\n\nDonc le quadrilatère BEAF est un losange.\n\n5. Démontrons que le triangle EAG est équilatéral.\n\nAE = AG donc le triangle AEG est isocèle en A.\n\nVoyons s’il a un angle de 60°.\n\nLe triangle BGF est rectangle en B et mesBGF = 30° donc mesBFG = 60° car ces deux angles sont\n\ncomplémentaires.\n\nLe quadrilatère BEAF est un losange donc les droites (BE) et (FA) sont parallèles.\n\nEt les angles BFG et EAG sont deux angles correspondants formés par deux droites parallèles et une sécante.\n\nDonc mesEAG = mesBFA = 60°\n\nle triangle EAG est un triangle isocèle qui a un angle de 60°, donc c’est un triangle équilatéral.",
+  "metadata": {
+    "source": "fomesoutra",
+    "pdfFile": "t_l_charger_35_kb.pdf",
+    "year": 2011,
+    "zone": "2",
+    "hasCorrection": true
+  }
+}

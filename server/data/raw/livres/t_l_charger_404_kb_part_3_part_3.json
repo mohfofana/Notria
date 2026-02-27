@@ -1,0 +1,15 @@
+{
+  "sourceType": "livre",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": null,
+  "title": "t l charger 404 kb - part 3",
+  "content": "BD alors AH = BD. Or BD = AC (car les diagonales d’un rectangle\n\nsont de même longueur). Donc AH = AC\n\n(2) De plus, ACMH est un parallélogramme\n\nEn eﬀet, comme −−→\n\nAH = −−→\n\nBD et −−→\n\nBD = −−→\n\nCM, alors −−→\n\nAH = −−→\n\nCM. De cette dernière égalité, on en déduit\n\nque le quadrilatère AHMC (qui est le même que le quadrilatère ACMH) est un parallélogramme.\n\nD’après (1) et (2), ACMH est un parallélogramme qui a deux côtés consécutifs de même longueur :\n\nc’est donc un losange.\n\nH\n\nN\n\nM\n\nP\n\nNP 2 = 52\n\n= 25\n\nMN 2 + MP 2 = 42 + 32\n\n= 16 + 9\n\n= 25\n\npage 57\n\nCorrigé brevet 2020\n\nJ’en déduis que NP 2 = MN 2 + MP 2\n\nD’après la réciproque du théorème de Pythagore, le triangle MNP est rectangle en M.\n\n3 Calcul de NH\n\n- Dans le triangle MNP rectangle en M, cos(÷\n\nMNP) = MN\n\nNP = 4\n\n5.\n\n- Dans le triangle MNH rectangle en H, cos(÷\n\nMNH) = NH\n\nMN = NH\n\n4 .\n\nOr ÷\n\nMNP = ÷\n\nMNH. On en déduit que 4\n\n5 = NH\n\n4 .\n\nD’où NH = 4 × 4\n\n= 3, 2 cm.\n\nCalcul de MH\n\nDans le triangle MNH rectangle en H, j’applique le théorème de Pythagore.\n\nMN 2 = MH2 + NH2\n\n42 = MH2 + 3, 22\n\nOn en déduit que MH2 = 42 −3, 22 = 5, 76\n\nD’où MH = √5, 76 = 2, 4 cm.\n\npage 58",
+  "metadata": {
+    "source": "fomesoutra",
+    "pdfFile": "t_l_charger_404_kb.pdf",
+    "year": 2021,
+    "zone": null,
+    "hasCorrection": true
+  }
+}

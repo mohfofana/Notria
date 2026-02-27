@@ -44,7 +44,7 @@ export default function OnboardingStep3() {
         dailyTime,
       });
       await refreshMe();
-      router.push("/onboarding/step-4");
+      router.push("/assessment/start");
     } catch (err: any) {
       setError(err?.response?.data?.error || "Une erreur est survenue");
     } finally {

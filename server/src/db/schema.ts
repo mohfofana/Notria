@@ -1,4 +1,30 @@
-import { pgTable, serial, text, integer, timestamp, boolean, decimal, jsonb, varchar } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import {
+  pgTable,
+  serial,
+  text,
+  integer,
+  timestamp,
+  boolean,
+  decimal,
+  jsonb,
+  varchar,
+  index,
+  uniqueIndex,
+  customType,
+} from "drizzle-orm/pg-core";
+
+const vector = customType<{ data: number[]; driverData: string }>({
+  dataType() {
+    return "vector(1536)";
+  },
+  toDriver(value: number[]) {
+    return `[${value.join(",")}]`;
+  },
+  fromDriver(value: string) {
+    return value.slice(1, -1).split(",").map(Number);
+  },
+});
 
 // Users table
 export const users = pgTable("users", {
@@ -144,6 +170,23 @@ export const subscriptions = pgTable("subscriptions", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Assessment questions
+export const assessmentQuestions = pgTable("assessment_questions", {
+  id: serial("id").primaryKey(),
+  subject: varchar("subject", { length: 100 }).notNull(),
+  examType: varchar("exam_type", { enum: ["BEPC", "BAC"] }).notNull(),
+  series: varchar("series", { enum: ["A1", "A2", "C", "D"] }), // null for BEPC
+  difficulty: varchar("difficulty", { enum: ["facile", "moyen", "difficile"] }).notNull(),
+  question: text("question").notNull(),
+  options: jsonb("options").notNull(), // Array of possible answers
+  correctAnswer: integer("correct_answer").notNull(), // Index of correct option (0-based)
+  explanation: text("explanation"),
+  tags: jsonb("tags"), // Array of topic tags
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Level assessments
 export const levelAssessments = pgTable("level_assessments", {
   id: serial("id").primaryKey(),
@@ -152,7 +195,7 @@ export const levelAssessments = pgTable("level_assessments", {
   questionsJson: jsonb("questions_json").notNull(),
   answersJson: jsonb("answers_json"),
   score: integer("score"),
-  level: varchar("level", { enum: ["debutant", "intermediaire", "avance"] }),
+  level: varchar("level", { enum: ["débutant", "intermédiaire", "avancé"] }),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -219,6 +262,40 @@ export const scheduledSessions = pgTable("scheduled_sessions", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// RAG content chunks with pgvector embeddings
+export const contentChunks = pgTable(
+  "content_chunks",
+  {
+    id: serial("id").primaryKey(),
+    sourceType: text("source_type").notNull(),
+    subject: text("subject").notNull(),
+    grade: text("grade").notNull(),
+    chapter: text("chapter"),
+    title: text("title").notNull(),
+    content: text("content").notNull(),
+    chunkIndex: integer("chunk_index").notNull(),
+    totalChunks: integer("total_chunks").notNull(),
+    embedding: vector("embedding").notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    embeddingIdx: index("content_chunks_embedding_idx").using(
+      "hnsw",
+      sql`${table.embedding} vector_cosine_ops`
+    ),
+    chapterIdx: index("content_chunks_chapter_idx").on(table.chapter),
+    sourceTypeIdx: index("content_chunks_source_type_idx").on(table.sourceType),
+    contentChunkUnique: uniqueIndex("content_chunks_doc_chunk_unique").on(
+      table.sourceType,
+      table.subject,
+      table.grade,
+      table.title,
+      table.chunkIndex
+    ),
+  })
+);
+
 // Types for TypeScript
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -250,5 +327,7 @@ export type StudyPlanWeek = typeof studyPlanWeeks.$inferSelect;
 export type NewStudyPlanWeek = typeof studyPlanWeeks.$inferInsert;
 export type Schedule = typeof schedules.$inferSelect;
 export type NewSchedule = typeof schedules.$inferInsert;
-export type ScheduledSession = typeof scheduledSessions.$inferSelect;
-export type NewScheduledSession = typeof scheduledSessions.$inferInsert;
+export type AssessmentQuestion = typeof assessmentQuestions.$inferSelect;
+export type NewAssessmentQuestion = typeof assessmentQuestions.$inferInsert;
+export type ContentChunk = typeof contentChunks.$inferSelect;
+export type NewContentChunk = typeof contentChunks.$inferInsert;

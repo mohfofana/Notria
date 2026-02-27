@@ -1,0 +1,15 @@
+{
+  "sourceType": "cours",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": "puissances_racines_carrees",
+  "title": "t l charger 70 kb",
+  "content": "http://www.maths-videos.com\n\n1\n\ngrandeurs composées\n\nI) Grandeur quotient :\n\nDéfinition : Lorsqu’on effectue le quotient de deux grandeurs, on obtient une grandeur\n\nquotient.\n\nEx :\n\n- la vitesse est le quotient de deux grandeurs (une longueur par une durée)\n\n- le prix au kilogramme d’un produit est le quotient du prix de l’article par sa masse\n\nII) Grandeur produit :\n\nDéfinition : Lorsqu’on effectue le produit de deux grandeurs, on obtient une grandeur\n\nproduit.\n\nEx : Soit un rectangle de longueur L et de largeur l\n\n- l’aire est le produit de deux grandeurs (deux longueurs)\n\nv = d\n\nt\n\nDistance (en m, en km)\n\nTemps (en s, en h)\n\nVitesse\n\n(en m/s, en km/h)\n\nPrix du produit au kilogramme = prix de l'article\n\nmasse de l'article\n\nen €\n\nen kg\n\nen €/kg\n\nA = L x l\n\nm\n\nm\n\nm²\n\nhttp://www.maths-videos.com\n\n2\n\nIII) Changement d’unités :\n\nSituation 1 :\n\nLa masse volumique d’un matériau est donnée par la formule ρ = m\n\nv où m est la masse\n\nen kg et v le volume en m3\n\nLa masse volumique de l’or est 19 300 kg/m3. Exprime cette masse volumique en g/cm3.\n\nSolution :\n\nOn convertit la masse m = 19 300 kg = 19 300 000 g\n\net le volume v = 1 m3 = 1 000 000 cm3\n\nd’où ρ = 19 300 000\n\n1 000 000 = 19,3 g/cm3\n\nSituation 2 :\n\nCalculer l’énergie électrique consommée E en kWh par un gaufrier de puissance\n\nP=700 W qui fonctionne pendant un temps t= 24 minutes.\n\nL’énergie électrique est la grandeur produit de formule : E = P x t\n\nSolution :\n\nP = 700 W = 0,7 kW t = 24 min = 24\n\n60 h = 0,4 h\n\nD’où E = 0,7 x 0,4 = 0,28 kWh",
+  "metadata": {
+    "source": "fomesoutra",
+    "pdfFile": "t_l_charger_70_kb.pdf",
+    "year": null,
+    "zone": null,
+    "hasCorrection": false
+  }
+}
