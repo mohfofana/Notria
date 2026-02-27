@@ -76,11 +76,21 @@ async function fetchRagContext(query: string, subject?: string): Promise<RagCont
   }
 }
 
+interface StudentContext {
+  student: typeof schema.students.$inferSelect;
+  firstName: string;
+  assessmentLevel?: string;
+  currentPhase?: string;
+  currentWeekTopic?: string;
+  currentWeekSubject?: string;
+}
+
 function buildSystemPrompt(
-  student: typeof schema.students.$inferSelect,
+  ctx: StudentContext,
   ragContext?: RagContext,
   conversationSubject?: string
 ): string {
+  const { student, firstName } = ctx;
   const subjects = Array.isArray(student.prioritySubjects)
     ? (student.prioritySubjects as string[]).join(", ")
     : "non définies";
@@ -122,12 +132,26 @@ Ta voix :
 ══════════════════════════
 TON ÉLÈVE
 ══════════════════════════
+- Prénom : ${firstName}
 - Examen préparé : ${student.examType}
 - Classe : ${student.grade}${student.series ? ` (Série ${student.series})` : ""}
+${student.school ? `- Établissement : ${student.school}` : ""}
 - Matières prioritaires : ${subjects}
 - Objectif de note : ${student.targetScore ?? "pas encore défini"}/20
+- Temps d'étude quotidien : ${student.dailyTime ?? "non défini"}
 - Série actuelle : ${student.currentStreak} jour(s) consécutif(s)
+${ctx.assessmentLevel ? `- Niveau évalué : ${ctx.assessmentLevel}` : ""}
+${ctx.currentPhase ? `- Phase du plan : ${ctx.currentPhase}` : ""}
+${ctx.currentWeekSubject && ctx.currentWeekTopic ? `- Cette semaine au programme : ${ctx.currentWeekSubject} — ${ctx.currentWeekTopic}` : ""}
 ${conversationSubject ? `- Sujet de cette conversation : ${conversationSubject}` : ""}
+
+ADAPTATION AU PROFIL :
+- Appelle l'élève par son prénom : "${firstName}"
+${student.dailyTime === "15min" ? "- L'élève a peu de temps : réponses TRÈS courtes, va à l'essentiel, 1 exercice max par session" : ""}
+${student.dailyTime === "1h" ? "- L'élève a du temps : tu peux approfondir, donner 2-3 exercices, faire des récaps détaillés" : ""}
+${ctx.assessmentLevel === "débutant" ? "- Niveau débutant : commence par les bases, vocabulaire simple, beaucoup d'exemples concrets" : ""}
+${ctx.assessmentLevel === "avancé" ? "- Niveau avancé : tu peux aller plus vite, proposer des exercices type BEPC difficiles" : ""}
+${ctx.currentPhase === "Révisions" ? "- Phase de révisions : focus sur les exercices type examen, les pièges classiques, les méthodes rapides" : ""}
 ${ragSection}
 
 ══════════════════════════
@@ -291,7 +315,7 @@ export const ChatService = {
     onDone: (fullContent: string) => void,
     onError: (error: string) => void
   ) {
-    // 1. Get student profile + conversation details in parallel
+    // 1. Get student profile, user, conversation in parallel
     const [student, conversation] = await Promise.all([
       db.query.students.findFirst({
         where: eq(schema.students.id, studentId),
@@ -306,11 +330,49 @@ export const ChatService = {
       return;
     }
 
-    // 2. Save user message + fetch RAG context in parallel
-    const [, ragContext] = await Promise.all([
+    // 2. Load enrichment data + save message + RAG in parallel
+    const [user, assessment, studyPlan, , ragContext] = await Promise.all([
+      db.query.users.findFirst({
+        where: eq(schema.users.id, student.userId),
+      }),
+      db.query.levelAssessments.findFirst({
+        where: and(
+          eq(schema.levelAssessments.studentId, studentId),
+          eq(schema.levelAssessments.subject, conversation?.subject ?? "")
+        ),
+      }),
+      db.query.studyPlans.findFirst({
+        where: eq(schema.studyPlans.studentId, studentId),
+      }),
       this.saveMessage(conversationId, "user", userContent),
       fetchRagContext(userContent, conversation?.subject),
     ]);
+
+    // Get current week from study plan
+    let currentWeek: typeof schema.studyPlanWeeks.$inferSelect | undefined;
+    if (studyPlan) {
+      currentWeek = await db.query.studyPlanWeeks.findFirst({
+        where: and(
+          eq(schema.studyPlanWeeks.studyPlanId, studyPlan.id),
+          eq(schema.studyPlanWeeks.weekNumber, studyPlan.currentWeek)
+        ),
+      }) ?? undefined;
+    }
+
+    // Build enriched student context
+    const phases = studyPlan?.phases as Array<{ name: string; startWeek: number; endWeek: number }> | null;
+    const currentPhase = phases?.find(
+      (p) => studyPlan && studyPlan.currentWeek >= p.startWeek && studyPlan.currentWeek <= p.endWeek
+    );
+
+    const studentCtx: StudentContext = {
+      student,
+      firstName: user?.firstName ?? "l'élève",
+      assessmentLevel: assessment?.level ?? undefined,
+      currentPhase: currentPhase?.name,
+      currentWeekTopic: currentWeek?.topic,
+      currentWeekSubject: currentWeek?.subject,
+    };
 
     // 3. Build messages array for OpenAI
     const history = await db.query.messages.findMany({
@@ -319,7 +381,7 @@ export const ChatService = {
     });
 
     const chatMessages: ChatCompletionMessageParam[] = [
-      { role: "system", content: buildSystemPrompt(student, ragContext, conversation?.subject) },
+      { role: "system", content: buildSystemPrompt(studentCtx, ragContext, conversation?.subject) },
       ...history.map((m) => ({
         role: m.role as "user" | "assistant" | "system",
         content: m.content,
