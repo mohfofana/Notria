@@ -2,15 +2,13 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
+import "./lib/load-env.js";
 
 import { authRouter } from "./routes/auth.routes.js";
 import { studentRouter } from "./routes/student.routes.js";
 import { studyPlanRouter } from "./routes/studyplan.routes.js";
 import { scheduleRouter } from "./routes/schedule.routes.js";
 import { chatRouter } from "./routes/chat.routes.js";
-
-dotenv.config({ path: "../.env" });
 
 const app = express();
 const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 3001);

@@ -7,9 +7,9 @@
     "dev:server": "pnpm --filter @notria/server dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "db:generate": "pnpm --filter @notria/server drizzle-kit generate",
-    "db:migrate": "pnpm --filter @notria/server drizzle-kit migrate",
-    "db:push": "pnpm --filter @notria/server drizzle-kit push",
-    "db:studio": "pnpm --filter @notria/server drizzle-kit studio"
+    "db:generate": "pnpm --filter @notria/server db:generate",
+    "db:migrate": "pnpm --filter @notria/server db:migrate",
+    "db:push": "pnpm --filter @notria/server db:push",
+    "db:studio": "pnpm --filter @notria/server db:studio"
   }
 }

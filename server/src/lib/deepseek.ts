@@ -1,7 +1,5 @@
 import OpenAI from "openai";
-import dotenv from "dotenv";
-
-dotenv.config({ path: "../.env" });
+import "./load-env.js";
 
 export const deepseek = new OpenAI({
   baseURL: "https://api.deepseek.com",

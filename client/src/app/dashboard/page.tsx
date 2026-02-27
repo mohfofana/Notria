@@ -11,6 +11,10 @@ import {
   MessageSquare,
   ChevronRight,
   Target,
+  Camera,
+  FileText,
+  Users,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
@@ -189,7 +193,7 @@ export default function DashboardPage() {
             )}
 
             {/* Quick actions */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <Link
                 href="/chat"
                 className="rounded-xl border bg-card p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
@@ -211,10 +215,52 @@ export default function DashboardPage() {
                 <div className="flex-1">
                   <p className="font-medium">Note cible : {student.targetScore}/20</p>
                   <p className="text-xs text-muted-foreground">
-                    {student.examType} {student.series ? `— Série ${student.series}` : ""}
+                    Parcours BEPC (3eme)
                   </p>
                 </div>
               </div>
+
+              <Link
+                href="/notria-vision"
+                className="rounded-xl border bg-card p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Camera className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium">Notria Vision</p>
+                  <p className="text-xs text-muted-foreground">Scanner et corriger un exercice</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+
+              <Link
+                href="/examens"
+                className="rounded-xl border bg-card p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <FileText className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium">BEPC Blanc</p>
+                  <p className="text-xs text-muted-foreground">Simulation et correction détaillée</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+
+              <Link
+                href="/paiement"
+                className="rounded-xl border bg-card p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <CreditCard className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium">Abonnements</p>
+                  <p className="text-xs text-muted-foreground">Gérer ton plan et paiements</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
             </div>
           </>
         ) : (
@@ -228,6 +274,12 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground max-w-md mx-auto">
                 Tu pourras bientôt suivre les progrès de ton enfant et recevoir des résumés IA.
               </p>
+              <Link href="/parent" className="inline-flex mt-4">
+                <Button variant="outline">
+                  <Users className="h-4 w-4 mr-2" />
+                  Voir la vue parent
+                </Button>
+              </Link>
             </div>
           </>
         )}

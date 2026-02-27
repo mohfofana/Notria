@@ -15,7 +15,7 @@ export function Footer() {
               <span className="font-bold text-white text-lg">Notria</span>
             </Link>
             <p className="text-slate-500 text-sm leading-relaxed">
-              Tutorat IA pour le BAC et BEPC en Côte d&apos;Ivoire.
+              Tutorat IA pour le BEPC en Côte d&apos;Ivoire.
             </p>
           </div>
 

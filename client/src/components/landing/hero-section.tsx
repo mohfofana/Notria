@@ -16,7 +16,7 @@ export function HeroSection() {
           <div className="space-y-8 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 rounded-full px-4 py-1.5 text-sm font-medium">
               <Sparkles className="w-4 h-4" />
-              Tutorat IA pour le BAC et BEPC
+              Tutorat IA pour le BEPC
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-[1.1] tracking-tight">
@@ -25,7 +25,7 @@ export function HeroSection() {
             </h1>
 
             <p className="text-lg sm:text-xl text-slate-600 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Prof Ada t&apos;explique, te corrige et te prépare au BAC.
+              Prof Ada t&apos;explique, te corrige et te prepare au BEPC.
               Comme un vrai prof particulier, mais 100% gratuit.
             </p>
 

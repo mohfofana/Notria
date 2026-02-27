@@ -8,9 +8,10 @@ interface ChatInputProps {
   onSend: (message: string) => void;
   disabled?: boolean;
   isStreaming?: boolean;
+  placeholder?: string;
 }
 
-export function ChatInput({ onSend, disabled, isStreaming }: ChatInputProps) {
+export function ChatInput({ onSend, disabled, isStreaming, placeholder }: ChatInputProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -44,7 +45,7 @@ export function ChatInput({ onSend, disabled, isStreaming }: ChatInputProps) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Écris ta question..."
+          placeholder={placeholder || "Écris ta question..."}
           disabled={disabled || isStreaming}
           rows={1}
           className="flex-1 resize-none rounded-xl border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50"

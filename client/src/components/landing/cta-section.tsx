@@ -7,7 +7,7 @@ export function CTASection() {
     <section className="py-20 sm:py-28 px-4 sm:px-6 bg-slate-900">
       <div className="max-w-3xl mx-auto text-center">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
-          Ton BAC, c&apos;est dans quelques mois.
+          Ton BEPC, c&apos;est dans quelques mois.
           <br />
           <span className="text-amber-400">Commence aujourd&apos;hui.</span>
         </h2>

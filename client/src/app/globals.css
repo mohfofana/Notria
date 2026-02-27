@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 40 33% 99%;
-    --foreground: 222 47% 11%;
+    --background: 195 40% 98%;
+    --foreground: 204 28% 14%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 204 28% 14%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 38 92% 50%;
+    --popover-foreground: 204 28% 14%;
+    --primary: 193 85% 33%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 40 20% 96%;
-    --muted-foreground: 220 9% 46%;
-    --accent: 220 14% 96%;
-    --accent-foreground: 222 47% 11%;
+    --secondary: 198 30% 94%;
+    --secondary-foreground: 204 28% 14%;
+    --muted: 192 35% 95%;
+    --muted-foreground: 203 14% 40%;
+    --accent: 36 95% 56%;
+    --accent-foreground: 18 42% 14%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 38 92% 50%;
-    --radius: 0.75rem;
+    --border: 197 24% 86%;
+    --input: 197 24% 86%;
+    --ring: 193 85% 33%;
+    --radius: 0.9rem;
   }
 }
 
@@ -33,9 +33,52 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body), sans-serif;
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(13, 148, 136, 0.12), transparent 40%),
+      radial-gradient(circle at 90% 0%, rgba(245, 158, 11, 0.15), transparent 38%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(242, 250, 250, 0.98));
   }
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), sans-serif;
+}
+
+@keyframes floatY {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-float-y {
+  animation: floatY 5s ease-in-out infinite;
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.55s ease-out both;
 }

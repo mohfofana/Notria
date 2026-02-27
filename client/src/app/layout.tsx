@@ -1,13 +1,23 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope, Space_Grotesk } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { ProfAdaGuide } from "@/components/prof-ada-guide";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-body",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
+});
 
 export const metadata: Metadata = {
-  title: "Notria - Tutorat IA pour le BAC/BEPC",
-  description: "Plateforme de tutorat IA pour les élèves ivoiriens préparant le BAC et le BEPC",
+  title: "Notria - IA educative BEPC",
+  description:
+    "Plateforme de tutorat IA contextualisee pour les eleves ivoiriens preparant le BEPC.",
 };
 
 export default function RootLayout({
@@ -17,9 +27,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={inter.className}>
+      <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
         <Providers>
           {children}
+          <ProfAdaGuide />
         </Providers>
       </body>
     </html>

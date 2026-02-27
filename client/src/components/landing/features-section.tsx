@@ -17,7 +17,7 @@ const features = [
   {
     icon: Brain,
     title: "Exercices adaptatifs",
-    description: "Des exercices conformes au programme BAC/BEPC ivoirien. La difficulté s'ajuste automatiquement à ton niveau.",
+    description: "Des exercices conformes au programme BEPC ivoirien. La difficulté s'ajuste automatiquement à ton niveau.",
     color: "bg-purple-50 text-purple-600",
   },
   {

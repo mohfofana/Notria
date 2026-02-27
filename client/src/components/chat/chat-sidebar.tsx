@@ -4,15 +4,37 @@ import { Plus, MessageSquare, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Conversation } from "@notria/shared";
 
+interface CourseStarter {
+  id: string;
+  subject: string;
+  topic: string;
+}
+
+function formatShortDate(isoDate: string): string {
+  const d = new Date(isoDate);
+  const months = ["jan", "fev", "mar", "avr", "mai", "jun", "jul", "aou", "sep", "oct", "nov", "dec"];
+  return `${d.getUTCDate()} ${months[d.getUTCMonth()]}`;
+}
+
 interface ChatSidebarProps {
   conversations: Conversation[];
   activeId: number | null;
   onSelect: (id: number) => void;
   onNew: () => void;
   onDelete: (id: number) => void;
+  starters?: CourseStarter[];
+  onStartCourse?: (starter: CourseStarter) => void;
 }
 
-export function ChatSidebar({ conversations, activeId, onSelect, onNew, onDelete }: ChatSidebarProps) {
+export function ChatSidebar({
+  conversations,
+  activeId,
+  onSelect,
+  onNew,
+  onDelete,
+  starters = [],
+  onStartCourse,
+}: ChatSidebarProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b">
@@ -23,6 +45,27 @@ export function ChatSidebar({ conversations, activeId, onSelect, onNew, onDelete
       </div>
 
       <div className="flex-1 overflow-y-auto">
+        {starters.length > 0 && (
+          <div className="p-3 border-b">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+              Cours rapides (demo)
+            </p>
+            <div className="space-y-2">
+              {starters.map((starter) => (
+                <button
+                  key={starter.id}
+                  type="button"
+                  onClick={() => onStartCourse?.(starter)}
+                  className="w-full rounded-lg border border-border px-3 py-2 text-left hover:border-primary/40 hover:bg-muted/30 transition-colors"
+                >
+                  <p className="text-xs font-medium">{starter.subject}</p>
+                  <p className="text-xs text-muted-foreground truncate">{starter.topic}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {conversations.length === 0 ? (
           <div className="p-4 text-center text-sm text-muted-foreground">
             Aucune conversation
@@ -30,33 +73,49 @@ export function ChatSidebar({ conversations, activeId, onSelect, onNew, onDelete
         ) : (
           <div className="py-2">
             {conversations.map((conv) => (
-              <button
+              <div
                 key={conv.id}
                 onClick={() => onSelect(conv.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onSelect(conv.id);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
                 className={`w-full flex items-center gap-3 px-4 py-3 text-left text-sm transition-colors group hover:bg-muted/50 ${
                   activeId === conv.id ? "bg-muted" : ""
                 }`}
               >
                 <MessageSquare className="h-4 w-4 text-muted-foreground shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{conv.title || conv.subject}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium truncate">{conv.title || conv.subject}</p>
+                    {conv.id < 0 && (
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                        Demo
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(conv.updatedAt).toLocaleDateString("fr-FR", {
-                      day: "numeric",
-                      month: "short",
-                    })}
+                    {formatShortDate(conv.updatedAt)}
                   </p>
                 </div>
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     onDelete(conv.id);
                   }}
-                  className="opacity-0 group-hover:opacity-100 p-1 hover:text-destructive transition-opacity"
+                  disabled={conv.id < 0}
+                  className={`p-1 hover:text-destructive transition-opacity ${
+                    conv.id < 0 ? "opacity-20 cursor-not-allowed" : "opacity-0 group-hover:opacity-100"
+                  }`}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
-              </button>
+              </div>
             ))}
           </div>
         )}

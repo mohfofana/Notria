@@ -4,14 +4,27 @@ import { useEffect, useRef } from "react";
 import { GraduationCap, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import type { Message } from "@notria/shared";
+import { CourseFlowSwiper } from "@/components/chat/course-flow-swiper";
 
 interface ChatMessagesProps {
   messages: Message[];
   streamingContent: string;
   isStreaming: boolean;
+  activeSubject?: string;
+  activeTopic?: string;
+  isCourseUnlocked?: boolean;
+  onUnlockCourse?: () => void;
 }
 
-export function ChatMessages({ messages, streamingContent, isStreaming }: ChatMessagesProps) {
+export function ChatMessages({
+  messages,
+  streamingContent,
+  isStreaming,
+  activeSubject,
+  activeTopic,
+  isCourseUnlocked,
+  onUnlockCourse,
+}: ChatMessagesProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,15 +38,28 @@ export function ChatMessages({ messages, streamingContent, isStreaming }: ChatMe
     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
       {visible.length === 0 && !isStreaming && (
         <div className="flex flex-col items-center justify-center h-full text-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <GraduationCap className="h-8 w-8 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold mb-1">Prof Ada est prête !</h2>
-            <p className="text-sm text-muted-foreground max-w-sm">
-              Pose ta question sur le cours, demande une explication ou un exercice.
-            </p>
-          </div>
+          {activeSubject ? (
+            <div className="w-full max-w-4xl text-left">
+              <CourseFlowSwiper
+                subject={activeSubject}
+                topic={activeTopic}
+                unlocked={Boolean(isCourseUnlocked)}
+                onUnlock={onUnlockCourse || (() => {})}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <GraduationCap className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold mb-1">Prof Ada est prête !</h2>
+                <p className="text-sm text-muted-foreground max-w-sm">
+                  Crée ou sélectionne une conversation pour démarrer ton cours.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       )}
 
