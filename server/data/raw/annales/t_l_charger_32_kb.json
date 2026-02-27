@@ -1,0 +1,15 @@
+{
+  "sourceType": "annale",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": null,
+  "title": "t l charger 32 kb",
+  "content": "CORRECTION MATHS BEPC 2008 ZONE 2\n\nEXERCICE 1\n\n1.\n\n5\n\n30\n\n25\n\n9\n\n34\n\n2.a. Donnons le programme de construction du segment [AB] de longueur %34 .\n\nOn construit un triangle rectangle qui a pour longueur de cotés 5 cm et 3 cm dont le segment [AB] est l’hypoténuse.\n\nb. Construisons le segment [AB].\n\nA\n\nC\n\nB\n\nEXERCICE 2\n\n1. Calculons SQ.\n\nConsidérons le triangle SHQ rectangle en H.\n\nD’après la propriété de Pythagore, on a : SQ\n\nSQ\n\nSQ\n\nHQ\n\nSH\n\n;\n\n900\n\n100\n\n1000\n\n1000\n\n10 x 3,2\n\n100x10\n\n2. Calculons l’aire latérale A de ce chapeau.\n\nB\n\nA\n\nA\n\n2 x HQ x xSQ\n\n2 x 10 x 3,1 x\n\n2 x 10 x 3,1 x\n\n1984\n\n992\n\n992\n\n;\n\ncm2\n\nEXERCICE 3\n\nEXERCICE 4\n\n1. A\n\n< >\n\n< >\n\n= (\n\n(\n\n(\n\n(\n\n(\n\n(\n\n)\n\n)\n\n)\n\n)\n\n)\n\n)\n\n9\n\n2.\n\n0\n\n0\n\n0\n\nou\n\nou\n\nR\n\nS\n\n;\n\nModalités\n\neffectifs\n\n3000\n\n5000\n\n7000\n\n10000\n\nTotal\n\n26\n\n1\n\n12\n\n11\n\n1. Tableau des effectifs\n\n2. Calculons la moyenne des recettes journalières de Anne.\n\nmoy\n\n3000 x 11 + 5000 x 12 + 7000 x 2 + 10000\n\n26\n\n26\n\n11700\n\n4500\n\nLa moyenne des recettes est 4500 francs.\n\nPROBLEME\n\n1. Le point M appartient au cercle de diamètre [BD] donc le triangle BDM est rectangle en M.\n\n2. Calculons BH.\n\nABC est un triangle isocèle en A et H est le pied de la hauteur issue de A, donc [AH] est la médiatrice de [BC].\n\nBH\n\nBH\n\nBC\n\nBH\n\nBM\n\nBM\n\nBM\n\nBD\n\nBD\n\nBM\n\nBM\n\nBM\n\nBM\n\nAB\n\nAB\n\nAB\n\nBH\n\nBH\n\nAH\n\nAH\n\n12\n\n6\n\n6\n\ndonc\n\n3.a. Justifions que AB = 10.\n\nConsidérons le triangle AHB rectangle en H.\n\nD’après la propriété de Pythagore, on a :\n\n6\n\n8\n\n36\n\n64\n\n100\n\ndonc\n\n%100\n\nb. Justifions que : cos ABC\n\ncos ABC\n\ncos ABC\n\ncos BMD\n\ncos BMD\n\ncos ABC\n\nAB\n\nBD\n\nBK\n\nBK\n\nBC\n\nBC\n\nBD\n\n6\n\n5\n\n5\n\n5\n\n5\n\n5\n\n5\n\nEn déduire que\n\n6 .\n\nConsidérons le triangle AHB rectangle en H.\n\n;\n\nCalculons BM.\n\nDans le triangle BMD rectangle en M on a :\n\n< >\n\n< >\n\nx 10\n\n30\n\n6\n\n6\n\n;\n\n4.\n\n0,6\n\n0,588 < 0,6 < 0,602\n\nmes ABC\n\nmes ABC\n\n<\n\n<\n\n53°\n\n53°\n\n54° donc\n\n5.a. Démontrons que les droites (CK) et (DM) sont parallèles.\n\nConsidérons le triangle BMD.\n\n,\n\n,\n\nK\n\n(MB)\n\n(BD)\n\net C\n\n6\n\n7,2\n\n12\n\n0,83\n\n0,83\n\net\n\ndonc\n\nD’après la réciproque de la propriété de Thalès (DM)\n\n(CK) .\n\nb. En déduisons que les droites (AB) et (CK) sont perpendiculaires.\n\nLa droite (BM) est perpendiculaire à la droite (AB). Or la droite (BM) est parallèle à la droite (CK). Donc la droite\n\n(AB) est perpendiculaire à la droite (CK).\n\n.",
+  "metadata": {
+    "source": "fomesoutra",
+    "pdfFile": "t_l_charger_32_kb.pdf",
+    "year": 2008,
+    "zone": "2",
+    "hasCorrection": true
+  }
+}

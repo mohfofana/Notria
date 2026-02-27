@@ -1,0 +1,15 @@
+{
+  "sourceType": "cours",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": null,
+  "title": "t l charger 106 kb",
+  "content": "http://www.maths-videos.com\n\n1\n\n« voici un système d’équations\n\nà deux inconnues : x et y !»\n\n« je substitue x à ce que\n\nje viens de trouver dans\n\nl’équation (1) !»\n\n« j’ ai trouvé y. Pour trouver x je\n\nchoisi l’égalité la plus simple ! !»\n\n«dans un couple, l’ordre des termes a de l’importance !\n\nLe premier sera x et le second y !!»\n\n«pour nous en 3ème, il n’y aura qu’une solution unique cette année !»\n\nsystèmes d’équations\n\nI) Systèmes de deux équations à 2 inconnues\n\nEx :\n\n\n\n\n\n 2x + 3y = –1\n\nx + 4y = 2\n\nSi x = –2 et y = 1\n\n• 2x + 3y = 2 x (–2) + 3 x 1 = – 4 + 3 = –1\n\n• x + 4y = −2 + 4 x 1 = 2\n\nLes deux égalités sont vérifiées. Le couple (−2 ;1) est une solution du système\n\nII) Résolution d’un système d’équations\n\nDéfinition : Résoudre un système d’équations c’est trouver toutes ses solutions, c’est\n\nà dire trouver tous les couples (x ; y) qui vérifient chacune des deux équations.\n\n1ère méthode : par substitution (par remplacement)\n\n\n\n\n\n 2x + 3y = –1\n\nx + 4y = 2\n\nD’après l’équation (2), x = 2 − 4y\n\nL’équation (1) peut alors s’écrire :\n\n2(2 − 4y) + 3y = −1\n\n4 −8y + 3y = −1\n\n−5y = −1 − 4 = −5\n\ny = −5\n\n−5 = 1\n\nD’après l’équation (2), on a :\n\nx = 2 − 4y = 2 – 4 x 1 = − 2\n\nLe couple (−2 ;1) est la solution du système\n\n(1)\n\n(2)\n\nhttp://www.maths-videos.com\n\n2\n\n« il s’agit de transformer\n\nles expressions pour\n\nfaire disparaître x ou y !»\n\n«je multiplie la 2ème\n\néquation par 2»\n\n«je soustrais les équations membre à\n\nmembre et je n’ai plus que des y !»\n\n2ème méthode : par combinaison\n\n\n\n\n\n 2x + 3y = –1\n\nx + 4y = 2\n\n\n\n\n\n2x + 3y = −1\n\n2x + 2 x 4y = 2 x 2\n\n\n\n\n\n2x + 3y = −1\n\n2x + 8y = 4\n\n2x + 3y – 2x – 8y = −1 −4\n\n−5y =−5 donc y = −5\n\n−5 = 1\n\nD’après l’équation (2), on a :\n\nx = 2 − 4y = 2 – 4 x 1 = − 2\n\nLe couple (−2 ;1) est la solution du système\n\nIII) Interprétation graphique\n\n\n\n 2x + 3y = –1\n\nx + 4y = 2\n\nle système peut s’écrire :\n\n\n\n\n\n\n\ny = –2\n\n3 x – 1\n\n3\n\ny= –1\n\n4 x + 1\n\n2\n\nTraçons dans un repère les droites d et d’ correspondantes\n\n(2)\n\n(1)\n\n(1)\n\n(2)\n\n(1) − (2)\n\nd : y = –2\n\n3 x − 1\n\n3\n\nd’ : y = –1\n\n4 x + 1\n\n2\n\n0\n\n1\n\n1\n\nA : (−2 ;1)\n\n«d est l’ensemble de tous les\n\npoints dont les coordonnées\n\nvérifient la première équation.\n\nd’ est l’ensemble de tous les\n\npoints dont les coordonnées\n\nvérifient la deuxième équation.\n\nLes coordonnées du point\n\nd’intersection vérifient les 2\n\néquations, donc le système !!!»\n\nd et d’ ont un seul point\n\ncommun.\n\nLe couple de coordonnées\n\nde ce point est la seule\n\nsolution du système.\n\n(-2 ;1) est la solution du\n\nsystème\n\n(1)\n\n(2)",
+  "metadata": {
+    "source": "fomesoutra",
+    "pdfFile": "t_l_charger_106_kb.pdf",
+    "year": null,
+    "zone": null,
+    "hasCorrection": false
+  }
+}

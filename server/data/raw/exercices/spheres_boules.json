@@ -1,0 +1,15 @@
+{
+  "sourceType": "exercice",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": "spheres_boules",
+  "title": "t l charger 1 27 mb",
+  "content": "http://www.maths-videos.com\n\n1\n\nsphères et boules\n\nI) Sphère et boule\n\ndéfinitions :\n\n. La sphère de centre O et de rayon R est formée de tous les points M de l’espace\n\ntels que OM = R\n\n. La boule de centre O et de rayon R est formée de tous les points M de l’espace tels\n\nque OM ≤ R\n\nII) Section d’une sphère par un plan\n\npropriété : La section d’une sphère par un plan est un cercle\n\n• la distance OK est appelée la distance de\n\nO au plan P\n\n• pour tout point M de la section, le triangle\n\nOKM est rectangle en K\n\n• le centre K du cercle C est le point\n\nd’intersection du plan P et de sa\n\nperpendiculaire passant par O\n\n« le cercle rouge, le cercle bleu, le cercle\n\nviolet ont le même centre et le même rayon\n\nque la sphère : on les appelle des grands\n\ncercles »\n\n« [AA’], [BB’], [CC’] sont des diamètres de\n\nla sphère. A et A’ sont diamétralement\n\nopposés.»\n\nA\n\nA'\n\nB\n\nB'\n\nC\n\nC'\n\nO\n\nP\n\nC\n\nK\n\nO\n\nM\n\nE\n\nhttp://www.maths-videos.com\n\n2\n\ncas particuliers :\n\nIII) Aire d’une sphère – Volume d’une boule\n\npropriétés :\n\nL’aire d’une sphère de rayon R est : A = 4πR²\n\nLe volume d’une boule de rayon R est : V = 4\n\n3πR3\n\nEx : R=4cm\n\nAire d’une sphère de rayon R :\n\nA = 4 x π x 4² = 4 x π x 16 = 64π cm² ⋍200,96 cm²\n\n200,96 cm²\n\n200,96 cm²\n\n200,96 cm²\n\nVolume d’une boule de rayon R:\n\nV = 4\n\n3 x π x 43 = 4 x π x 64\n\n3\n\n= 256\n\n3 π cm3 ⋍268,08\n\n268,08\n\n268,08\n\n268,08 cm3\n\n«si le plan de section passe par O alors la section est un grand cercle. »\n\n«K et O sont confondus. OK = 0»\n\nO\n\nK\n\nP\n\nP\n\nO\n\nK\n\n« le plan de section est tangent à la sphère alors la section est le point K. »\n\n«la distance OK est le rayon de la sphère»",
+  "metadata": {
+    "source": "fomesoutra",
+    "pdfFile": "t_l_charger_1_27_mb.pdf",
+    "year": null,
+    "zone": null,
+    "hasCorrection": false
+  }
+}

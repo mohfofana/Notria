@@ -51,9 +51,12 @@ interface IngestionSummary {
   chunksCreated: number;
   chunksInserted: number;
   chunksSkipped: number;
+  filesFailed: number;
 }
 
 const EMBEDDING_MODEL = "text-embedding-3-small";
+const EMBEDDING_MAX_TOKENS = 8192;
+const EMBEDDING_SAFE_TOKENS = 7000;
 const EMBEDDING_BATCH_SIZE = 20;
 const EMBEDDING_BATCH_PAUSE_MS = 200;
 const SIMILARITY_THRESHOLD = 0.7;
@@ -75,8 +78,9 @@ function getOpenAIClient(): OpenAI {
 }
 
 function estimateTokens(text: string): number {
-  const words = text.trim().split(/\s+/).filter(Boolean);
-  return words.length;
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  const charsApprox = Math.ceil(text.length / 4);
+  return Math.max(words, charsApprox);
 }
 
 function splitIntoSentences(paragraph: string): string[] {
@@ -201,12 +205,18 @@ async function ensureVectorExtension(): Promise<void> {
 
 async function createEmbeddings(input: string[]): Promise<number[][]> {
   const openai = getOpenAIClient();
+  const sanitizedInput = input.map((value) => {
+    const estimated = estimateTokens(value);
+    if (estimated <= EMBEDDING_SAFE_TOKENS) return value;
+    const safeChars = EMBEDDING_SAFE_TOKENS * 4;
+    return value.slice(0, safeChars);
+  });
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
     try {
       const response = await openai.embeddings.create({
         model: EMBEDDING_MODEL,
-        input,
+        input: sanitizedInput,
       });
       return response.data.map((item) => item.embedding);
     } catch (error: unknown) {
@@ -214,11 +224,18 @@ async function createEmbeddings(input: string[]): Promise<number[][]> {
         ? Number((error as { status?: number }).status)
         : undefined;
 
-      if (status !== 429 || attempt === 4) {
+      const message =
+        typeof error === "object" && error !== null && "message" in error
+          ? String((error as { message?: string }).message)
+          : "";
+      const contextTooLong =
+        status === 400 && message.includes(`maximum context length is ${EMBEDDING_MAX_TOKENS}`);
+
+      if ((status !== 429 && !contextTooLong) || attempt === 4) {
         throw error;
       }
 
-      const backoffMs = 500 * 2 ** attempt;
+      const backoffMs = contextTooLong ? 50 : 500 * 2 ** attempt;
       await sleep(backoffMs);
     }
   }
@@ -333,21 +350,29 @@ export const RagService = {
       chunksCreated: 0,
       chunksInserted: 0,
       chunksSkipped: 0,
+      filesFailed: 0,
     };
 
     for (const filePath of files) {
       const fileName = path.basename(filePath);
-      const { chunkCount, insertedCount, skippedCount } = await ingestSingleDocument(filePath);
+      try {
+        const { chunkCount, insertedCount, skippedCount } = await ingestSingleDocument(filePath);
 
-      summary.filesProcessed += 1;
-      summary.chunksCreated += chunkCount;
-      summary.chunksInserted += insertedCount;
-      summary.chunksSkipped += skippedCount;
+        summary.filesProcessed += 1;
+        summary.chunksCreated += chunkCount;
+        summary.chunksInserted += insertedCount;
+        summary.chunksSkipped += skippedCount;
 
-      console.log(`Ingesting ${fileName}... ${insertedCount} inserted, ${skippedCount} skipped`);
+        console.log(`Ingesting ${fileName}... ${insertedCount} inserted, ${skippedCount} skipped`);
+      } catch (error) {
+        summary.filesFailed += 1;
+        console.warn(`Skipping ${fileName} due to error:`, error);
+      }
     }
 
-    console.log(`Done. ${summary.chunksInserted} chunks inserted across ${summary.filesProcessed} files.`);
+    console.log(
+      `Done. ${summary.chunksInserted} chunks inserted across ${summary.filesProcessed} files, ${summary.filesFailed} failed files.`
+    );
     return summary;
   },
 

@@ -1,0 +1,15 @@
+{
+  "sourceType": "cours",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": null,
+  "title": "t l charger 86 kb",
+  "content": "Quelques règles de divisibilités\n\nChiffres\n\n0, 1, 2, 3, 4, 5, 6, 7, 8 et 9 sont des chiffres.\n\nNombres\n\nLes nombres sont formés de chiffres. Par exemple 12 est composé du chiffre 1 et du chiffre 2.\n\nRègle de divisibilité par 1\n\nTous les nombres sont divisibles par 1.\n\nRègle de divisibilité par 2\n\nUn nombre est divisible par 2, si le chiffre à la position des unités est PAIR. Donc, tous les nombres\n\nse terminant par 0, 2, 4, 6 et 8 sont divisibles par 2.\n\nRègle de divisibilité par 3\n\nUn nombre est divisible par 3 si la somme de ses chiffres est divisible par 3. Ex: 987 : 9+8+7=24. 24\n\nest divisible par 3, 24/3=8. Alors, 987 est un nombre divisible par 3.\n\nRègle de divisibilité par 4\n\nUn nombre est divisible par 4, si le nombre formé par ses deux derniers chiffres est divisible par 4.\n\nEx: 4532 : 32 est divisible par 4, 32/4=8. Alors 4532 est divisible par 4.\n\nRègle de divisibilité par 5\n\nUn nombre est divisible par 5 si le chiffre à la position des unités est 0 ou 5.\n\nRègle de divisibilité par 6\n\nUn nombre est divisible par 6, si le chiffre à la position des unités est PAIR et si le nombre est\n\ndivisible par 3. Ex: 234 : 234 est un nombre pair, 2+3+4=9 et 9 est divisible par 3. 234 est donc\n\ndivisible par 6.\n\nRègle de divisibilité par 8\n\nUn nombre est divisible par 8 si le nombre formé par ses trois derniers chiffres est divisible par 8. Ex:\n\n3264 : 264 est divisible par 8 donc, 3264 est divisible par 8.\n\nRègle de divisibilité par 9\n\nUn nombre est divisible par 9 si la somme de ses chiffres est divisible par 9. Ex: 523 278 :\n\n5+2+3+2+7+8=27. 27 est divisible par 9, soit 27/9=3 donc, 523 278 est divisible par 9.\n\nRègle de divisibilité par 10\n\nUn nombre est divisible par 10 si le chiffre à la position des unités est 0.\n\nNombres premiers\n\nUn nombre premier a seulement deux facteurs, 1 et lui-même. Ex: 3 est un nombre premier, car ses\n\nfacteurs sont 1 et 3.\n\n2, 3, 5, 7, 11, 13, 17, 19, 23, 29, etc. sont des nombres premiers.\n\nNombres composés\n\nUn nombre composé a plus de deux facteurs. Ex: 6 est un nombre composé, car ses facteurs sont 1,\n\n2, 3 et 6.",
+  "metadata": {
+    "source": "fomesoutra",
+    "pdfFile": "t_l_charger_86_kb.pdf",
+    "year": null,
+    "zone": null,
+    "hasCorrection": false
+  }
+}
