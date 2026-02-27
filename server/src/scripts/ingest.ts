@@ -1,12 +1,27 @@
 import path from "node:path";
+import { existsSync } from "node:fs";
 
 import "../lib/load-env.js";
 import { RagService } from "../services/rag.service.js";
 
 async function main() {
-  const dataDir = process.argv[2]
-    ? path.resolve(process.argv[2])
-    : path.resolve(process.cwd(), "server", "data", "raw");
+  const inputPath = process.argv[2];
+  let dataDir: string;
+
+  if (inputPath) {
+    dataDir = path.resolve(inputPath);
+  } else {
+    const candidates = [
+      path.resolve(process.cwd(), "data", "raw"),
+      path.resolve(process.cwd(), "server", "data", "raw"),
+    ];
+
+    const found = candidates.find((candidate) => existsSync(candidate));
+    if (!found) {
+      throw new Error(`No data directory found. Checked: ${candidates.join(", ")}`);
+    }
+    dataDir = found;
+  }
 
   console.log(`Starting ingestion from: ${dataDir}`);
   const summary = await RagService.ingestFromDirectory(dataDir);
