@@ -1,0 +1,13 @@
+{
+  "sourceType": "cours",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": "pythagore",
+  "title": "theoreme de pythagore - test",
+  "content": "Le theoreme de Pythagore s'applique dans un triangle rectangle. Si ABC est un triangle rectangle en B, alors AC carre est egal a AB carre plus BC carre. L'hypotenuse est le cote oppose a l'angle droit, c'est le plus grand cote du triangle. Exemple: si AB = 3 cm et BC = 4 cm, alors AC carre = 9 + 16 = 25, donc AC = 5 cm. Reciprocite: si le carre du plus grand cote est egal a la somme des carres des deux autres cotes, alors le triangle est rectangle. Dans les exercices de BEPC, on utilise ce resultat pour verifier la nature d'un triangle et calculer une longueur manquante.",
+  "metadata": {
+    "source": "test",
+    "pages": "1-2"
+  }
+}
+

@@ -12,6 +12,7 @@ import { chatRouter } from "./routes/chat.routes.js";
 import assessmentRouter from "./routes/assessment.routes.js";
 import sessionRouter from "./routes/session.routes.js";
 import parentRouter from "./routes/parent.routes.js";
+import ragRouter from "./routes/rag.routes.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 3001);
@@ -33,6 +34,7 @@ app.use("/api/chat", chatRouter);
 app.use("/api/assessment", assessmentRouter);
 app.use("/api/sessions", sessionRouter);
 app.use("/api/parent", parentRouter);
+app.use("/api/rag", ragRouter);
 
 // Health check
 app.get("/health", (req, res) => {

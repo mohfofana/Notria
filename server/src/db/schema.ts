@@ -1,4 +1,30 @@
-import { pgTable, serial, text, integer, timestamp, boolean, decimal, jsonb, varchar } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import {
+  pgTable,
+  serial,
+  text,
+  integer,
+  timestamp,
+  boolean,
+  decimal,
+  jsonb,
+  varchar,
+  index,
+  uniqueIndex,
+  customType,
+} from "drizzle-orm/pg-core";
+
+const vector = customType<{ data: number[]; driverData: string }>({
+  dataType() {
+    return "vector(1536)";
+  },
+  toDriver(value: number[]) {
+    return `[${value.join(",")}]`;
+  },
+  fromDriver(value: string) {
+    return value.slice(1, -1).split(",").map(Number);
+  },
+});
 
 // Users table
 export const users = pgTable("users", {
@@ -236,6 +262,40 @@ export const scheduledSessions = pgTable("scheduled_sessions", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// RAG content chunks with pgvector embeddings
+export const contentChunks = pgTable(
+  "content_chunks",
+  {
+    id: serial("id").primaryKey(),
+    sourceType: text("source_type").notNull(),
+    subject: text("subject").notNull(),
+    grade: text("grade").notNull(),
+    chapter: text("chapter"),
+    title: text("title").notNull(),
+    content: text("content").notNull(),
+    chunkIndex: integer("chunk_index").notNull(),
+    totalChunks: integer("total_chunks").notNull(),
+    embedding: vector("embedding").notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    embeddingIdx: index("content_chunks_embedding_idx").using(
+      "hnsw",
+      sql`${table.embedding} vector_cosine_ops`
+    ),
+    chapterIdx: index("content_chunks_chapter_idx").on(table.chapter),
+    sourceTypeIdx: index("content_chunks_source_type_idx").on(table.sourceType),
+    contentChunkUnique: uniqueIndex("content_chunks_doc_chunk_unique").on(
+      table.sourceType,
+      table.subject,
+      table.grade,
+      table.title,
+      table.chunkIndex
+    ),
+  })
+);
+
 // Types for TypeScript
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -269,3 +329,5 @@ export type Schedule = typeof schedules.$inferSelect;
 export type NewSchedule = typeof schedules.$inferInsert;
 export type AssessmentQuestion = typeof assessmentQuestions.$inferSelect;
 export type NewAssessmentQuestion = typeof assessmentQuestions.$inferInsert;
+export type ContentChunk = typeof contentChunks.$inferSelect;
+export type NewContentChunk = typeof contentChunks.$inferInsert;

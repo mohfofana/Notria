@@ -10,6 +10,7 @@ export type HomeworkStatus = "pending" | "completed" | "partial";
 export type SessionStatus = "upcoming" | "completed" | "missed" | "rescheduled";
 export type StudyPlanWeekStatus = "upcoming" | "in_progress" | "completed";
 export type StudentLevel = "debutant" | "intermediaire" | "avance";
+export type RagSourceType = "cours" | "exercice" | "annale" | "livre";
 
 export interface User {
   id: number;
@@ -156,4 +157,26 @@ export interface LevelAssessment {
   score?: number;
   level?: StudentLevel;
   completedAt?: string;
+}
+
+export interface RagSearchFilters {
+  chapter?: string;
+  grade?: string;
+  sourceType?: RagSourceType;
+}
+
+export interface RagSearchRequest {
+  query: string;
+  limit?: number;
+  filters?: RagSearchFilters;
+}
+
+export interface RagSearchResult {
+  id: number;
+  content: string;
+  chapter: string | null;
+  sourceType: RagSourceType | string;
+  title: string;
+  similarity: number;
+  metadata: Record<string, unknown> | null;
 }

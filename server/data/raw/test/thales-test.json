@@ -1,0 +1,13 @@
+{
+  "sourceType": "cours",
+  "subject": "mathematiques",
+  "grade": "3eme",
+  "chapter": "thales",
+  "title": "theoreme de thales - test",
+  "content": "Le theoreme de Thales relie les longueurs dans un triangle coupe par une droite parallele a un cote. Si dans un triangle ABC, les points D sur AB et E sur AC verifient DE parallele a BC, alors AD/AB = AE/AC = DE/BC. Ce resultat permet de calculer une longueur inconnue en utilisant un produit en croix. Reciprocite: si les rapports de longueurs sont egaux, alors on peut conclure au parallelisme. Dans les sujets BEPC, il faut d'abord identifier la configuration de Thales sur la figure, puis ecrire les rapports dans le bon ordre avant de calculer.",
+  "metadata": {
+    "source": "test",
+    "pages": "5-6"
+  }
+}
+
