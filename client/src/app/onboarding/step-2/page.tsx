@@ -62,9 +62,10 @@ export default function OnboardingStep2() {
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">Quelles matières veux-tu prioriser ?</h1>
+        <h1 className="text-2xl font-bold">Tes matières</h1>
         <p className="text-muted-foreground mt-1">
-          Prof Ada se concentrera sur ces matières en priorité
+          Prof Ada se concentrera sur ces matières en priorité.
+          D'autres matières seront bientôt disponibles !
         </p>
       </div>
 

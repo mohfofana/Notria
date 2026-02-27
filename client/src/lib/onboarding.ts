@@ -21,7 +21,7 @@ export function getNextOnboardingPath(input: {
   const subjects = student.prioritySubjects ?? [];
   if (!Array.isArray(subjects) || subjects.length === 0) return "/onboarding/step-2";
 
-  if (student.targetScore == null || !student.dailyTime) return "/onboarding/step-3";
+  if (student.targetScore == null) return "/onboarding/step-3";
 
   if (!hasSchedule) return "/onboarding/step-4";
 

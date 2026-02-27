@@ -1,19 +1,25 @@
 import { z } from "zod";
+import { AVAILABLE_BEPC_SUBJECTS } from "../constants/index";
 
 export const onboardingStep1Schema = z.object({
-  examType: z.enum(["BEPC", "BAC"]),
-  grade: z.enum(["3eme", "terminale"]),
+  examType: z.enum(["BEPC"]),
+  grade: z.enum(["3eme"]),
   series: z.enum(["A1", "A2", "C", "D"]).optional(),
   school: z.string().optional(),
 });
 
 export const onboardingStep2Schema = z.object({
-  prioritySubjects: z.array(z.string()).min(1, "Sélectionnez au moins une matière"),
+  prioritySubjects: z
+    .array(z.string())
+    .min(1, "Sélectionnez au moins une matière")
+    .refine(
+      (subjects) => subjects.every((s) => AVAILABLE_BEPC_SUBJECTS.includes(s)),
+      { message: "Matière non disponible pour le moment" }
+    ),
 });
 
 export const onboardingStep3Schema = z.object({
   targetScore: z.number().min(8).max(20),
-  dailyTime: z.enum(["15min", "30min", "1h"]),
 });
 
 export const assessmentAnswerSchema = z.object({

@@ -47,9 +47,9 @@ export const StudentController = {
     }
 
     const userId = req.user!.userId;
-    const { targetScore, dailyTime } = parsed.data;
+    const { targetScore } = parsed.data;
 
-    const result = await StudentService.onboardingStep3(userId, { targetScore, dailyTime });
+    const result = await StudentService.onboardingStep3(userId, { targetScore });
     if (!result) return res.status(404).json({ error: "Complète d'abord les étapes précédentes" });
 
     return res.json({ student: result.student, studyPlan: result.studyPlan });

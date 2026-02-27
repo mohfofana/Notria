@@ -21,6 +21,9 @@ export const BEPC_SUBJECTS = [
   "Histoire-Géographie",
 ] as const;
 
+/** Matières réellement disponibles (contenu + RAG prêts). Étendre au fur et à mesure. */
+export const AVAILABLE_BEPC_SUBJECTS: readonly string[] = ["Mathématiques"];
+
 export const MATH_TOPICS_BAC_CD = [
   "Suites numériques",
   "Fonctions numériques",
@@ -188,7 +191,7 @@ export const SUBSCRIPTION_PRICES = {
 
 export function getSubjectsForStudent(examType: "BEPC" | "BAC", series?: string): string[] {
   if (examType === "BEPC") {
-    return [...BEPC_SUBJECTS];
+    return [...AVAILABLE_BEPC_SUBJECTS];
   }
   const seriesSubjects = BAC_SUBJECTS[series as keyof typeof BAC_SUBJECTS] ?? [];
   return [...BAC_SUBJECTS.common, ...seriesSubjects];
