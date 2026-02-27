@@ -70,7 +70,9 @@ export default function DashboardPage() {
         topic: entry.topic,
       });
       // Navigate to chat with auto-start flag
-      router.push(`/chat?id=${data.conversation.id}&autostart=1`);
+      const subject = encodeURIComponent(entry.subject);
+      const topic = encodeURIComponent(entry.topic);
+      router.push(`/chat?id=${data.conversation.id}&autostart=1&subject=${subject}&topic=${topic}`);
     } catch {
       setIsStarting(null);
     }

@@ -5,6 +5,7 @@ export type OnboardingStudent = {
   targetScore?: number | null;
   dailyTime?: string | null;
   onboardingCompleted?: boolean | null;
+  assessmentCompleted?: boolean | null;
 };
 
 export function getNextOnboardingPath(input: {
@@ -14,7 +15,6 @@ export function getNextOnboardingPath(input: {
   const { student, hasSchedule } = input;
 
   if (!student) return "/onboarding/step-1";
-  if (student.onboardingCompleted) return "/dashboard";
 
   if (!student.examType || !student.grade) return "/onboarding/step-1";
 
@@ -24,6 +24,9 @@ export function getNextOnboardingPath(input: {
   if (student.targetScore == null || !student.dailyTime) return "/onboarding/step-3";
 
   if (!hasSchedule) return "/onboarding/step-4";
+
+  // Onboarding done — check assessment
+  if (!student.assessmentCompleted) return "/assessment/start";
 
   return "/dashboard";
 }

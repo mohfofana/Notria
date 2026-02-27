@@ -144,6 +144,23 @@ export const subscriptions = pgTable("subscriptions", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Assessment questions
+export const assessmentQuestions = pgTable("assessment_questions", {
+  id: serial("id").primaryKey(),
+  subject: varchar("subject", { length: 100 }).notNull(),
+  examType: varchar("exam_type", { enum: ["BEPC", "BAC"] }).notNull(),
+  series: varchar("series", { enum: ["A1", "A2", "C", "D"] }), // null for BEPC
+  difficulty: varchar("difficulty", { enum: ["facile", "moyen", "difficile"] }).notNull(),
+  question: text("question").notNull(),
+  options: jsonb("options").notNull(), // Array of possible answers
+  correctAnswer: integer("correct_answer").notNull(), // Index of correct option (0-based)
+  explanation: text("explanation"),
+  tags: jsonb("tags"), // Array of topic tags
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Level assessments
 export const levelAssessments = pgTable("level_assessments", {
   id: serial("id").primaryKey(),
@@ -152,7 +169,7 @@ export const levelAssessments = pgTable("level_assessments", {
   questionsJson: jsonb("questions_json").notNull(),
   answersJson: jsonb("answers_json"),
   score: integer("score"),
-  level: varchar("level", { enum: ["debutant", "intermediaire", "avance"] }),
+  level: varchar("level", { enum: ["débutant", "intermédiaire", "avancé"] }),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -250,5 +267,5 @@ export type StudyPlanWeek = typeof studyPlanWeeks.$inferSelect;
 export type NewStudyPlanWeek = typeof studyPlanWeeks.$inferInsert;
 export type Schedule = typeof schedules.$inferSelect;
 export type NewSchedule = typeof schedules.$inferInsert;
-export type ScheduledSession = typeof scheduledSessions.$inferSelect;
-export type NewScheduledSession = typeof scheduledSessions.$inferInsert;
+export type AssessmentQuestion = typeof assessmentQuestions.$inferSelect;
+export type NewAssessmentQuestion = typeof assessmentQuestions.$inferInsert;

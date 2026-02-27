@@ -9,6 +9,9 @@ import { studentRouter } from "./routes/student.routes.js";
 import { studyPlanRouter } from "./routes/studyplan.routes.js";
 import { scheduleRouter } from "./routes/schedule.routes.js";
 import { chatRouter } from "./routes/chat.routes.js";
+import assessmentRouter from "./routes/assessment.routes.js";
+import sessionRouter from "./routes/session.routes.js";
+import parentRouter from "./routes/parent.routes.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 3001);
@@ -27,6 +30,9 @@ app.use("/api/students", studentRouter);
 app.use("/api/study-plans", studyPlanRouter);
 app.use("/api/schedules", scheduleRouter);
 app.use("/api/chat", chatRouter);
+app.use("/api/assessment", assessmentRouter);
+app.use("/api/sessions", sessionRouter);
+app.use("/api/parent", parentRouter);
 
 // Health check
 app.get("/health", (req, res) => {

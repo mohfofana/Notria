@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GraduationCap, ArrowLeft, Menu, Mic, Camera, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,7 @@ const DEMO_CONVERSATIONS: Conversation[] = COURSE_STARTERS.map((starter, index) 
 export default function ChatPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const autostartDone = useRef(false);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<number | null>(null);
@@ -140,6 +141,31 @@ export default function ChatPage() {
     setCourseUnlockedByConversation((prev) => ({ ...prev, [created.id]: true }));
     return created.id;
   }
+
+  // Auto-start: when coming from dashboard, send the first message automatically
+  useEffect(() => {
+    if (
+      !autostartDone.current &&
+      searchParams.get("autostart") === "1" &&
+      activeId &&
+      messages.length === 0 &&
+      !isStreaming
+    ) {
+      const subjectFromQuery = searchParams.get("subject");
+      const topicFromQuery = searchParams.get("topic");
+      const conv = conversations.find((c) => c.id === activeId);
+      const subject = subjectFromQuery || conv?.subject;
+      const topic = topicFromQuery || conv?.topic;
+
+      if (!subject) return;
+
+      autostartDone.current = true;
+      const prompt = topic
+        ? `Nous commencons la session guidee sur "${topic}" en ${subject}. Donne directement un mini-cours structure (definitions, methode, exemple type BAC/BEPC Cote d'Ivoire), puis 2 questions de verification et 1 exercice d'application.`
+        : `Nous commencons la session guidee en ${subject}. Donne directement un mini-cours structure, puis 2 questions de verification et 1 exercice d'application.`;
+      handleSend(prompt);
+    }
+  }, [activeId, messages, conversations, searchParams, isStreaming]);
 
   async function handleSend(content: string) {
     if (!activeId || isStreaming || needsCourseUnlock) return;
