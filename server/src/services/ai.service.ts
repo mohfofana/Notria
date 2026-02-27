@@ -1,9 +1,9 @@
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { getTopicsForSubject } from "@notria/shared";
-import { deepseek, DEEPSEEK_MODEL } from "../lib/deepseek.js";
+import { openai, CHAT_MODEL } from "../lib/openai.js";
 import { PedagogicalContentService } from "./pedagogical-content.service.js";
 
-/** Extract JSON from DeepSeek responses that may be wrapped in ```json ... ``` */
+/** Extract JSON from OpenAI responses that may be wrapped in ```json ... ``` */
 function parseJsonResponse(content: string): any {
   let cleaned = content.trim();
   // Remove markdown code block wrappers
@@ -151,8 +151,8 @@ RÈGLES IMPORTANTES :
     ];
 
     try {
-      const response = await deepseek.chat.completions.create({
-        model: DEEPSEEK_MODEL,
+      const response = await openai.chat.completions.create({
+        model: CHAT_MODEL,
         messages,
         temperature: 0.7,
         max_tokens: 1000,
@@ -160,7 +160,7 @@ RÈGLES IMPORTANTES :
 
       const content = response.choices[0]?.message?.content;
       if (!content) {
-        throw new Error("No response from DeepSeek");
+        throw new Error("No response from OpenAI");
       }
 
       // Parse JSON response
@@ -180,7 +180,7 @@ RÈGLES IMPORTANTES :
 
       return parsed;
     } catch (error) {
-      console.error("Error generating question with DeepSeek:", error);
+      console.error("Error generating question with OpenAI:", error);
       // Fallback to a static question
       return this.getFallbackQuestion(subject, difficulty);
     }
@@ -261,8 +261,8 @@ ADAPTE LE PLAN AU CONTEXTE IVOIRIEN :
     ];
 
     try {
-      const response = await deepseek.chat.completions.create({
-        model: DEEPSEEK_MODEL,
+      const response = await openai.chat.completions.create({
+        model: CHAT_MODEL,
         messages,
         temperature: 0.3,
         max_tokens: 1500,
@@ -270,12 +270,12 @@ ADAPTE LE PLAN AU CONTEXTE IVOIRIEN :
 
       const content = response.choices[0]?.message?.content;
       if (!content) {
-        throw new Error("No response from DeepSeek");
+        throw new Error("No response from OpenAI");
       }
 
       return parseJsonResponse(content);
     } catch (error) {
-      console.error("Error generating plan with DeepSeek:", error);
+      console.error("Error generating plan with OpenAI:", error);
       return this.getFallbackPlan(student, assessmentResults);
     }
   },
@@ -330,8 +330,8 @@ ADAPTE AU CONTEXTE IVOIRIEN :
     ];
 
     try {
-      const response = await deepseek.chat.completions.create({
-        model: DEEPSEEK_MODEL,
+      const response = await openai.chat.completions.create({
+        model: CHAT_MODEL,
         messages,
         temperature: 0.5,
         max_tokens: 2000,
@@ -339,12 +339,12 @@ ADAPTE AU CONTEXTE IVOIRIEN :
 
       const content = response.choices[0]?.message?.content;
       if (!content) {
-        throw new Error("No response from DeepSeek");
+        throw new Error("No response from OpenAI");
       }
 
       return parseJsonResponse(content);
     } catch (error) {
-      console.error("Error generating homework with DeepSeek:", error);
+      console.error("Error generating homework with OpenAI:", error);
       return this.getFallbackHomework(subject, topic, difficulty);
     }
   },

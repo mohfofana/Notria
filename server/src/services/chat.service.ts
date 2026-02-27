@@ -2,7 +2,7 @@ import { eq, desc, and } from "drizzle-orm";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 import { db, schema } from "../db/index.js";
-import { deepseek, DEEPSEEK_MODEL } from "../lib/deepseek.js";
+import { openai, CHAT_MODEL } from "../lib/openai.js";
 import { RagService } from "./rag.service.js";
 
 interface RagContext {
@@ -311,7 +311,7 @@ export const ChatService = {
       fetchRagContext(userContent, conversation?.subject),
     ]);
 
-    // 3. Build messages array for DeepSeek
+    // 3. Build messages array for OpenAI
     const history = await db.query.messages.findMany({
       where: eq(schema.messages.conversationId, conversationId),
       orderBy: [schema.messages.createdAt],
@@ -325,10 +325,10 @@ export const ChatService = {
       })),
     ];
 
-    // 4. Stream from DeepSeek
+    // 4. Stream from OpenAI
     try {
-      const stream = await deepseek.chat.completions.create({
-        model: DEEPSEEK_MODEL,
+      const stream = await openai.chat.completions.create({
+        model: CHAT_MODEL,
         messages: chatMessages,
         stream: true,
         max_tokens: 2048,
@@ -349,7 +349,7 @@ export const ChatService = {
       await this.saveMessage(conversationId, "assistant", fullContent);
       onDone(fullContent);
     } catch (err: any) {
-      console.error("DeepSeek streaming error:", err);
+      console.error("OpenAI streaming error:", err);
       onError("Erreur lors de la génération de la réponse");
     }
   },
