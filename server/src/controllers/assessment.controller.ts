@@ -4,6 +4,14 @@ import { AssessmentService } from "../services/assessment.service.js";
 // In-memory store for assessment sessions (use Redis in production)
 const assessmentSessions = new Map<number, any>();
 
+function sanitizeQuestionForClient<T extends { correctAnswer?: number; explanation?: string }>(
+  question: T | null | undefined,
+) {
+  if (!question) return question ?? null;
+  const { correctAnswer: _correctAnswer, explanation: _explanation, ...safeQuestion } = question;
+  return safeQuestion;
+}
+
 export const AssessmentController = {
   async getOverview(req: Request, res: Response) {
     try {
@@ -33,7 +41,7 @@ export const AssessmentController = {
         data: {
           currentQuestionIndex: progress.currentQuestionIndex,
           totalQuestions: progress.totalQuestions,
-          question,
+          question: sanitizeQuestionForClient(question),
         },
       });
     } catch (error: any) {
@@ -78,7 +86,7 @@ export const AssessmentController = {
           completed: false,
           currentQuestionIndex: progress.currentQuestionIndex,
           totalQuestions: progress.totalQuestions,
-          question,
+          question: sanitizeQuestionForClient(question),
         },
       });
     } catch (error: any) {
@@ -139,7 +147,7 @@ export const AssessmentController = {
           completed: false,
           currentQuestionIndex: updatedProgress.currentQuestionIndex,
           totalQuestions: updatedProgress.totalQuestions,
-          question: nextQuestion,
+          question: sanitizeQuestionForClient(nextQuestion),
           previousAnswer: {
             isCorrect: updatedProgress.questions[updatedProgress.currentQuestionIndex - 1]?.isCorrect,
             explanation: updatedProgress.questions[updatedProgress.currentQuestionIndex - 1]?.explanation,

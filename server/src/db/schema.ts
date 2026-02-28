@@ -296,6 +296,60 @@ export const contentChunks = pgTable(
   })
 );
 
+// Course Programs (personalized 4-week learning programs based on assessment)
+export const coursePrograms = pgTable("course_programs", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").references(() => students.id).notNull(),
+  assessmentId: integer("assessment_id").references(() => levelAssessments.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  totalWeeks: integer("total_weeks").default(4).notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  weeklySessionCount: integer("weekly_session_count").notNull(),
+  sessionDurationMinutes: integer("session_duration_minutes").notNull(),
+  overallLevel: varchar("overall_level", { length: 50 }).notNull(),
+  weaknesses: jsonb("weaknesses").notNull(), // { domain: string, level: string, percentage: number }[]
+  strengths: jsonb("strengths").notNull(), // { domain: string, level: string, percentage: number }[]
+  recommendations: jsonb("recommendations"), // AI-generated recommendations
+  status: varchar("status", { enum: ["active", "completed", "abandoned"] }).default("active").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Course Program Weeks (4 weeks per program)
+export const courseProgramWeeks = pgTable("course_program_weeks", {
+  id: serial("id").primaryKey(),
+  programId: integer("program_id").references(() => coursePrograms.id).notNull(),
+  weekNumber: integer("week_number").notNull(),
+  theme: varchar("theme", { length: 255 }).notNull(),
+  objectives: jsonb("objectives").notNull(), // string[]
+  focusTopics: jsonb("focus_topics").notNull(), // { topic: string, priority: 'high'|'medium'|'low', hoursAllocated: number }[]
+  status: varchar("status", { enum: ["upcoming", "in_progress", "completed"] }).default("upcoming").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Course Program Sessions (individual daily learning sessions)
+export const courseProgramSessions = pgTable("course_program_sessions", {
+  id: serial("id").primaryKey(),
+  weekId: integer("week_id").references(() => courseProgramWeeks.id).notNull(),
+  dayNumber: integer("day_number").notNull(), // 1-based day within the week
+  sessionOrder: integer("session_order").default(1).notNull(),
+  topic: varchar("topic", { length: 255 }).notNull(),
+  type: varchar("type", { enum: ["lesson", "exercise", "revision", "evaluation"] }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  durationMinutes: integer("duration_minutes").notNull(),
+  difficulty: varchar("difficulty", { enum: ["facile", "moyen", "difficile"] }).notNull(),
+  content: jsonb("content"), // { keyConcepts: string[], exercises: string[], ragSources: string[] }
+  objectives: jsonb("objectives"), // string[]
+  status: varchar("status", { enum: ["upcoming", "in_progress", "completed", "skipped"] }).default("upcoming").notNull(),
+  completedAt: timestamp("completed_at"),
+  scoreAtCompletion: integer("score_at_completion"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Types for TypeScript
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -331,3 +385,9 @@ export type AssessmentQuestion = typeof assessmentQuestions.$inferSelect;
 export type NewAssessmentQuestion = typeof assessmentQuestions.$inferInsert;
 export type ContentChunk = typeof contentChunks.$inferSelect;
 export type NewContentChunk = typeof contentChunks.$inferInsert;
+export type CourseProgram = typeof coursePrograms.$inferSelect;
+export type NewCourseProgram = typeof coursePrograms.$inferInsert;
+export type CourseProgramWeek = typeof courseProgramWeeks.$inferSelect;
+export type NewCourseProgramWeek = typeof courseProgramWeeks.$inferInsert;
+export type CourseProgramSession = typeof courseProgramSessions.$inferSelect;
+export type NewCourseProgramSession = typeof courseProgramSessions.$inferInsert;

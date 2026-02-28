@@ -181,6 +181,79 @@ export interface RagSearchResult {
   metadata: Record<string, unknown> | null;
 }
 
+// Course Program types
+export type CourseProgramStatus = "active" | "completed" | "abandoned";
+export type CourseProgramWeekStatus = "upcoming" | "in_progress" | "completed";
+export type CourseProgramSessionStatus = "upcoming" | "in_progress" | "completed" | "skipped";
+export type CourseProgramSessionType = "lesson" | "exercise" | "revision" | "evaluation";
+export type TopicPriority = "high" | "medium" | "low";
+
+export interface DomainAssessment {
+  domain: string;
+  level: string;
+  percentage: number;
+}
+
+export interface TopicFocus {
+  topic: string;
+  priority: TopicPriority;
+  hoursAllocated: number;
+}
+
+export interface SessionContent {
+  keyConcepts: string[];
+  exercises: string[];
+  ragSources: string[];
+}
+
+export interface CourseProgram {
+  id: number;
+  studentId: number;
+  assessmentId?: number;
+  title: string;
+  totalWeeks: number;
+  startDate: string;
+  endDate: string;
+  weeklySessionCount: number;
+  sessionDurationMinutes: number;
+  overallLevel: string;
+  weaknesses: DomainAssessment[];
+  strengths: DomainAssessment[];
+  recommendations?: Record<string, unknown>;
+  status: CourseProgramStatus;
+  createdAt: string;
+  weeks?: CourseProgramWeek[];
+}
+
+export interface CourseProgramWeek {
+  id: number;
+  programId: number;
+  weekNumber: number;
+  theme: string;
+  objectives: string[];
+  focusTopics: TopicFocus[];
+  status: CourseProgramWeekStatus;
+  sessions?: CourseProgramSession[];
+}
+
+export interface CourseProgramSession {
+  id: number;
+  weekId: number;
+  dayNumber: number;
+  sessionOrder: number;
+  topic: string;
+  type: CourseProgramSessionType;
+  title: string;
+  description?: string;
+  durationMinutes: number;
+  difficulty: Difficulty;
+  content?: SessionContent;
+  objectives?: string[];
+  status: CourseProgramSessionStatus;
+  completedAt?: string;
+  scoreAtCompletion?: number;
+}
+
 export type GuidedSessionState =
   | "INTRO"
   | "EXPLAIN"

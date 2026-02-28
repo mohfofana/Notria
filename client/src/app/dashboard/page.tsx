@@ -355,17 +355,21 @@ export default function DashboardPage() {
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </button>
 
-              <div className="soft-card rounded-2xl p-5 flex items-center gap-4 sm:col-span-2 lg:col-span-1">
+              <Link
+                href="/programme"
+                className="soft-card rounded-2xl p-5 hover:border-primary/30 transition-colors group flex items-center gap-4 sm:col-span-2 lg:col-span-1"
+              >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Target className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-base font-medium">Objectif : {student.targetScore}/20</p>
+                  <p className="text-base font-medium">Mon programme</p>
                   <p className="text-sm text-muted-foreground">
-                    Parcours {student.examType} ({student.grade})
+                    Objectif : {student.targetScore}/20 — {student.examType} ({student.grade})
                   </p>
                 </div>
-              </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
 
               <Link
                 href="/notria-vision"

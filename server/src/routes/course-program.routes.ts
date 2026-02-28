@@ -1,0 +1,23 @@
+import { Router } from "express";
+import { CourseProgramController } from "../controllers/course-program.controller.js";
+import { authenticate, requireRole } from "../middleware/auth.js";
+
+const router = Router();
+
+// All course program routes require authentication as student
+router.use(authenticate);
+router.use(requireRole(["student"]));
+
+// Generate personalized program (after assessment)
+router.post("/generate", CourseProgramController.generate);
+
+// Get current active program
+router.get("/current", CourseProgramController.getCurrent);
+
+// Get specific week details
+router.get("/week/:weekNumber", CourseProgramController.getWeek);
+
+// Mark a session as completed
+router.patch("/session/:sessionId/complete", CourseProgramController.completeSession);
+
+export default router;
