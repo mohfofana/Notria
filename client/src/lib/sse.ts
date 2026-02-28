@@ -11,6 +11,7 @@ interface SSECallbacks {
 export async function streamChat(
   conversationId: number,
   content: string,
+  options: { internal?: boolean } | undefined,
   callbacks: SSECallbacks
 ): Promise<void> {
   const token = getAccessToken();
@@ -22,7 +23,7 @@ export async function streamChat(
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     credentials: "include",
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({ content, internal: options?.internal === true }),
   });
 
   if (!res.ok || !res.body) {

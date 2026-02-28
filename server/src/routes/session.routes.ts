@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { SessionController } from "../controllers/session.controller.js";
-import { authenticate } from "../middleware/auth.js";
+import { authenticate, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
 // All session routes require authentication
 router.use(authenticate);
+router.use(requireRole(["student"]));
 
 // Get today's session
 router.get("/today", SessionController.getTodaysSession);

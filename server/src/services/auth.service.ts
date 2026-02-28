@@ -49,6 +49,12 @@ export const AuthService = {
       })
       .returning();
 
+    if (user.role === "parent") {
+      await db.insert(schema.parents).values({
+        userId: user.id,
+      });
+    }
+
     const accessToken = JWTService.signAccessToken({
       userId: user.id,
       role: user.role as any,

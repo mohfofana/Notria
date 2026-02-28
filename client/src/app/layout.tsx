@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Space_Grotesk } from "next/font/google";
 import { Providers } from "@/components/providers";
-import { ProfAdaGuide } from "@/components/prof-ada-guide";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -28,10 +27,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
-        <Providers>
-          {children}
-          <ProfAdaGuide />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

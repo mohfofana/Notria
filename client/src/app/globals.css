@@ -82,3 +82,103 @@ h4 {
 .animate-fade-slide-up {
   animation: fadeSlideUp 0.55s ease-out both;
 }
+
+@keyframes chalkLineIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes chalkDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.chalkboard-root {
+  margin-top: 0.75rem;
+}
+
+.chalkboard-panel {
+  border-radius: 0.9rem;
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 20% 15%, hsl(var(--primary-foreground) / 0.08), transparent 34%),
+    radial-gradient(circle at 85% 10%, hsl(var(--primary-foreground) / 0.06), transparent 34%),
+    linear-gradient(
+      160deg,
+      hsl(var(--primary) / 0.52),
+      hsl(var(--primary) / 0.42) 62%,
+      hsl(193 72% 20%)
+    );
+  border: 1px solid hsl(var(--primary) / 0.4);
+  box-shadow: inset 0 0 28px hsl(0 0% 0% / 0.22);
+}
+
+.chalk-line {
+  opacity: 0;
+  animation: chalkLineIn 0.95s ease-out forwards;
+}
+
+.chalk-title {
+  font-family: "Comic Sans MS", "Chalkboard", "Bradley Hand", cursive;
+  color: hsl(var(--primary-foreground));
+  font-size: 1.1rem;
+  line-height: 1.4;
+  margin: 0 0 0.55rem;
+}
+
+.chalk-formula {
+  font-family: "Comic Sans MS", "Chalkboard", "Bradley Hand", cursive;
+  color: hsl(var(--primary-foreground));
+  font-size: 1.05rem;
+  line-height: 1.55;
+  margin: 0.25rem 0 0.35rem;
+  white-space: pre-wrap;
+}
+
+.chalk-highlight {
+  color: hsl(var(--accent-foreground));
+  text-shadow: 0 0 10px hsl(var(--accent) / 0.35);
+}
+
+.chalk-geometry {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  margin-top: 0.35rem;
+}
+
+.chalk-draw {
+  stroke: hsl(var(--primary-foreground));
+  stroke-width: 2;
+  fill: none;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: chalkDraw 1.1s ease forwards;
+}
+
+.chalk-draw-2 {
+  animation-delay: 0.45s;
+}
+
+.chalk-draw-3 {
+  animation-delay: 0.95s;
+}
+
+.chalk-label {
+  fill: hsl(var(--primary-foreground));
+  font-size: 12px;
+  font-family: "Comic Sans MS", "Chalkboard", "Bradley Hand", cursive;
+}
+
+.chalk-value {
+  fill: hsl(var(--accent-foreground));
+}

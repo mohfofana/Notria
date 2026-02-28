@@ -25,13 +25,17 @@ export const SessionService = {
         lte(schema.scheduledSessions.date, endOfDay),
         eq(schema.scheduledSessions.status, "upcoming")
       ),
-      with: {
-        schedule: true,
-      },
     });
 
     if (!scheduledSession) {
       return null; // No session scheduled for today
+    }
+
+    const schedule = await db.query.schedules.findFirst({
+      where: eq(schema.schedules.id, scheduledSession.scheduleId),
+    });
+    if (!schedule) {
+      return null;
     }
 
     // Get or create conversation for this session
@@ -61,8 +65,8 @@ export const SessionService = {
       session: scheduledSession,
       conversation,
       subject: scheduledSession.subject,
-      startTime: scheduledSession.schedule.startTime,
-      durationMinutes: scheduledSession.schedule.durationMinutes,
+      startTime: schedule.startTime,
+      durationMinutes: schedule.durationMinutes,
     };
   },
 
@@ -97,15 +101,19 @@ export const SessionService = {
   },
 
   async generateHomework(studentId: number, sessionId: number) {
-    // Get the conversation for this session
     const session = await db.query.scheduledSessions.findFirst({
       where: eq(schema.scheduledSessions.id, sessionId),
-      with: {
-        conversation: true,
-      },
     });
 
-    if (!session?.conversation) {
+    if (!session?.conversationId) {
+      return;
+    }
+
+    const conversation = await db.query.conversations.findFirst({
+      where: eq(schema.conversations.id, session.conversationId),
+    });
+
+    if (!conversation) {
       return;
     }
 
@@ -115,7 +123,7 @@ export const SessionService = {
 
     const [homeworkSet] = await db.insert(schema.homeworkSets).values({
       studentId,
-      conversationId: session.conversation.id,
+      conversationId: conversation.id,
       dueDate,
     }).returning();
 

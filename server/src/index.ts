@@ -13,15 +13,22 @@ import assessmentRouter from "./routes/assessment.routes.js";
 import sessionRouter from "./routes/session.routes.js";
 import parentRouter from "./routes/parent.routes.js";
 import ragRouter from "./routes/rag.routes.js";
+import guidedSessionRouter from "./routes/guided-session.routes.js";
+import adminRouter from "./routes/admin.routes.js";
 
 const app = express();
 const BASE_PORT = Number(process.env.PORT || process.env.SERVER_PORT || 3001);
 const MAX_PORT_ATTEMPTS = 10;
+const defaultOrigins = ["http://localhost:4000", "http://localhost:3000"];
+const configuredOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(",").map((value) => value.trim()).filter(Boolean)
+  : [];
+const allowedOrigins = Array.from(new Set([...configuredOrigins, ...defaultOrigins]));
 
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use(express.json());
@@ -36,6 +43,8 @@ app.use("/api/assessment", assessmentRouter);
 app.use("/api/sessions", sessionRouter);
 app.use("/api/parent", parentRouter);
 app.use("/api/rag", ragRouter);
+app.use("/api/guided-sessions", guidedSessionRouter);
+app.use("/api/admin", adminRouter);
 
 // Health check
 app.get("/health", (req, res) => {

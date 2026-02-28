@@ -436,11 +436,25 @@ export const RagService = {
       metadata: Record<string, unknown> | null;
     }>;
 
-    return rows
+    const normalizedRows = rows
       .map((row) => ({
         ...row,
         similarity: typeof row.similarity === "number" ? row.similarity : Number(row.similarity),
       }))
-      .filter((row) => row.similarity > SIMILARITY_THRESHOLD);
+      .sort((a, b) => b.similarity - a.similarity);
+
+    const strictMatches = normalizedRows.filter((row) => row.similarity > SIMILARITY_THRESHOLD);
+    if (strictMatches.length > 0) {
+      return strictMatches.slice(0, normalizedLimit);
+    }
+
+    // Fallback: return best available matches to avoid empty RAG responses
+    // when corpus is small or embeddings are less discriminative.
+    const relaxedMatches = normalizedRows.filter((row) => row.similarity > 0.35);
+    if (relaxedMatches.length > 0) {
+      return relaxedMatches.slice(0, normalizedLimit);
+    }
+
+    return normalizedRows.slice(0, normalizedLimit);
   },
 };

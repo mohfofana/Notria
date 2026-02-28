@@ -1,19 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Bell, BookOpen, CheckCircle, Clock, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Bell, TrendingUp, Clock, BookOpen, CheckCircle } from "lucide-react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/contexts/auth-context";
 
-interface StudentStats {
+interface ParentDashboardStudent {
   student: {
     id: number;
     firstName: string;
     lastName: string;
     examType: string;
-    targetScore: number;
+    targetScore: number | null;
   };
   stats: {
     currentStreak: number;
@@ -24,7 +26,7 @@ interface StudentStats {
     id: number;
     subject: string;
     durationMinutes: number;
-    score: number;
+    score: number | null;
     createdAt: string;
   }>;
   notifications: Array<{
@@ -36,79 +38,59 @@ interface StudentStats {
   }>;
 }
 
-export default function ParentDashboard() {
-  const [dashboard, setDashboard] = useState<StudentStats[]>([]);
+interface ParentDashboardResponse {
+  success: boolean;
+  data: ParentDashboardStudent[];
+}
+
+export default function ParentDashboardPage() {
+  const { user, isLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [dashboard, setDashboard] = useState<ParentDashboardStudent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const unreadCount = useMemo(
+    () => dashboard.flatMap((entry) => entry.notifications).filter((n) => !n.read).length,
+    [dashboard]
+  );
 
   useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  const loadDashboard = async () => {
-    try {
-      const response = await api.get("/parent/dashboard");
-      setDashboard(response.data);
-    } catch (error) {
-      console.error("Failed to load parent dashboard:", error);
-      // Mock data for demo
-      setDashboard([
-        {
-          student: {
-            id: 1,
-            firstName: "Fatou",
-            lastName: "Diallo",
-            examType: "BAC",
-            targetScore: 14,
-          },
-          stats: {
-            currentStreak: 5,
-            recentSessions: 4,
-            homeworkCompleted: true,
-          },
-          recentActivity: [
-            {
-              id: 1,
-              subject: "Mathématiques",
-              durationMinutes: 45,
-              score: 85,
-              createdAt: new Date().toISOString(),
-            },
-            {
-              id: 2,
-              subject: "SVT",
-              durationMinutes: 40,
-              score: 92,
-              createdAt: new Date(Date.now() - 86400000).toISOString(),
-            },
-          ],
-          notifications: [
-            {
-              id: "1",
-              type: "session_completed",
-              message: "Fatou a terminé sa séance Maths - Score: 85/100",
-              createdAt: new Date().toISOString(),
-              read: false,
-            },
-            {
-              id: "2",
-              type: "homework_completed",
-              message: "Fatou a terminé ses devoirs du jour !",
-              createdAt: new Date().toISOString(),
-              read: false,
-            },
-          ],
-        },
-      ]);
-    } finally {
-      setLoading(false);
+    if (isLoading) return;
+    if (!isAuthenticated) {
+      router.replace("/connexion");
+      return;
     }
-  };
+    if (user?.role !== "parent") {
+      router.replace("/dashboard");
+    }
+  }, [isLoading, isAuthenticated, user, router]);
 
-  if (loading) {
+  useEffect(() => {
+    if (isLoading || !isAuthenticated || user?.role !== "parent") return;
+
+    async function loadDashboard() {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await api.get<ParentDashboardResponse>("/parent/dashboard");
+        setDashboard(response.data.data || []);
+      } catch {
+        setError("Impossible de charger le dashboard parent.");
+        setDashboard([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDashboard();
+  }, [isLoading, isAuthenticated, user]);
+
+  if (isLoading || loading) {
     return (
       <div className="max-w-6xl mx-auto flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
           <p>Chargement du suivi parental...</p>
         </div>
       </div>
@@ -116,139 +98,150 @@ export default function ParentDashboard() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">Suivi de {dashboard.length > 1 ? "vos enfants" : "votre enfant"}</h1>
-        <p className="text-muted-foreground mt-2">
-          Suivez les progrès et l'activité de vos enfants sur Notria
-        </p>
+    <div className="max-w-6xl mx-auto space-y-8 p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard Parent</h1>
+          <p className="text-muted-foreground mt-1">
+            Suivi en temps reel de {dashboard.length > 1 ? "vos enfants" : "votre enfant"}
+          </p>
+        </div>
+        <Badge variant="outline">{unreadCount} notification(s) non lue(s)</Badge>
       </div>
 
+      {error && (
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-red-600">{error}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {dashboard.length === 0 && !error && (
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+            <h2 className="text-lg font-semibold">Aucun enfant lie</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Relie un compte eleve pour voir l'activite et les progres.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {dashboard.map((studentData) => (
-        <div key={studentData.student.id} className="space-y-6">
-          {/* Student Header */}
+        <div key={studentData.student.id} className="space-y-5">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-xl">
+                  <p className="text-xl">
                     {studentData.student.firstName} {studentData.student.lastName}
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Préparation {studentData.student.examType} - Objectif: {studentData.student.targetScore}/20
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {studentData.student.examType} • Objectif: {studentData.student.targetScore ?? "-"} / 20
                   </p>
                 </div>
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3" />
-                  Série: {studentData.stats.currentStreak} jours
-                </Badge>
+                <Badge variant="secondary">{studentData.stats.currentStreak} jours de serie</Badge>
               </CardTitle>
             </CardHeader>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
+                <CardTitle className="text-base flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-primary" />
                   Statistiques
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Série actuelle</span>
-                  <span className="font-semibold">{studentData.stats.currentStreak} jours</span>
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Serie</span>
+                  <span className="font-medium">{studentData.stats.currentStreak} jours</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Séances cette semaine</span>
-                  <span className="font-semibold">{studentData.stats.recentSessions}</span>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Sessions (7j)</span>
+                  <span className="font-medium">{studentData.stats.recentSessions}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Devoirs aujourd'hui</span>
-                  <span className={`font-semibold flex items-center gap-1 ${
-                    studentData.stats.homeworkCompleted ? "text-green-600" : "text-orange-600"
-                  }`}>
-                    {studentData.stats.homeworkCompleted ? (
-                      <>
-                        <CheckCircle className="h-3 w-3" />
-                        Terminés
-                      </>
-                    ) : (
-                      "En cours"
-                    )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Devoirs</span>
+                  <span className={`font-medium ${studentData.stats.homeworkCompleted ? "text-green-600" : "text-amber-600"}`}>
+                    {studentData.stats.homeworkCompleted ? "Termines" : "En cours"}
                   </span>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Recent Activity */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
+                <CardTitle className="text-base flex items-center gap-2">
                   <Clock className="h-4 w-4 text-primary" />
-                  Activité récente
+                  Activite recente
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {studentData.recentActivity.slice(0, 3).map((activity) => (
-                    <div key={activity.id} className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                      <div>
-                        <div className="font-medium">{activity.subject}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {activity.durationMinutes} min
-                        </div>
-                      </div>
-                      <Badge variant="outline">
-                        {activity.score}/100
-                      </Badge>
+              <CardContent className="space-y-2">
+                {studentData.recentActivity.slice(0, 4).map((activity) => (
+                  <div key={activity.id} className="rounded-lg border bg-muted/40 p-2 text-sm">
+                    <div className="flex justify-between gap-2">
+                      <span className="font-medium">{activity.subject}</span>
+                      <span className="text-xs text-muted-foreground">{activity.durationMinutes} min</span>
                     </div>
-                  ))}
-                  {studentData.recentActivity.length === 0 && (
-                    <p className="text-muted-foreground text-center py-4">
-                      Aucune activité récente
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Score: {activity.score ?? "-"} / 100
                     </p>
-                  )}
-                </div>
+                  </div>
+                ))}
+                {studentData.recentActivity.length === 0 && (
+                  <p className="text-sm text-muted-foreground">Aucune activite recente.</p>
+                )}
               </CardContent>
             </Card>
 
-            {/* Notifications */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
+                <CardTitle className="text-base flex items-center gap-2">
                   <Bell className="h-4 w-4 text-primary" />
                   Notifications
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {studentData.notifications.slice(0, 3).map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`p-3 rounded-lg border ${
-                        notification.read ? "bg-muted" : "bg-blue-50 border-blue-200"
-                      }`}
-                    >
-                      <p className="text-sm">{notification.message}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(notification.createdAt).toLocaleDateString('fr-FR', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                    </div>
-                  ))}
-                  {studentData.notifications.length === 0 && (
-                    <p className="text-muted-foreground text-center py-4">
-                      Aucune notification
+              <CardContent className="space-y-2">
+                {studentData.notifications.slice(0, 4).map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`rounded-lg border p-2 text-sm ${
+                      notification.read ? "bg-muted/30" : "bg-blue-50 border-blue-200"
+                    }`}
+                  >
+                    <p>{notification.message}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {new Date(notification.createdAt).toLocaleString("fr-FR")}
                     </p>
-                  )}
-                </div>
-                {studentData.notifications.some(n => !n.read) && (
-                  <Button variant="outline" size="sm" className="w-full mt-3">
+                  </div>
+                ))}
+                {studentData.notifications.length === 0 && (
+                  <p className="text-sm text-muted-foreground">Aucune notification.</p>
+                )}
+                {studentData.notifications.some((n) => !n.read) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-1"
+                    onClick={async () => {
+                      await api.post("/parent/notifications/read", { notificationId: "all" });
+                      setDashboard((prev) =>
+                        prev.map((entry) =>
+                          entry.student.id === studentData.student.id
+                            ? {
+                                ...entry,
+                                notifications: entry.notifications.map((n) => ({ ...n, read: true })),
+                              }
+                            : entry
+                        )
+                      );
+                    }}
+                  >
+                    <CheckCircle className="h-4 w-4 mr-1" />
                     Marquer comme lu
                   </Button>
                 )}
@@ -257,18 +250,6 @@ export default function ParentDashboard() {
           </div>
         </div>
       ))}
-
-      {dashboard.length === 0 && (
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Aucun enfant lié</h2>
-            <p className="text-muted-foreground">
-              Vous n'avez pas encore d'enfants inscrits sur Notria.
-            </p>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

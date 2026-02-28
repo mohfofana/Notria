@@ -5,6 +5,20 @@ import { AssessmentService } from "../services/assessment.service.js";
 const assessmentSessions = new Map<number, any>();
 
 export const AssessmentController = {
+  async getOverview(req: Request, res: Response) {
+    try {
+      const userId = req.user!.userId;
+      const overview = await AssessmentService.getExamOverview(userId);
+      res.json({ success: true, data: overview });
+    } catch (error: any) {
+      console.error("Get assessment overview error:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Failed to get assessment overview",
+      });
+    }
+  },
+
   async startAssessment(req: Request, res: Response) {
     try {
       const userId = req.user!.userId;
