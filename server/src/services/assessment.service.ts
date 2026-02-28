@@ -1,43 +1,337 @@
-import { eq, and, desc } from "drizzle-orm";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { desc, eq } from "drizzle-orm";
 import { db, schema } from "../db/index.js";
 import { AIService } from "./ai.service.js";
 
-interface QuestionWithAnswer {
-  id: string; // Now using generated IDs
-  subject: string;
-  difficulty: "facile" | "moyen" | "difficile"; // Fix type to match GeneratedQuestion
+type Difficulty = "facile" | "moyen" | "difficile";
+
+interface QuestionBankItem {
+  id: string;
+  topic: string;
+  difficulty: Difficulty;
   question: string;
   options: string[];
   correctAnswer: number;
-  explanation: string; // Make required to match GeneratedQuestion
+  explanation: string;
+  tags: string[];
+}
+
+interface PlannedQuestion extends QuestionBankItem {
+  subject: "Mathematiques";
+  domainKey: string;
+  domainAttempt: number;
   userAnswer?: number;
   isCorrect?: boolean;
-  tags: string[]; // Make required to match GeneratedQuestion
+}
+
+interface DomainProgress {
+  topic: string;
+  asked: number;
+  correct: number;
+  totalPlanned: number;
+}
+
+interface StudentProfile {
+  examType: "BEPC" | "BAC";
+  grade: "3eme" | "terminale";
+  series?: "A1" | "A2" | "C" | "D";
+  prioritySubjects: string[];
+  targetScore?: number;
 }
 
 interface AssessmentProgress {
   currentQuestionIndex: number;
   totalQuestions: number;
-  questions: QuestionWithAnswer[];
-  subjectProgress: Record<string, {
-    correct: number;
-    total: number;
-    currentDifficulty: string;
-    questionsAsked: number;
-  }>;
-  studentProfile: {
-    examType: "BEPC" | "BAC";
-    grade: "3eme" | "terminale";
-    series?: "A1" | "A2" | "C" | "D";
-    prioritySubjects: string[];
-    targetScore?: number;
-    currentLevel?: Record<string, "débutant" | "intermédiaire" | "avancé">;
-  };
+  questions: PlannedQuestion[];
+  domainProgress: Record<string, DomainProgress>;
+  studentProfile: StudentProfile;
+}
+
+const QUESTION_BANK_PATH = fileURLToPath(
+  new URL("../../data/assessment/bepc-maths-3eme.json", import.meta.url),
+);
+
+const DOMAIN_CONFIG = [
+  { key: "calc_num", topic: "Calcul numerique", idPrefix: "calc-num", count: 1 },
+  { key: "calc_lit", topic: "Calcul litteral", idPrefix: "calc-lit", count: 2 },
+  { key: "equations", topic: "Equations et inequations", idPrefix: "eq-", count: 2 },
+  { key: "systemes", topic: "Systemes d'equations", idPrefix: "sys-", count: 1 },
+  { key: "fonctions", topic: "Fonctions lineaires et affines", idPrefix: "fonc-", count: 2 },
+  { key: "statistiques", topic: "Statistiques", idPrefix: "stat-", count: 1 },
+  { key: "pythagore", topic: "Theoreme de Pythagore", idPrefix: "pyth-", count: 2 },
+  { key: "thales", topic: "Theoreme de Thales", idPrefix: "thal-", count: 2 },
+  { key: "trigonometrie", topic: "Trigonometrie", idPrefix: "trigo-", count: 1 },
+  { key: "vie_courante", topic: "Problemes de la vie courante", idPrefix: "prob-", count: 1 },
+] as const;
+
+const REQUIRED_TOTAL_QUESTIONS = DOMAIN_CONFIG.reduce((sum, domain) => sum + domain.count, 0);
+const LEVEL_BEGINNER = "debutant";
+const LEVEL_INTERMEDIATE = "intermediaire";
+const LEVEL_ADVANCED = "avance";
+
+function repairMojibake(input: string): string {
+  if (!/[ÃÂâ]/.test(input)) {
+    return input;
+  }
+
+  const repaired = Buffer.from(input, "latin1").toString("utf8");
+  return /[ÃÂâ]/.test(repaired) ? input : repaired;
+}
+
+const WINDOWS_1252_REVERSE_MAP: Record<number, number> = {
+  0x20ac: 0x80,
+  0x201a: 0x82,
+  0x0192: 0x83,
+  0x201e: 0x84,
+  0x2026: 0x85,
+  0x2020: 0x86,
+  0x2021: 0x87,
+  0x02c6: 0x88,
+  0x2030: 0x89,
+  0x0160: 0x8a,
+  0x2039: 0x8b,
+  0x0152: 0x8c,
+  0x017d: 0x8e,
+  0x2018: 0x91,
+  0x2019: 0x92,
+  0x201c: 0x93,
+  0x201d: 0x94,
+  0x2022: 0x95,
+  0x2013: 0x96,
+  0x2014: 0x97,
+  0x02dc: 0x98,
+  0x2122: 0x99,
+  0x0161: 0x9a,
+  0x203a: 0x9b,
+  0x0153: 0x9c,
+  0x017e: 0x9e,
+  0x0178: 0x9f,
+};
+
+function corruptionScore(input: string): number {
+  let score = 0;
+  for (const char of input) {
+    const code = char.charCodeAt(0);
+    if (code === 0xfffd) {
+      score += 3;
+      continue;
+    }
+    if (code < 32 && code !== 9 && code !== 10 && code !== 13) {
+      score += 2;
+      continue;
+    }
+    if (code === 0x00c3 || code === 0x00c2 || code === 0x00e2) {
+      score += 1;
+    }
+  }
+  return score;
+}
+
+function toWindows1252Bytes(input: string): Uint8Array | null {
+  const bytes: number[] = [];
+  for (const char of input) {
+    const code = char.charCodeAt(0);
+    if (code <= 0xff) {
+      bytes.push(code);
+      continue;
+    }
+
+    const mapped = WINDOWS_1252_REVERSE_MAP[code];
+    if (mapped === undefined) {
+      return null;
+    }
+    bytes.push(mapped);
+  }
+  return Uint8Array.from(bytes);
+}
+
+function cleanupResidualArtifacts(input: string): string {
+  return input
+    .replace(/\uFFFD!\u0019/g, "\u21D2")
+    .replace(/\uFFFD\uFFFD\u0019/g, "\u2212")
+    .replace(/\uFFFD\u0019/g, "\u2212")
+    .replace(/\uFFFD\u0014/g, "\u00D7")
+    .replace(/\uFFFD0\uFFFD/g, "\u2248")
+    .replace(/\uFFFD\u001A/g, "\u03B1");
+}
+
+function hasSuspiciousArtifacts(input: string): boolean {
+  for (const char of input) {
+    const code = char.charCodeAt(0);
+    if (code === 0xfffd || code === 0x00c3 || code === 0x00c2 || code === 0x00e2) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function normalizeQuestionText(input: string): string {
+  if (!hasSuspiciousArtifacts(input)) {
+    return cleanupResidualArtifacts(input);
+  }
+
+  const bytes = toWindows1252Bytes(input);
+  if (!bytes) {
+    return cleanupResidualArtifacts(repairMojibake(input));
+  }
+
+  const repaired = Buffer.from(bytes).toString("utf8");
+  if (corruptionScore(repaired) < corruptionScore(input)) {
+    return cleanupResidualArtifacts(repaired);
+  }
+
+  return cleanupResidualArtifacts(repairMojibake(input));
+}
+
+function normalizeText(input: string): string {
+  return input
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function loadQuestionBank(): QuestionBankItem[] {
+  const raw = readFileSync(QUESTION_BANK_PATH, "utf8");
+  const sanitized = raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
+  const parsed = JSON.parse(sanitized) as unknown;
+  if (!Array.isArray(parsed)) {
+    throw new Error("Invalid assessment question bank format");
+  }
+
+  const questions = (parsed as QuestionBankItem[]).map((question) => ({
+    ...question,
+    topic: normalizeQuestionText(question.topic),
+    question: normalizeQuestionText(question.question),
+    options: question.options.map((option) => normalizeQuestionText(option)),
+    explanation: normalizeQuestionText(question.explanation),
+    tags: question.tags.map((tag) => normalizeQuestionText(tag)),
+  }));
+
+  const uniqueIds = new Set<string>();
+  for (const question of questions) {
+    if (
+      !question.id ||
+      !question.topic ||
+      !question.question ||
+      !Array.isArray(question.options) ||
+      question.options.length !== 4 ||
+      typeof question.correctAnswer !== "number"
+    ) {
+      throw new Error(`Invalid question in bank: ${JSON.stringify(question).slice(0, 120)}`);
+    }
+    if (uniqueIds.has(question.id)) {
+      throw new Error(`Duplicate question id in bank: ${question.id}`);
+    }
+    uniqueIds.add(question.id);
+  }
+
+  return questions;
+}
+
+const QUESTION_BANK = loadQuestionBank();
+
+function findDomainByQuestion(question: QuestionBankItem) {
+  const normalizedTopic = normalizeText(question.topic);
+  return DOMAIN_CONFIG.find((domain) => {
+    if (question.id.startsWith(domain.idPrefix)) {
+      return true;
+    }
+    return normalizedTopic.includes(normalizeText(domain.topic));
+  });
+}
+
+function getQuestionsForDomain(domainKey: string, difficulty: Difficulty) {
+  return QUESTION_BANK.filter((question) => {
+    const domain = findDomainByQuestion(question);
+    return domain?.key === domainKey && question.difficulty === difficulty;
+  });
+}
+
+function pickQuestion(
+  domainKey: string,
+  difficulty: Difficulty,
+  usedIds: Set<string>,
+): QuestionBankItem {
+  const preferred = getQuestionsForDomain(domainKey, difficulty).filter((q) => !usedIds.has(q.id));
+  if (preferred.length > 0) {
+    return preferred[Math.floor(Math.random() * preferred.length)];
+  }
+
+  const fallback = QUESTION_BANK.filter((q) => {
+    const domain = findDomainByQuestion(q);
+    return domain?.key === domainKey && !usedIds.has(q.id);
+  });
+  if (fallback.length > 0) {
+    return fallback[Math.floor(Math.random() * fallback.length)];
+  }
+
+  throw new Error(`No available question for domain "${domainKey}"`);
+}
+
+function resolveTopic(domainKey: string, questionTopic: string): string {
+  const domain = DOMAIN_CONFIG.find((item) => item.key === domainKey);
+  return domain?.topic ?? questionTopic;
+}
+
+function createQuestionPlan(): PlannedQuestion[] {
+  const usedIds = new Set<string>();
+  const plan: PlannedQuestion[] = [];
+
+  const shuffledDomains = [...DOMAIN_CONFIG].sort(() => Math.random() - 0.5);
+
+  for (const domain of shuffledDomains) {
+    const firstQuestion = pickQuestion(domain.key, "moyen", usedIds);
+    usedIds.add(firstQuestion.id);
+    plan.push({
+      ...firstQuestion,
+      topic: resolveTopic(domain.key, firstQuestion.topic),
+      subject: "Mathematiques",
+      domainKey: domain.key,
+      domainAttempt: 1,
+    });
+  }
+
+  for (const domain of shuffledDomains.filter((item) => item.count === 2)) {
+    const secondQuestion = pickQuestion(domain.key, "moyen", usedIds);
+    usedIds.add(secondQuestion.id);
+    plan.push({
+      ...secondQuestion,
+      topic: resolveTopic(domain.key, secondQuestion.topic),
+      subject: "Mathematiques",
+      domainKey: domain.key,
+      domainAttempt: 2,
+    });
+  }
+
+  if (plan.length !== REQUIRED_TOTAL_QUESTIONS) {
+    throw new Error(`Invalid assessment plan length: ${plan.length}`);
+  }
+
+  return plan;
+}
+
+function computeDomainLevel(
+  correct: number,
+  totalPlanned: number,
+): { level: string; percentage: number } {
+  const percentage = totalPlanned > 0 ? Math.round((correct / totalPlanned) * 100) : 0;
+
+  if (totalPlanned === 2) {
+    if (correct === 2) return { level: LEVEL_ADVANCED, percentage };
+    if (correct === 1) return { level: LEVEL_INTERMEDIATE, percentage };
+    return { level: LEVEL_BEGINNER, percentage };
+  }
+
+  if (percentage >= 80) return { level: LEVEL_ADVANCED, percentage };
+  if (percentage >= 50) return { level: LEVEL_INTERMEDIATE, percentage };
+  return { level: LEVEL_BEGINNER, percentage };
 }
 
 export const AssessmentService = {
   async startAssessment(userId: number): Promise<AssessmentProgress> {
-    // Get student profile
     const student = await db.query.students.findFirst({
       where: eq(schema.students.userId, userId),
     });
@@ -46,199 +340,135 @@ export const AssessmentService = {
       throw new Error("Student not found");
     }
 
-    // Get priority subjects or all subjects for exam type
-    const subjects = student.prioritySubjects as string[] || this.getDefaultSubjects(student);
-
-    // Initialize progress
-    const subjectProgress: Record<string, { correct: number; total: number; currentDifficulty: string; questionsAsked: number }> = {};
-    subjects.forEach(subject => {
-      subjectProgress[subject] = { correct: 0, total: 0, currentDifficulty: "facile", questionsAsked: 0 };
-    });
-
-    const studentProfile = {
-      examType: student.examType as "BEPC" | "BAC",
-      grade: student.grade as "3eme" | "terminale",
-      series: student.series as "A1" | "A2" | "C" | "D" | undefined,
-      prioritySubjects: subjects,
-      targetScore: student.targetScore || undefined,
-      currentLevel: {} as Record<string, "débutant" | "intermédiaire" | "avancé">, // Explicitly type as the expected union
-    };
-
-    // Generate first question using AI
-    const firstQuestion = await this.generateNextQuestion(studentProfile, subjectProgress, []);
+    const domainProgress: Record<string, DomainProgress> = {};
+    for (const domain of DOMAIN_CONFIG) {
+      domainProgress[domain.key] = {
+        topic: domain.topic,
+        asked: 0,
+        correct: 0,
+        totalPlanned: domain.count,
+      };
+    }
 
     return {
       currentQuestionIndex: 0,
-      totalQuestions: 10,
-      questions: [firstQuestion],
-      subjectProgress,
-      studentProfile,
+      totalQuestions: REQUIRED_TOTAL_QUESTIONS,
+      questions: createQuestionPlan(),
+      domainProgress,
+      studentProfile: {
+        examType: student.examType as "BEPC" | "BAC",
+        grade: student.grade as "3eme" | "terminale",
+        series: student.series as "A1" | "A2" | "C" | "D" | undefined,
+        prioritySubjects: ["Mathematiques"],
+        targetScore: student.targetScore || undefined,
+      },
     };
   },
 
-  async generateNextQuestion(
-    studentProfile: any,
-    subjectProgress: Record<string, any>,
-    previousQuestions: QuestionWithAnswer[]
-  ): Promise<QuestionWithAnswer> {
-    // Choose subject based on progress (prioritize less tested subjects)
-    const availableSubjects = Object.keys(subjectProgress).filter(subject => subjectProgress[subject].questionsAsked < 5);
-    const subject = availableSubjects[Math.floor(Math.random() * availableSubjects.length)] ||
-                   Object.keys(subjectProgress)[0];
-
-    const subjectData = subjectProgress[subject];
-    const difficulty = subjectData.currentDifficulty;
-
-    // Generate question using AI
-    try {
-      const aiQuestion = await AIService.generateAdaptiveQuestion(
-        studentProfile,
-        subject,
-        difficulty as "facile" | "moyen" | "difficile",
-        previousQuestions
-      );
-
-      return {
-        id: `q_${Date.now()}_${Math.random()}`,
-        subject: aiQuestion.subject,
-        difficulty: aiQuestion.difficulty,
-        question: aiQuestion.question,
-        options: aiQuestion.options,
-        correctAnswer: aiQuestion.correctAnswer,
-        explanation: aiQuestion.explanation,
-        tags: aiQuestion.tags,
-      };
-    } catch (error) {
-      console.warn("AI service failed, using fallback question:", error);
-      return this.getFallbackQuestion(subject, difficulty);
-    }
-  },
-
-  async getNextQuestion(userId: number, progress: AssessmentProgress): Promise<QuestionWithAnswer | null> {
+  async getNextQuestion(userId: number, progress: AssessmentProgress): Promise<PlannedQuestion | null> {
     if (progress.currentQuestionIndex >= progress.totalQuestions) {
-      return null; // Assessment complete
+      return null;
     }
 
-    // If we don't have enough questions pre-generated, generate the next one
-    if (progress.questions.length <= progress.currentQuestionIndex) {
-      const nextQuestion = await this.generateNextQuestion(
-        progress.studentProfile,
-        progress.subjectProgress,
-        progress.questions
-      );
-      progress.questions.push(nextQuestion);
-    }
-
-    return progress.questions[progress.currentQuestionIndex];
+    return progress.questions[progress.currentQuestionIndex] ?? null;
   },
 
   async submitAnswer(
     userId: number,
     questionId: string,
     userAnswer: number,
-    progress: AssessmentProgress
+    progress: AssessmentProgress,
   ): Promise<AssessmentProgress> {
-    const question = progress.questions.find(q => q.id === questionId);
-    if (!question) {
+    const currentQuestion = progress.questions.find((question) => question.id === questionId);
+    if (!currentQuestion) {
       throw new Error("Question not found in progress");
     }
 
-    // Mark answer
-    question.userAnswer = userAnswer;
-    question.isCorrect = userAnswer === question.correctAnswer;
+    currentQuestion.userAnswer = userAnswer;
+    currentQuestion.isCorrect = userAnswer === currentQuestion.correctAnswer;
 
-    // Update subject progress
-    const subjectData = progress.subjectProgress[question.subject];
-    subjectData.total += 1;
-    subjectData.questionsAsked += 1;
+    const domainState = progress.domainProgress[currentQuestion.domainKey];
+    domainState.asked += 1;
+    if (currentQuestion.isCorrect) {
+      domainState.correct += 1;
+    }
 
-    if (question.isCorrect) {
-      subjectData.correct += 1;
+    if (currentQuestion.domainAttempt === 1 && domainState.totalPlanned === 2) {
+      const secondQuestionIndex = progress.questions.findIndex(
+        (question) => question.domainKey === currentQuestion.domainKey && question.domainAttempt === 2,
+      );
 
-      // Increase difficulty if performing well
-      if (subjectData.questionsAsked >= 2 && (subjectData.correct / subjectData.total) >= 0.7) {
-        if (subjectData.currentDifficulty === "facile") {
-          subjectData.currentDifficulty = "moyen";
-        } else if (subjectData.currentDifficulty === "moyen") {
-          subjectData.currentDifficulty = "difficile";
-        }
-      }
-    } else {
-      // Decrease difficulty if struggling
-      if (subjectData.currentDifficulty === "difficile") {
-        subjectData.currentDifficulty = "moyen";
-      } else if (subjectData.currentDifficulty === "moyen") {
-        subjectData.currentDifficulty = "facile";
+      if (secondQuestionIndex >= 0) {
+        const desiredDifficulty: Difficulty = currentQuestion.isCorrect ? "difficile" : "facile";
+        const nextQuestion = progress.questions[secondQuestionIndex];
+        const usedIds = new Set(progress.questions.map((question) => question.id));
+        usedIds.delete(nextQuestion.id);
+
+        const replacement = pickQuestion(currentQuestion.domainKey, desiredDifficulty, usedIds);
+        progress.questions[secondQuestionIndex] = {
+          ...replacement,
+          topic: resolveTopic(currentQuestion.domainKey, replacement.topic),
+          subject: "Mathematiques",
+          domainKey: currentQuestion.domainKey,
+          domainAttempt: 2,
+        };
       }
     }
 
-    // Move to next question
     progress.currentQuestionIndex += 1;
-
     return progress;
   },
 
-  async completeAssessment(userId: number, finalProgress: AssessmentProgress): Promise<{
+  async completeAssessment(
+    userId: number,
+    finalProgress: AssessmentProgress,
+  ): Promise<{
     subjectLevels: Record<string, { level: string; percentage: number }>;
     overallAverage: number;
-    personalizedPlan: any;
+    personalizedPlan: unknown;
   }> {
     const subjectLevels: Record<string, { level: string; percentage: number }> = {};
 
-    let totalScore = 0;
-    let totalQuestions = 0;
+    let totalCorrect = 0;
+    let totalAnswered = 0;
 
-    for (const [subject, data] of Object.entries(finalProgress.subjectProgress)) {
-      const percentage = Math.round((data.correct / data.total) * 100);
-      totalScore += data.correct;
-      totalQuestions += data.total;
+    for (const [domainKey, domainState] of Object.entries(finalProgress.domainProgress)) {
+      totalCorrect += domainState.correct;
+      totalAnswered += domainState.asked;
 
-      let level: string;
-      if (percentage >= 80) {
-        level = "avancé";
-      } else if (percentage >= 60) {
-        level = "intermédiaire";
-      } else {
-        level = "débutant";
-      }
-
-      subjectLevels[subject] = { level, percentage };
+      const result = computeDomainLevel(domainState.correct, domainState.totalPlanned);
+      const label = DOMAIN_CONFIG.find((domain) => domain.key === domainKey)?.topic ?? domainState.topic;
+      subjectLevels[label] = result;
     }
 
-    const overallAverage = Math.round((totalScore / totalQuestions) * 100);
+    const overallAverage = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+    const personalizedPlan = await AIService.generatePersonalizedPlan(finalProgress.studentProfile, subjectLevels);
 
-    // Generate personalized plan using AI
-    const personalizedPlan = await AIService.generatePersonalizedPlan(
-      finalProgress.studentProfile,
-      subjectLevels
-    );
-
-    // Save assessment results
     const student = await db.query.students.findFirst({
       where: eq(schema.students.userId, userId),
     });
 
     if (student) {
-      // Save to level_assessments table
       await db.insert(schema.levelAssessments).values({
         studentId: student.id,
-        subject: "global", // For overall assessment
-        questionsJson: finalProgress.questions.map(q => ({
-          id: q.id,
-          subject: q.subject,
-          difficulty: q.difficulty,
-          question: q.question,
-          userAnswer: q.userAnswer,
-          correctAnswer: q.correctAnswer,
-          isCorrect: q.isCorrect,
+        subject: "Mathematiques",
+        questionsJson: finalProgress.questions.map((question) => ({
+          id: question.id,
+          topic: question.topic,
+          subject: question.subject,
+          difficulty: question.difficulty,
+          question: question.question,
+          options: question.options,
+          userAnswer: question.userAnswer,
+          correctAnswer: question.correctAnswer,
+          isCorrect: question.isCorrect,
+          tags: question.tags,
         })),
-        answersJson: finalProgress.questions.map(q => q.userAnswer),
+        answersJson: finalProgress.questions.map((question) => question.userAnswer ?? null),
         score: overallAverage,
-        level: overallAverage >= 80 ? "avancé" : overallAverage >= 60 ? "intermédiaire" : "débutant",
         completedAt: new Date(),
       });
 
-      // Update student assessment status
       await db
         .update(schema.students)
         .set({
@@ -251,84 +481,44 @@ export const AssessmentService = {
     return { subjectLevels, overallAverage, personalizedPlan };
   },
 
-  getFallbackQuestion(subject: string, difficulty: string): QuestionWithAnswer {
-    // Fallback questions when AI service is not available
-    const fallbackQuestions: Record<string, QuestionWithAnswer[]> = {
-      "Mathématiques": [
-        {
-          id: `fallback_math_${Date.now()}`,
-          subject: "Mathématiques",
-          difficulty: difficulty as "facile" | "moyen" | "difficile",
-          question: "Quel est le résultat de 2 + 3 ?",
-          options: ["3", "4", "5", "6"],
-          correctAnswer: 2,
-          explanation: "2 + 3 = 5, donc la réponse correcte est 5.",
-          tags: ["arithmétique", "addition"]
-        },
-        {
-          id: `fallback_math_${Date.now() + 1}`,
-          subject: "Mathématiques",
-          difficulty: difficulty as "facile" | "moyen" | "difficile",
-          question: "Quel est le périmètre d'un carré de côté 4 cm ?",
-          options: ["8 cm", "12 cm", "16 cm", "20 cm"],
-          correctAnswer: 2,
-          explanation: "Le périmètre d'un carré est 4 × côté = 4 × 4 = 16 cm.",
-          tags: ["géométrie", "périmètre"]
-        }
-      ],
-      "Français": [
-        {
-          id: `fallback_fr_${Date.now()}`,
-          subject: "Français",
-          difficulty: difficulty as "facile" | "moyen" | "difficile",
-          question: "Quelle est la nature du mot 'maison' dans la phrase 'La maison est grande' ?",
-          options: ["Verbe", "Adjectif", "Nom commun", "Pronom"],
-          correctAnswer: 2,
-          explanation: "'Maison' est un nom commun car il désigne un objet concret.",
-          tags: ["grammaire", "nature des mots"]
-        }
-      ]
-    };
-
-    const subjectQuestions = fallbackQuestions[subject] || fallbackQuestions["Mathématiques"];
-    return subjectQuestions[Math.floor(Math.random() * subjectQuestions.length)];
-  },
-
   async getLatestResults(userId: number) {
     const student = await db.query.students.findFirst({
       where: eq(schema.students.userId, userId),
     });
-    if (!student) return null;
+    if (!student) {
+      return null;
+    }
 
     const assessment = await db.query.levelAssessments.findFirst({
       where: eq(schema.levelAssessments.studentId, student.id),
       orderBy: [desc(schema.levelAssessments.createdAt)],
     });
-    if (!assessment) return null;
-
-    // Rebuild subject levels from saved questions
-    const questions = assessment.questionsJson as Array<{
-      subject: string;
-      isCorrect?: boolean;
-    }>;
-
-    const subjectLevels: Record<string, { level: string; percentage: number }> = {};
-    const subjectStats: Record<string, { correct: number; total: number }> = {};
-
-    for (const q of questions) {
-      if (!subjectStats[q.subject]) {
-        subjectStats[q.subject] = { correct: 0, total: 0 };
-      }
-      subjectStats[q.subject].total += 1;
-      if (q.isCorrect) subjectStats[q.subject].correct += 1;
+    if (!assessment) {
+      return null;
     }
 
-    for (const [subject, stats] of Object.entries(subjectStats)) {
-      const percentage = Math.round((stats.correct / stats.total) * 100);
-      subjectLevels[subject] = {
-        level: percentage >= 80 ? "avancé" : percentage >= 60 ? "intermédiaire" : "débutant",
-        percentage,
-      };
+    const questions = (assessment.questionsJson as Array<{
+      topic?: string;
+      isCorrect?: boolean;
+    }>) ?? [];
+
+    const topicStats: Record<string, { correct: number; total: number }> = {};
+    for (const question of questions) {
+      const topic = question.topic ?? "Mathematiques";
+      if (!topicStats[topic]) {
+        topicStats[topic] = { correct: 0, total: 0 };
+      }
+      topicStats[topic].total += 1;
+      if (question.isCorrect) {
+        topicStats[topic].correct += 1;
+      }
+    }
+
+    const subjectLevels: Record<string, { level: string; percentage: number }> = {};
+    for (const [topic, stats] of Object.entries(topicStats)) {
+      const domain = DOMAIN_CONFIG.find((item) => normalizeText(item.topic) === normalizeText(topic));
+      const totalPlanned = domain?.count ?? stats.total;
+      subjectLevels[topic] = computeDomainLevel(stats.correct, totalPlanned);
     }
 
     return {
@@ -336,24 +526,5 @@ export const AssessmentService = {
       overallAverage: assessment.score ?? 0,
       completedAt: assessment.completedAt,
     };
-  },
-
-  getDefaultSubjects(student: any): string[] {
-    // Return default subjects based on exam type and series
-    if (student.examType === "BEPC") {
-      return ["Mathématiques", "Français", "Histoire-Géographie", "SVT", "Physique-Chimie", "Anglais"];
-    } else { // BAC
-      switch (student.series) {
-        case "C":
-          return ["Mathématiques", "Physique-Chimie", "SVT", "Philosophie", "Français", "Anglais"];
-        case "D":
-          return ["Mathématiques", "SVT", "Philosophie", "Français", "Anglais", "Espagnol"];
-        case "A1":
-        case "A2":
-          return ["Mathématiques", "Philosophie", "Français", "Anglais", "SVT", "Histoire-Géographie"];
-        default:
-          return ["Mathématiques", "Français", "Philosophie", "Anglais"];
-      }
-    }
   },
 };

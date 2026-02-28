@@ -15,7 +15,8 @@ import parentRouter from "./routes/parent.routes.js";
 import ragRouter from "./routes/rag.routes.js";
 
 const app = express();
-const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 3001);
+const BASE_PORT = Number(process.env.PORT || process.env.SERVER_PORT || 3001);
+const MAX_PORT_ATTEMPTS = 10;
 
 // Middleware
 app.use(helmet());
@@ -50,7 +51,22 @@ app.get("/", (req, res) => {
   res.json({ message: "Notria API Server" });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-});
+function startServer(port: number, attemptsLeft: number): void {
+  const server = app.listen(port, () => {
+    console.log(`🚀 Server running on port ${port}`);
+    console.log(`📊 Health check: http://localhost:${port}/health`);
+  });
+
+  server.on("error", (error: NodeJS.ErrnoException) => {
+    if (error.code === "EADDRINUSE" && attemptsLeft > 0) {
+      const nextPort = port + 1;
+      console.warn(`Port ${port} is already in use. Retrying on port ${nextPort}...`);
+      startServer(nextPort, attemptsLeft - 1);
+      return;
+    }
+
+    throw error;
+  });
+}
+
+startServer(BASE_PORT, MAX_PORT_ATTEMPTS);
