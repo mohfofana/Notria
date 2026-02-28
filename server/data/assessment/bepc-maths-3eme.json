@@ -1,0 +1,1272 @@
+﻿[
+    {
+        "id":  "calc-num-01",
+        "topic":  "Calcul numÃ©rique",
+        "difficulty":  "facile",
+        "question":  "Calcule : 3Â² + 4Â²",
+        "options":  [
+                        "7",
+                        "25",
+                        "24",
+                        "49"
+                    ],
+        "correctAnswer":  1,
+        "explanation":  "3Â² + 4Â² = 9 + 16 = 25.",
+        "tags":  [
+                     "puissances",
+                     "carrÃ©s"
+                 ]
+    },
+    {
+        "id":  "calc-num-02",
+        "topic":  "Calcul numÃ©rique",
+        "difficulty":  "facile",
+        "question":  "Simplifie : âˆš49",
+        "options":  [
+                        "6",
+                        "7",
+                        "8",
+                        "âˆš49 ne se simplifie pas"
+                    ],
+        "correctAnswer":  1,
+        "explanation":  "âˆš49 = 7 car 7 Ã— 7 = 49.",
+        "tags":  [
+                     "racines carrÃ©es"
+                 ]
+    },
+    {
+        "id":  "calc-num-03",
+        "topic":  "Calcul numÃ©rique",
+        "difficulty":  "moyen",
+        "question":  "Calcule : âˆš(50) sous forme simplifiÃ©e",
+        "options":  [
+                        "5âˆš2",
+                        "2âˆš5",
+                        "âˆš50",
+                        "10âˆš5"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "âˆš50 = âˆš(25 Ã— 2) = âˆš25 Ã— âˆš2 = 5âˆš2.",
+        "tags":  [
+                     "racines carrÃ©es",
+                     "simplification"
+                 ]
+    },
+    {
+        "id":  "calc-num-04",
+        "topic":  "Calcul numÃ©rique",
+        "difficulty":  "moyen",
+        "question":  "Calcule le PGCD de 36 et 48",
+        "options":  [
+                        "6",
+                        "12",
+                        "18",
+                        "24"
+                    ],
+        "correctAnswer":  1,
+        "explanation":  "36 = 2Â² Ã— 3Â² et 48 = 2â´ Ã— 3. Le PGCD = 2Â² Ã— 3 = 12.",
+        "tags":  [
+                     "PGCD",
+                     "dÃ©composition"
+                 ]
+    },
+    {
+        "id":  "calc-num-05",
+        "topic":  "Calcul numÃ©rique",
+        "difficulty":  "difficile",
+        "question":  "Rends irrÃ©ductible la fraction 84/126",
+        "options":  [
+                        "2/3",
+                        "4/6",
+                        "14/21",
+                        "28/42"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "PGCD(84, 126) = 42. Donc 84/126 = (84Ã·42)/(126Ã·42) = 2/3.",
+        "tags":  [
+                     "fractions",
+                     "PGCD",
+                     "simplification"
+                 ]
+    },
+    {
+        "id":  "calc-num-06",
+        "topic":  "Calcul numÃ©rique",
+        "difficulty":  "difficile",
+        "question":  "Ã‰cris sous la forme aâˆšb : âˆš12 + âˆš27 âˆ’ âˆš3",
+        "options":  [
+                        "4âˆš3",
+                        "5âˆš3",
+                        "3âˆš3",
+                        "6âˆš3"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "âˆš12 = 2âˆš3, âˆš27 = 3âˆš3. Donc 2âˆš3 + 3âˆš3 âˆ’ âˆš3 = (2+3âˆ’1)âˆš3 = 4âˆš3.",
+        "tags":  [
+                     "racines carrÃ©es",
+                     "simplification",
+                     "opÃ©rations"
+                 ]
+    },
+    {
+        "id":  "calc-lit-01",
+        "topic":  "Calcul littÃ©ral",
+        "difficulty":  "facile",
+        "question":  "DÃ©veloppe : 3(2x + 5)",
+        "options":  [
+                        "6x + 15",
+                        "6x + 5",
+                        "5x + 15",
+                        "6x + 8"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "3(2x + 5) = 3 Ã— 2x + 3 Ã— 5 = 6x + 15.",
+        "tags":  [
+                     "dÃ©veloppement",
+                     "distributivitÃ©"
+                 ]
+    },
+    {
+        "id":  "calc-lit-02",
+        "topic":  "Calcul littÃ©ral",
+        "difficulty":  "facile",
+        "question":  "RÃ©duis l\u0027expression : 4x âˆ’ 2x + 7 âˆ’ 3",
+        "options":  [
+                        "2x + 4",
+                        "6x + 4",
+                        "2x + 10",
+                        "2x âˆ’ 4"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "4x âˆ’ 2x = 2x et 7 âˆ’ 3 = 4. Donc 2x + 4.",
+        "tags":  [
+                     "rÃ©duction",
+                     "expressions"
+                 ]
+    },
+    {
+        "id":  "calc-lit-03",
+        "topic":  "Calcul littÃ©ral",
+        "difficulty":  "moyen",
+        "question":  "Factorise : 4xÂ² âˆ’ 9",
+        "options":  [
+                        "(2x âˆ’ 3)(2x + 3)",
+                        "(4x âˆ’ 9)(x + 1)",
+                        "(2x âˆ’ 3)Â²",
+                        "(2x + 9)(2x âˆ’ 1)"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "4xÂ² âˆ’ 9 = (2x)Â² âˆ’ 3Â². C\u0027est une identitÃ© remarquable aÂ² âˆ’ bÂ² = (aâˆ’b)(a+b). Donc (2xâˆ’3)(2x+3).",
+        "tags":  [
+                     "factorisation",
+                     "identitÃ© remarquable",
+                     "aÂ²âˆ’bÂ²"
+                 ]
+    },
+    {
+        "id":  "calc-lit-04",
+        "topic":  "Calcul littÃ©ral",
+        "difficulty":  "moyen",
+        "question":  "DÃ©veloppe et rÃ©duis : (x + 3)Â²",
+        "options":  [
+                        "xÂ² + 6x + 9",
+                        "xÂ² + 9",
+                        "xÂ² + 3x + 9",
+                        "2x + 9"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "(x + 3)Â² = xÂ² + 2 Ã— x Ã— 3 + 3Â² = xÂ² + 6x + 9. C\u0027est l\u0027identitÃ© (a+b)Â² = aÂ² + 2ab + bÂ².",
+        "tags":  [
+                     "dÃ©veloppement",
+                     "identitÃ© remarquable",
+                     "(a+b)Â²"
+                 ]
+    },
+    {
+        "id":  "calc-lit-05",
+        "topic":  "Calcul littÃ©ral",
+        "difficulty":  "moyen",
+        "question":  "Factorise : 6xÂ² + 9x",
+        "options":  [
+                        "3x(2x + 3)",
+                        "6x(x + 9)",
+                        "3(2xÂ² + 3x)",
+                        "9x(x + 1)"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Le facteur commun est 3x. 6xÂ² + 9x = 3x(2x + 3).",
+        "tags":  [
+                     "factorisation",
+                     "facteur commun"
+                 ]
+    },
+    {
+        "id":  "calc-lit-06",
+        "topic":  "Calcul littÃ©ral",
+        "difficulty":  "difficile",
+        "question":  "DÃ©veloppe et rÃ©duis : (2x âˆ’ 1)(x + 4) âˆ’ (x âˆ’ 3)Â²",
+        "options":  [
+                        "xÂ² + 13x âˆ’ 13",
+                        "xÂ² + 7x âˆ’ 13",
+                        "xÂ² + 13x + 5",
+                        "3xÂ² + 7x âˆ’ 13"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "(2xâˆ’1)(x+4) = 2xÂ² + 8x âˆ’ x âˆ’ 4 = 2xÂ² + 7x âˆ’ 4. (xâˆ’3)Â² = xÂ² âˆ’ 6x + 9. Donc 2xÂ² + 7x âˆ’ 4 âˆ’ xÂ² + 6x âˆ’ 9 = xÂ² + 13x âˆ’ 13.",
+        "tags":  [
+                     "dÃ©veloppement",
+                     "identitÃ© remarquable",
+                     "rÃ©duction"
+                 ]
+    },
+    {
+        "id":  "calc-lit-07",
+        "topic":  "Calcul littÃ©ral",
+        "difficulty":  "difficile",
+        "question":  "Factorise complÃ¨tement : xÂ² âˆ’ 6x + 9",
+        "options":  [
+                        "(x âˆ’ 3)Â²",
+                        "(x + 3)Â²",
+                        "(x âˆ’ 3)(x + 3)",
+                        "(x âˆ’ 9)(x + 1)"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "xÂ² âˆ’ 6x + 9 = xÂ² âˆ’ 2 Ã— x Ã— 3 + 3Â² = (x âˆ’ 3)Â². C\u0027est l\u0027identitÃ© (aâˆ’b)Â² = aÂ² âˆ’ 2ab + bÂ².",
+        "tags":  [
+                     "factorisation",
+                     "identitÃ© remarquable",
+                     "(aâˆ’b)Â²"
+                 ]
+    },
+    {
+        "id":  "eq-01",
+        "topic":  "Ã‰quations et inÃ©quations",
+        "difficulty":  "facile",
+        "question":  "RÃ©sous : 2x + 6 = 0",
+        "options":  [
+                        "x = âˆ’3",
+                        "x = 3",
+                        "x = âˆ’6",
+                        "x = 6"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "2x + 6 = 0 â‡’ 2x = âˆ’6 â‡’ x = âˆ’6/2 = âˆ’3.",
+        "tags":  [
+                     "Ã©quation premier degrÃ©"
+                 ]
+    },
+    {
+        "id":  "eq-02",
+        "topic":  "Ã‰quations et inÃ©quations",
+        "difficulty":  "facile",
+        "question":  "RÃ©sous l\u0027inÃ©quation : x + 5 \u003e 8",
+        "options":  [
+                        "x \u003e 3",
+                        "x \u003e 13",
+                        "x \u003c 3",
+                        "x \u003e âˆ’3"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "x + 5 \u003e 8 â‡’ x \u003e 8 âˆ’ 5 â‡’ x \u003e 3.",
+        "tags":  [
+                     "inÃ©quation premier degrÃ©"
+                 ]
+    },
+    {
+        "id":  "eq-03",
+        "topic":  "Ã‰quations et inÃ©quations",
+        "difficulty":  "moyen",
+        "question":  "RÃ©sous : 3(x âˆ’ 2) = 2(x + 1)",
+        "options":  [
+                        "x = 8",
+                        "x = 4",
+                        "x = âˆ’8",
+                        "x = 2"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "3x âˆ’ 6 = 2x + 2 â‡’ 3x âˆ’ 2x = 2 + 6 â‡’ x = 8.",
+        "tags":  [
+                     "Ã©quation premier degrÃ©",
+                     "dÃ©veloppement"
+                 ]
+    },
+    {
+        "id":  "eq-04",
+        "topic":  "Ã‰quations et inÃ©quations",
+        "difficulty":  "moyen",
+        "question":  "RÃ©sous : (x âˆ’ 5)(2x + 3) = 0",
+        "options":  [
+                        "x = 5 ou x = âˆ’3/2",
+                        "x = âˆ’5 ou x = 3/2",
+                        "x = 5 ou x = 3/2",
+                        "x = âˆ’5 ou x = âˆ’3/2"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Un produit est nul si l\u0027un des facteurs est nul. x âˆ’ 5 = 0 donne x = 5. 2x + 3 = 0 donne x = âˆ’3/2.",
+        "tags":  [
+                     "Ã©quation produit nul"
+                 ]
+    },
+    {
+        "id":  "eq-05",
+        "topic":  "Ã‰quations et inÃ©quations",
+        "difficulty":  "difficile",
+        "question":  "RÃ©sous : (x + 1)/(x âˆ’ 2) = 3, avec x â‰  2",
+        "options":  [
+                        "x = 7/2",
+                        "x = 5/2",
+                        "x = 3",
+                        "x = 7"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "x + 1 = 3(x âˆ’ 2) â‡’ x + 1 = 3x âˆ’ 6 â‡’ 1 + 6 = 3x âˆ’ x â‡’ 7 = 2x â‡’ x = 7/2.",
+        "tags":  [
+                     "Ã©quation avec fractions",
+                     "premier degrÃ©"
+                 ]
+    },
+    {
+        "id":  "eq-06",
+        "topic":  "Ã‰quations et inÃ©quations",
+        "difficulty":  "difficile",
+        "question":  "RÃ©sous l\u0027inÃ©quation : âˆ’2x + 7 â‰¤ 3x âˆ’ 8",
+        "options":  [
+                        "x â‰¥ 3",
+                        "x â‰¤ 3",
+                        "x â‰¥ âˆ’3",
+                        "x â‰¤ âˆ’1"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "âˆ’2x + 7 â‰¤ 3x âˆ’ 8 â‡’ 7 + 8 â‰¤ 3x + 2x â‡’ 15 â‰¤ 5x â‡’ x â‰¥ 3.",
+        "tags":  [
+                     "inÃ©quation",
+                     "premier degrÃ©"
+                 ]
+    },
+    {
+        "id":  "sys-01",
+        "topic":  "SystÃ¨mes d\u0027Ã©quations",
+        "difficulty":  "facile",
+        "question":  "Quel couple (x ; y) est solution du systÃ¨me : x + y = 7 et x âˆ’ y = 3 ?",
+        "options":  [
+                        "(5 ; 2)",
+                        "(4 ; 3)",
+                        "(3 ; 4)",
+                        "(6 ; 1)"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "En additionnant : 2x = 10 donc x = 5. Et y = 7 âˆ’ 5 = 2. VÃ©rification : 5 âˆ’ 2 = 3 âœ“.",
+        "tags":  [
+                     "systÃ¨me",
+                     "addition"
+                 ]
+    },
+    {
+        "id":  "sys-02",
+        "topic":  "SystÃ¨mes d\u0027Ã©quations",
+        "difficulty":  "moyen",
+        "question":  "RÃ©sous par substitution : y = 2x âˆ’ 1 et 3x + y = 9",
+        "options":  [
+                        "(2 ; 3)",
+                        "(3 ; 5)",
+                        "(1 ; 1)",
+                        "(4 ; 7)"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "On remplace y dans la 2e : 3x + (2x âˆ’ 1) = 9 â‡’ 5x = 10 â‡’ x = 2. Puis y = 2(2) âˆ’ 1 = 3.",
+        "tags":  [
+                     "systÃ¨me",
+                     "substitution"
+                 ]
+    },
+    {
+        "id":  "sys-03",
+        "topic":  "SystÃ¨mes d\u0027Ã©quations",
+        "difficulty":  "moyen",
+        "question":  "RÃ©sous : 2x + 3y = 12 et 4x âˆ’ 3y = 6",
+        "options":  [
+                        "(3 ; 2)",
+                        "(2 ; 3)",
+                        "(6 ; 0)",
+                        "(0 ; 4)"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "En additionnant les deux Ã©quations : 6x = 18 donc x = 3. Puis 2(3) + 3y = 12 â‡’ 3y = 6 â‡’ y = 2.",
+        "tags":  [
+                     "systÃ¨me",
+                     "combinaison linÃ©aire"
+                 ]
+    },
+    {
+        "id":  "sys-04",
+        "topic":  "SystÃ¨mes d\u0027Ã©quations",
+        "difficulty":  "difficile",
+        "question":  "Resous : 3x - 2y = 1 et 5x + 4y = 23",
+        "options":  [
+                        "x = 3 et y = 4",
+                        "x = 25/11 et y = 32/11",
+                        "x = 2 et y = 3",
+                        "x = 4 et y = 3"
+                    ],
+        "correctAnswer":  1,
+        "explanation":  "On multiplie la 1ere equation par 2 : 6x - 4y = 2. En ajoutant avec 5x + 4y = 23, on obtient 11x = 25 donc x = 25/11. Puis 3x - 2y = 1 donne y = 32/11.",
+        "tags":  [
+                     "systÃ¨me",
+                     "combinaison"
+                 ]
+    },
+    {
+        "id":  "sys-05",
+        "topic":  "SystÃ¨mes d\u0027Ã©quations",
+        "difficulty":  "difficile",
+        "question":  "Un pÃ¨re a 40 ans et son fils a 10 ans. Dans combien d\u0027annÃ©es l\u0027Ã¢ge du pÃ¨re sera-t-il le double de celui de son fils ?",
+        "options":  [
+                        "20 ans",
+                        "10 ans",
+                        "15 ans",
+                        "30 ans"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Dans x annÃ©es : pÃ¨re = 40+x, fils = 10+x. On veut 40+x = 2(10+x) â‡’ 40+x = 20+2x â‡’ 20 = x. Dans 20 ans.",
+        "tags":  [
+                     "systÃ¨me",
+                     "mise en Ã©quation",
+                     "problÃ¨me"
+                 ]
+    },
+    {
+        "id":  "sys-06",
+        "topic":  "SystÃ¨mes d\u0027Ã©quations",
+        "difficulty":  "facile",
+        "question":  "Le couple (1 ; 4) est-il solution du systÃ¨me : x + y = 5 et 2x âˆ’ y = âˆ’2 ?",
+        "options":  [
+                        "Oui",
+                        "Non, car la 1re n\u0027est pas vÃ©rifiÃ©e",
+                        "Non, car la 2e n\u0027est pas vÃ©rifiÃ©e",
+                        "Non, aucune n\u0027est vÃ©rifiÃ©e"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "VÃ©rifions : 1 + 4 = 5 âœ“ et 2(1) âˆ’ 4 = 2 âˆ’ 4 = âˆ’2 âœ“. Le couple (1;4) est bien solution.",
+        "tags":  [
+                     "systÃ¨me",
+                     "vÃ©rification"
+                 ]
+    },
+    {
+        "id":  "fonc-01",
+        "topic":  "Fonctions linÃ©aires et affines",
+        "difficulty":  "facile",
+        "question":  "La fonction f(x) = 3x est une fonction :",
+        "options":  [
+                        "LinÃ©aire",
+                        "Affine (non linÃ©aire)",
+                        "Constante",
+                        "Ni linÃ©aire ni affine"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "f(x) = 3x est de la forme f(x) = ax, c\u0027est une fonction linÃ©aire (elle passe par l\u0027origine).",
+        "tags":  [
+                     "fonction linÃ©aire",
+                     "dÃ©finition"
+                 ]
+    },
+    {
+        "id":  "fonc-02",
+        "topic":  "Fonctions linÃ©aires et affines",
+        "difficulty":  "facile",
+        "question":  "Quelle est l\u0027image de 4 par la fonction f(x) = 2x âˆ’ 3 ?",
+        "options":  [
+                        "5",
+                        "8",
+                        "11",
+                        "1"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "f(4) = 2 Ã— 4 âˆ’ 3 = 8 âˆ’ 3 = 5.",
+        "tags":  [
+                     "fonction affine",
+                     "image"
+                 ]
+    },
+    {
+        "id":  "fonc-03",
+        "topic":  "Fonctions linÃ©aires et affines",
+        "difficulty":  "moyen",
+        "question":  "Quel est l\u0027antÃ©cÃ©dent de 7 par la fonction f(x) = 3x + 1 ?",
+        "options":  [
+                        "2",
+                        "3",
+                        "22",
+                        "8/3"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "On rÃ©sout f(x) = 7 : 3x + 1 = 7 â‡’ 3x = 6 â‡’ x = 2.",
+        "tags":  [
+                     "fonction affine",
+                     "antÃ©cÃ©dent"
+                 ]
+    },
+    {
+        "id":  "fonc-04",
+        "topic":  "Fonctions linÃ©aires et affines",
+        "difficulty":  "moyen",
+        "question":  "La droite d\u0027Ã©quation y = âˆ’2x + 5 a pour coefficient directeur et ordonnÃ©e Ã  l\u0027origine :",
+        "options":  [
+                        "a = âˆ’2 et b = 5",
+                        "a = 5 et b = âˆ’2",
+                        "a = 2 et b = 5",
+                        "a = âˆ’2 et b = âˆ’5"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Dans y = ax + b, le coefficient directeur est a = âˆ’2 et l\u0027ordonnÃ©e Ã  l\u0027origine est b = 5.",
+        "tags":  [
+                     "fonction affine",
+                     "coefficient directeur",
+                     "ordonnÃ©e Ã  l\u0027origine"
+                 ]
+    },
+    {
+        "id":  "fonc-05",
+        "topic":  "Fonctions linÃ©aires et affines",
+        "difficulty":  "moyen",
+        "question":  "Les droites d\u0027Ã©quations y = 2x + 1 et y = 2x âˆ’ 3 sont :",
+        "options":  [
+                        "ParallÃ¨les",
+                        "SÃ©cantes",
+                        "Confondues",
+                        "Perpendiculaires"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Elles ont le mÃªme coefficient directeur (a = 2) mais des ordonnÃ©es Ã  l\u0027origine diffÃ©rentes, donc elles sont parallÃ¨les.",
+        "tags":  [
+                     "droites parallÃ¨les",
+                     "coefficient directeur"
+                 ]
+    },
+    {
+        "id":  "fonc-06",
+        "topic":  "Fonctions linÃ©aires et affines",
+        "difficulty":  "difficile",
+        "question":  "DÃ©termine l\u0027Ã©quation de la droite passant par A(1 ; 3) et B(3 ; 7)",
+        "options":  [
+                        "y = 2x + 1",
+                        "y = 2x + 3",
+                        "y = 4x âˆ’ 1",
+                        "y = 2x âˆ’ 1"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Coefficient directeur : a = (7âˆ’3)/(3âˆ’1) = 4/2 = 2. Puis b : 3 = 2(1) + b â‡’ b = 1. Donc y = 2x + 1.",
+        "tags":  [
+                     "Ã©quation de droite",
+                     "coefficient directeur"
+                 ]
+    },
+    {
+        "id":  "fonc-07",
+        "topic":  "Fonctions linÃ©aires et affines",
+        "difficulty":  "difficile",
+        "question":  "Un taxi Ã  Abidjan facture 500 FCFA de prise en charge + 100 FCFA par km. Quel est le prix pour 12 km ?",
+        "options":  [
+                        "1 700 FCFA",
+                        "1 200 FCFA",
+                        "1 500 FCFA",
+                        "600 FCFA"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "f(x) = 100x + 500. Pour 12 km : f(12) = 100 Ã— 12 + 500 = 1200 + 500 = 1 700 FCFA.",
+        "tags":  [
+                     "fonction affine",
+                     "application",
+                     "vie courante"
+                 ]
+    },
+    {
+        "id":  "stat-01",
+        "topic":  "Statistiques",
+        "difficulty":  "facile",
+        "question":  "Calcule la moyenne de la sÃ©rie : 8, 12, 10, 14, 6",
+        "options":  [
+                        "10",
+                        "12",
+                        "8",
+                        "50"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Moyenne = (8 + 12 + 10 + 14 + 6) / 5 = 50 / 5 = 10.",
+        "tags":  [
+                     "moyenne"
+                 ]
+    },
+    {
+        "id":  "stat-02",
+        "topic":  "Statistiques",
+        "difficulty":  "facile",
+        "question":  "Quel est le mode de la sÃ©rie : 3, 5, 7, 5, 9, 5, 8 ?",
+        "options":  [
+                        "5",
+                        "7",
+                        "3",
+                        "9"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Le mode est la valeur qui apparaÃ®t le plus souvent. 5 apparaÃ®t 3 fois.",
+        "tags":  [
+                     "mode"
+                 ]
+    },
+    {
+        "id":  "stat-03",
+        "topic":  "Statistiques",
+        "difficulty":  "moyen",
+        "question":  "Les notes de 5 Ã©lÃ¨ves sont : 7, 9, 11, 13, 15. Quelle est la mÃ©diane ?",
+        "options":  [
+                        "11",
+                        "10",
+                        "13",
+                        "12"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "5 valeurs rangÃ©es : 7, 9, 11, 13, 15. La mÃ©diane est la 3e valeur = 11.",
+        "tags":  [
+                     "mÃ©diane"
+                 ]
+    },
+    {
+        "id":  "stat-04",
+        "topic":  "Statistiques",
+        "difficulty":  "moyen",
+        "question":  "Dans une classe, les effectifs par note sont : 8 (3 Ã©lÃ¨ves), 10 (5 Ã©lÃ¨ves), 12 (7 Ã©lÃ¨ves), 14 (5 Ã©lÃ¨ves). Quelle est la moyenne ?",
+        "options":  [
+                        "11,4",
+                        "11",
+                        "10,8",
+                        "12"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Moyenne = (8x3 + 10x5 + 12x7 + 14x5) / (3+5+7+5) = 228/20 = 11,4.",
+        "tags":  [
+                     "moyenne pondÃ©rÃ©e",
+                     "effectifs"
+                 ]
+    },
+    {
+        "id":  "stat-05",
+        "topic":  "Statistiques",
+        "difficulty":  "difficile",
+        "question":  "L\u0027Ã©tendue d\u0027une sÃ©rie est 12 et la plus petite valeur est 5. Quelle est la plus grande valeur ?",
+        "options":  [
+                        "17",
+                        "7",
+                        "12",
+                        "60"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Ã‰tendue = plus grande valeur âˆ’ plus petite valeur. Donc plus grande valeur = Ã©tendue + plus petite = 12 + 5 = 17.",
+        "tags":  [
+                     "Ã©tendue"
+                 ]
+    },
+    {
+        "id":  "stat-06",
+        "topic":  "Statistiques",
+        "difficulty":  "difficile",
+        "question":  "Un Ã©lÃ¨ve a eu les moyennes suivantes : Maths (coeff 4) : 12, FranÃ§ais (coeff 3) : 10, Anglais (coeff 2) : 14. Quelle est sa moyenne gÃ©nÃ©rale ?",
+        "options":  [
+                        "11,78",
+                        "12",
+                        "11,33",
+                        "10,89"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Moyenne = (12x4 + 10x3 + 14x2) / (4+3+2) = 106/9 = 11,78 (arrondi).",
+        "tags":  [
+                     "moyenne pondÃ©rÃ©e",
+                     "coefficients"
+                 ]
+    },
+    {
+        "id":  "pyth-01",
+        "topic":  "ThÃ©orÃ¨me de Pythagore",
+        "difficulty":  "facile",
+        "question":  "Un triangle rectangle a des cÃ´tÃ©s de l\u0027angle droit de 3 cm et 4 cm. Quelle est la longueur de l\u0027hypotÃ©nuse ?",
+        "options":  [
+                        "5 cm",
+                        "7 cm",
+                        "6 cm",
+                        "âˆš7 cm"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Par Pythagore : cÂ² = 3Â² + 4Â² = 9 + 16 = 25. Donc c = âˆš25 = 5 cm.",
+        "tags":  [
+                     "Pythagore",
+                     "hypotÃ©nuse"
+                 ]
+    },
+    {
+        "id":  "pyth-02",
+        "topic":  "ThÃ©orÃ¨me de Pythagore",
+        "difficulty":  "facile",
+        "question":  "Le triangle de cÃ´tÃ©s 5 cm, 12 cm et 13 cm est-il rectangle ?",
+        "options":  [
+                        "Oui, car 5Â² + 12Â² = 13Â²",
+                        "Non",
+                        "On ne peut pas savoir",
+                        "Oui, car 5 + 12 = 17"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "5Â² + 12Â² = 25 + 144 = 169 = 13Â². L\u0027Ã©galitÃ© de Pythagore est vÃ©rifiÃ©e, le triangle est rectangle.",
+        "tags":  [
+                     "Pythagore",
+                     "rÃ©ciproque"
+                 ]
+    },
+    {
+        "id":  "pyth-03",
+        "topic":  "ThÃ©orÃ¨me de Pythagore",
+        "difficulty":  "moyen",
+        "question":  "Dans un triangle ABC rectangle en B, AC = 10 cm et BC = 6 cm. Calcule AB.",
+        "options":  [
+                        "8 cm",
+                        "4 cm",
+                        "âˆš136 cm",
+                        "16 cm"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "AC est l\u0027hypotÃ©nuse. ABÂ² = ACÂ² âˆ’ BCÂ² = 100 âˆ’ 36 = 64. AB = âˆš64 = 8 cm.",
+        "tags":  [
+                     "Pythagore",
+                     "cÃ´tÃ© manquant"
+                 ]
+    },
+    {
+        "id":  "pyth-04",
+        "topic":  "ThÃ©orÃ¨me de Pythagore",
+        "difficulty":  "moyen",
+        "question":  "Un terrain rectangulaire mesure 30 m Ã— 40 m. Quelle est la longueur de sa diagonale ?",
+        "options":  [
+                        "50 m",
+                        "70 m",
+                        "35 m",
+                        "10âˆš7 m"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "La diagonale d\u0027un rectangle forme un triangle rectangle. dÂ² = 30Â² + 40Â² = 900 + 1600 = 2500. d = 50 m.",
+        "tags":  [
+                     "Pythagore",
+                     "rectangle",
+                     "diagonale"
+                 ]
+    },
+    {
+        "id":  "pyth-05",
+        "topic":  "ThÃ©orÃ¨me de Pythagore",
+        "difficulty":  "difficile",
+        "question":  "Un poteau de 8 m est maintenu par un cÃ¢ble fixÃ© au sol Ã  6 m du pied. Quelle est la longueur du cÃ¢ble ?",
+        "options":  [
+                        "10 m",
+                        "14 m",
+                        "âˆš100 m",
+                        "2âˆš7 m"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "CÃ¢bleÂ² = 8Â² + 6Â² = 64 + 36 = 100. CÃ¢ble = âˆš100 = 10 m.",
+        "tags":  [
+                     "Pythagore",
+                     "situation concrÃ¨te"
+                 ]
+    },
+    {
+        "id":  "pyth-06",
+        "topic":  "ThÃ©orÃ¨me de Pythagore",
+        "difficulty":  "difficile",
+        "question":  "Dans le triangle ABC rectangle en A, AB = 5 cm, AC = 12 cm. M est le milieu de [BC]. Calcule AM.",
+        "options":  [
+                        "6,5 cm",
+                        "8,5 cm",
+                        "7 cm",
+                        "13 cm"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "BCÂ² = ABÂ² + ACÂ² = 25 + 144 = 169, BC = 13 cm. Dans un triangle rectangle, la mÃ©diane relative Ã  l\u0027hypotÃ©nuse = BC/2 = 13/2 = 6,5 cm.",
+        "tags":  [
+                     "Pythagore",
+                     "mÃ©diane",
+                     "hypotÃ©nuse"
+                 ]
+    },
+    {
+        "id":  "thal-01",
+        "topic":  "ThÃ©orÃ¨me de ThalÃ¨s",
+        "difficulty":  "facile",
+        "question":  "Dans un triangle ABC, (MN) est parallÃ¨le Ã  (BC) avec M sur [AB] et N sur [AC]. Si AM = 2, AB = 6 et AN = 3, que vaut AC ?",
+        "options":  [
+                        "9",
+                        "6",
+                        "4",
+                        "12"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Par ThalÃ¨s : AM/AB = AN/AC. Donc 2/6 = 3/AC â‡’ AC = 3 Ã— 6/2 = 9.",
+        "tags":  [
+                     "ThalÃ¨s",
+                     "proportionnalitÃ©"
+                 ]
+    },
+    {
+        "id":  "thal-02",
+        "topic":  "ThÃ©orÃ¨me de ThalÃ¨s",
+        "difficulty":  "facile",
+        "question":  "Deux droites parallÃ¨les coupÃ©es par deux sÃ©cantes donnent des segments proportionnels. Cet Ã©noncÃ© est :",
+        "options":  [
+                        "Le thÃ©orÃ¨me de ThalÃ¨s",
+                        "Le thÃ©orÃ¨me de Pythagore",
+                        "La rÃ©ciproque de ThalÃ¨s",
+                        "Le thÃ©orÃ¨me des milieux"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Le thÃ©orÃ¨me de ThalÃ¨s affirme que si deux droites parallÃ¨les coupent deux sÃ©cantes, alors elles dÃ©terminent des segments proportionnels.",
+        "tags":  [
+                     "ThalÃ¨s",
+                     "dÃ©finition"
+                 ]
+    },
+    {
+        "id":  "thal-03",
+        "topic":  "ThÃ©orÃ¨me de ThalÃ¨s",
+        "difficulty":  "moyen",
+        "question":  "Dans la configuration de ThalÃ¨s : AM/AB = 3/5, AB = 10 cm et BC = 8 cm. Calcule MN si (MN) // (BC).",
+        "options":  [
+                        "4,8 cm",
+                        "5 cm",
+                        "6 cm",
+                        "3,2 cm"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Par ThalÃ¨s : MN/BC = AM/AB = 3/5. Donc MN = BC Ã— 3/5 = 8 Ã— 3/5 = 24/5 = 4,8 cm.",
+        "tags":  [
+                     "ThalÃ¨s",
+                     "calcul de longueur"
+                 ]
+    },
+    {
+        "id":  "thal-04",
+        "topic":  "ThÃ©orÃ¨me de ThalÃ¨s",
+        "difficulty":  "moyen",
+        "question":  "Un arbre de hauteur inconnue projette une ombre de 6 m. Un piquet de 1,5 m projette une ombre de 2 m au mÃªme moment. Quelle est la hauteur de l\u0027arbre ?",
+        "options":  [
+                        "4,5 m",
+                        "3 m",
+                        "8 m",
+                        "6 m"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Par ThalÃ¨s (rayons parallÃ¨les du soleil) : h/1,5 = 6/2 â‡’ h = 1,5 Ã— 3 = 4,5 m.",
+        "tags":  [
+                     "ThalÃ¨s",
+                     "ombre",
+                     "situation concrÃ¨te"
+                 ]
+    },
+    {
+        "id":  "thal-05",
+        "topic":  "ThÃ©orÃ¨me de ThalÃ¨s",
+        "difficulty":  "difficile",
+        "question":  "Peut-on affirmer que (MN) // (BC) si AM/AB = 4/7 et AN/AC = 8/14 ?",
+        "options":  [
+                        "Oui, par la rÃ©ciproque de ThalÃ¨s",
+                        "Non",
+                        "On ne peut pas conclure",
+                        "Oui, par Pythagore"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "8/14 = 4/7. Les rapports AM/AB et AN/AC sont Ã©gaux. Par la rÃ©ciproque du thÃ©orÃ¨me de ThalÃ¨s, (MN) // (BC).",
+        "tags":  [
+                     "ThalÃ¨s",
+                     "rÃ©ciproque"
+                 ]
+    },
+    {
+        "id":  "thal-06",
+        "topic":  "ThÃ©orÃ¨me de ThalÃ¨s",
+        "difficulty":  "difficile",
+        "question":  "Sur la figure, (DE) // (BC). AD = x, DB = 4, AE = 3 et EC = 6. Trouve x.",
+        "options":  [
+                        "2",
+                        "3",
+                        "4",
+                        "6"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Par ThalÃ¨s : AD/AB = AE/AC. AB = x + 4 et AC = 3 + 6 = 9. Donc x/(x+4) = 3/9 = 1/3. 3x = x + 4 â‡’ 2x = 4 â‡’ x = 2.",
+        "tags":  [
+                     "ThalÃ¨s",
+                     "Ã©quation",
+                     "recherche de longueur"
+                 ]
+    },
+    {
+        "id":  "trigo-01",
+        "topic":  "TrigonomÃ©trie",
+        "difficulty":  "facile",
+        "question":  "Dans un triangle rectangle, le cosinus d\u0027un angle aigu est le rapport :",
+        "options":  [
+                        "CÃ´tÃ© adjacent / HypotÃ©nuse",
+                        "CÃ´tÃ© opposÃ© / HypotÃ©nuse",
+                        "CÃ´tÃ© opposÃ© / CÃ´tÃ© adjacent",
+                        "HypotÃ©nuse / CÃ´tÃ© adjacent"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "cos(angle) = cÃ´tÃ© adjacent / hypotÃ©nuse. C\u0027est la dÃ©finition du cosinus dans un triangle rectangle.",
+        "tags":  [
+                     "trigonomÃ©trie",
+                     "cosinus",
+                     "dÃ©finition"
+                 ]
+    },
+    {
+        "id":  "trigo-02",
+        "topic":  "TrigonomÃ©trie",
+        "difficulty":  "facile",
+        "question":  "Dans un triangle rectangle, sin(30Â°) vaut :",
+        "options":  [
+                        "0,5",
+                        "1",
+                        "âˆš3/2",
+                        "âˆš2/2"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "sin(30Â°) = 0,5. C\u0027est une valeur remarquable Ã  connaÃ®tre.",
+        "tags":  [
+                     "trigonomÃ©trie",
+                     "sinus",
+                     "valeur remarquable"
+                 ]
+    },
+    {
+        "id":  "trigo-03",
+        "topic":  "TrigonomÃ©trie",
+        "difficulty":  "moyen",
+        "question":  "Dans le triangle ABC rectangle en B, AB = 5 cm et l\u0027angle Ã‚ = 40Â°. Calcule BC (arrondi au dixiÃ¨me). On donne tan(40Â°) â‰ˆ 0,84.",
+        "options":  [
+                        "4,2 cm",
+                        "5,95 cm",
+                        "3,83 cm",
+                        "6 cm"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "tan(Ã‚) = BC/AB â‡’ BC = AB Ã— tan(40Â°) = 5 Ã— 0,84 = 4,2 cm.",
+        "tags":  [
+                     "trigonomÃ©trie",
+                     "tangente",
+                     "calcul"
+                 ]
+    },
+    {
+        "id":  "trigo-04",
+        "topic":  "TrigonomÃ©trie",
+        "difficulty":  "moyen",
+        "question":  "Dans un triangle rectangle, l\u0027hypotÃ©nuse mesure 10 cm et un angle aigu mesure 60Â°. Quel est le cÃ´tÃ© opposÃ© Ã  cet angle ? (cos 60Â° = 0,5 ; sin 60Â° â‰ˆ 0,87)",
+        "options":  [
+                        "8,7 cm",
+                        "5 cm",
+                        "10 cm",
+                        "17,3 cm"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "sin(60Â°) = opposÃ© / hypotÃ©nuse â‡’ opposÃ© = 10 Ã— sin(60Â°) = 10 Ã— 0,87 = 8,7 cm.",
+        "tags":  [
+                     "trigonomÃ©trie",
+                     "sinus",
+                     "calcul"
+                 ]
+    },
+    {
+        "id":  "trigo-05",
+        "topic":  "TrigonomÃ©trie",
+        "difficulty":  "difficile",
+        "question":  "Du haut d\u0027une falaise de 50 m, on voit un bateau sous un angle de dÃ©pression de 30Â°. Ã€ quelle distance du pied de la falaise se trouve le bateau ? (tan 30Â° â‰ˆ 0,577)",
+        "options":  [
+                        "86,7 m",
+                        "57,7 m",
+                        "28,9 m",
+                        "100 m"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "tan(30Â°) = 50/d â‡’ d = 50/tan(30Â°) = 50/0,577 â‰ˆ 86,7 m.",
+        "tags":  [
+                     "trigonomÃ©trie",
+                     "tangente",
+                     "angle de dÃ©pression"
+                 ]
+    },
+    {
+        "id":  "trigo-06",
+        "topic":  "TrigonomÃ©trie",
+        "difficulty":  "difficile",
+        "question":  "Calcule la mesure de l\u0027angle Ã‚ dans le triangle ABC rectangle en C si AC = 4 cm et AB = 8 cm.",
+        "options":  [
+                        "60Â°",
+                        "30Â°",
+                        "45Â°",
+                        "90Â°"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "cos(Ã‚) = AC/AB = 4/8 = 0,5. Or cos(60Â°) = 0,5 donc Ã‚ = 60Â°.",
+        "tags":  [
+                     "trigonomÃ©trie",
+                     "cosinus",
+                     "recherche d\u0027angle"
+                 ]
+    },
+    {
+        "id":  "prob-01",
+        "topic":  "ProblÃ¨mes de la vie courante",
+        "difficulty":  "facile",
+        "question":  "Un commerÃ§ant au marchÃ© de Treichville achÃ¨te un sac de riz Ã  15 000 FCFA et le revend Ã  18 000 FCFA. Quel est son bÃ©nÃ©fice ?",
+        "options":  [
+                        "3 000 FCFA",
+                        "33 000 FCFA",
+                        "18 000 FCFA",
+                        "15 000 FCFA"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "BÃ©nÃ©fice = prix de vente âˆ’ prix d\u0027achat = 18 000 âˆ’ 15 000 = 3 000 FCFA.",
+        "tags":  [
+                     "bÃ©nÃ©fice",
+                     "commerce"
+                 ]
+    },
+    {
+        "id":  "prob-02",
+        "topic":  "ProblÃ¨mes de la vie courante",
+        "difficulty":  "facile",
+        "question":  "Un article coÃ»te 25 000 FCFA. On fait une rÃ©duction de 20%. Quel est le nouveau prix ?",
+        "options":  [
+                        "20 000 FCFA",
+                        "5 000 FCFA",
+                        "22 000 FCFA",
+                        "30 000 FCFA"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "RÃ©duction = 25 000 Ã— 20/100 = 5 000. Nouveau prix = 25 000 âˆ’ 5 000 = 20 000 FCFA.",
+        "tags":  [
+                     "pourcentage",
+                     "rÃ©duction"
+                 ]
+    },
+    {
+        "id":  "prob-03",
+        "topic":  "ProblÃ¨mes de la vie courante",
+        "difficulty":  "moyen",
+        "question":  "Koffi partage 60 000 FCFA entre ses 3 enfants dans le rapport 1:2:3. Combien reÃ§oit l\u0027aÃ®nÃ© ?",
+        "options":  [
+                        "30 000 FCFA",
+                        "20 000 FCFA",
+                        "10 000 FCFA",
+                        "40 000 FCFA"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "Total des parts = 1+2+3 = 6. L\u0027aÃ®nÃ© (3 parts) reÃ§oit 60 000 Ã— 3/6 = 30 000 FCFA.",
+        "tags":  [
+                     "partage",
+                     "proportionnalitÃ©"
+                 ]
+    },
+    {
+        "id":  "prob-04",
+        "topic":  "ProblÃ¨mes de la vie courante",
+        "difficulty":  "moyen",
+        "question":  "Un terrain rectangulaire de 20 m Ã— 15 m doit Ãªtre clÃ´turÃ©. Le prix est de 5 000 FCFA/m. Quel est le coÃ»t total ?",
+        "options":  [
+                        "350 000 FCFA",
+                        "300 000 FCFA",
+                        "1 500 000 FCFA",
+                        "175 000 FCFA"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "PÃ©rimÃ¨tre = 2 Ã— (20 + 15) = 70 m. CoÃ»t = 70 Ã— 5 000 = 350 000 FCFA.",
+        "tags":  [
+                     "pÃ©rimÃ¨tre",
+                     "coÃ»t"
+                 ]
+    },
+    {
+        "id":  "prob-05",
+        "topic":  "ProblÃ¨mes de la vie courante",
+        "difficulty":  "difficile",
+        "question":  "Awa place 500 000 FCFA Ã  la banque Ã  un taux annuel de 5%. Quel sera le montant total aprÃ¨s 2 ans (intÃ©rÃªts simples) ?",
+        "options":  [
+                        "550 000 FCFA",
+                        "525 000 FCFA",
+                        "551 250 FCFA",
+                        "600 000 FCFA"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "IntÃ©rÃªts simples : I = C Ã— t Ã— n = 500 000 Ã— 0,05 Ã— 2 = 50 000. Montant total = 500 000 + 50 000 = 550 000 FCFA.",
+        "tags":  [
+                     "intÃ©rÃªts simples",
+                     "placement"
+                 ]
+    },
+    {
+        "id":  "prob-06",
+        "topic":  "ProblÃ¨mes de la vie courante",
+        "difficulty":  "difficile",
+        "question":  "Un rÃ©servoir cylindrique a un rayon de 3 m et une hauteur de 7 m. Quel est son volume en mÂ³ ? (Ï€ â‰ˆ 3,14)",
+        "options":  [
+                        "197,82 mÂ³",
+                        "65,94 mÂ³",
+                        "131,88 mÂ³",
+                        "63 mÂ³"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "V = Ï€ Ã— rÂ² Ã— h = 3,14 Ã— 3Â² Ã— 7 = 3,14 Ã— 9 Ã— 7 = 3,14 Ã— 63 = 197,82 mÂ³.",
+        "tags":  [
+                     "volume",
+                     "cylindre"
+                 ]
+    },
+    {
+        "id":  "calc-lit-08",
+        "topic":  "Calcul litteral",
+        "difficulty":  "difficile",
+        "question":  "Simplifie : (x+2)(x-2) + (x-1)^2",
+        "options":  [
+                        "2x² - 2x - 3",
+                        "2x² + 1",
+                        "x² - 5",
+                        "2x² - 1"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "(x+2)(x-2)=x²-4 et (x-1)^2=x²-2x+1 donc total=2x²-2x-3.",
+        "tags":  [
+                     "developpement",
+                     "identite remarquable"
+                 ]
+    },
+    {
+        "id":  "eq-07",
+        "topic":  "Equations et inequations",
+        "difficulty":  "moyen",
+        "question":  "Resous : 5x - 4 = 3x + 8",
+        "options":  [
+                        "x = 6",
+                        "x = -6",
+                        "x = 2",
+                        "x = 12"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "5x-3x=8+4 donc 2x=12 puis x=6.",
+        "tags":  [
+                     "equation premier degre"
+                 ]
+    },
+    {
+        "id":  "fonc-08",
+        "topic":  "Fonctions lineaires et affines",
+        "difficulty":  "facile",
+        "question":  "Pour f(x)= -x + 4, calcule f(6).",
+        "options":  [
+                        "-2",
+                        "2",
+                        "10",
+                        "-10"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "f(6)=-6+4=-2.",
+        "tags":  [
+                     "fonction affine",
+                     "image"
+                 ]
+    },
+    {
+        "id":  "pyth-07",
+        "topic":  "Theoreme de Pythagore",
+        "difficulty":  "moyen",
+        "question":  "Dans un triangle rectangle, un cote mesure 9 cm et l\u0027hypotenuse 15 cm. Calcule l\u0027autre cote.",
+        "options":  [
+                        "12 cm",
+                        "6 cm",
+                        "24 cm",
+                        "18 cm"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "x²=15²-9²=225-81=144 donc x=12.",
+        "tags":  [
+                     "pythagore",
+                     "cote manquant"
+                 ]
+    },
+    {
+        "id":  "thal-07",
+        "topic":  "Theoreme de Thales",
+        "difficulty":  "moyen",
+        "question":  "Si AM/AB = 2/3 et AB = 9 cm, quelle est la valeur de AM ?",
+        "options":  [
+                        "6 cm",
+                        "3 cm",
+                        "4,5 cm",
+                        "13,5 cm"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "AM=(2/3)*9=6 cm.",
+        "tags":  [
+                     "thales",
+                     "proportionnalite"
+                 ]
+    },
+    {
+        "id":  "trigo-07",
+        "topic":  "Trigonometrie",
+        "difficulty":  "moyen",
+        "question":  "Dans un triangle rectangle, cote oppose = 6 et hypotenuse = 10. Quelle est la valeur de sin(angle) ?",
+        "options":  [
+                        "0,6",
+                        "0,4",
+                        "1,6",
+                        "0,8"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "sin = oppose / hypotenuse = 6/10 = 0,6.",
+        "tags":  [
+                     "trigonometrie",
+                     "sinus"
+                 ]
+    },
+    {
+        "id":  "stat-07",
+        "topic":  "Statistiques",
+        "difficulty":  "moyen",
+        "question":  "Serie : 4, 6, 6, 7, 9. Quelle est la mediane ?",
+        "options":  [
+                        "6",
+                        "7",
+                        "6,4",
+                        "9"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "La serie est ordonnee, la valeur centrale est 6.",
+        "tags":  [
+                     "statistiques",
+                     "mediane"
+                 ]
+    },
+    {
+        "id":  "prob-07",
+        "topic":  "Problemes de la vie courante",
+        "difficulty":  "moyen",
+        "question":  "Un cahier coute 350 FCFA. Combien coutent 12 cahiers ?",
+        "options":  [
+                        "4200 FCFA",
+                        "3850 FCFA",
+                        "4700 FCFA",
+                        "3200 FCFA"
+                    ],
+        "correctAnswer":  0,
+        "explanation":  "12 x 350 = 4200 FCFA.",
+        "tags":  [
+                     "proportionnalite",
+                     "vie courante"
+                 ]
+    }
+]
