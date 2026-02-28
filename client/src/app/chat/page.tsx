@@ -183,11 +183,15 @@ export default function ChatPage() {
 
   // Auto-start: when coming from dashboard, send the first message automatically
   useEffect(() => {
+    const hasConversationStarted = messages.some(
+      (msg) => msg.role === "user" || msg.role === "assistant"
+    );
+
     if (
       !autostartDone.current &&
       searchParams.get("autostart") === "1" &&
       activeId &&
-      messages.length === 0 &&
+      !hasConversationStarted &&
       !isStreaming
     ) {
       const subjectFromQuery = searchParams.get("subject");
@@ -200,8 +204,8 @@ export default function ChatPage() {
 
       autostartDone.current = true;
       const prompt = topic
-        ? `On commence une séance guidée sur ${topic} en ${subject}.`
-        : `On commence une séance guidée en ${subject}.`;
+        ? `On commence une seance guidee sur ${topic} en ${subject}.`
+        : `On commence une seance guidee en ${subject}.`;
       handleSend(prompt, { internal: true });
     }
   }, [activeId, messages, conversations, searchParams, isStreaming]);
