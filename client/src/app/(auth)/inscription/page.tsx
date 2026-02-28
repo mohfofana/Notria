@@ -88,9 +88,9 @@ export default function InscriptionPage() {
   return (
     <>
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Crée ton compte</h1>
-        <p className="text-muted-foreground">
-          Commence à étudier avec Prof Ada gratuitement
+        <h1 className="text-3xl font-bold tracking-tight">Cree ton compte</h1>
+        <p className="text-base text-muted-foreground">
+          Commence tes revisions de maths en quelques minutes
         </p>
       </div>
 
@@ -105,7 +105,7 @@ export default function InscriptionPage() {
               : "border-border text-muted-foreground hover:border-primary/40"
           }`}
         >
-          Je suis élève
+          Je suis eleve
         </button>
         <button
           type="button"
@@ -123,7 +123,7 @@ export default function InscriptionPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
-            <Label htmlFor="firstName">Prénom</Label>
+            <Label htmlFor="firstName" className="text-base">Prenom</Label>
             <Input
               id="firstName"
               placeholder="Fatou"
@@ -133,7 +133,7 @@ export default function InscriptionPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="lastName">Nom</Label>
+            <Label htmlFor="lastName" className="text-base">Nom</Label>
             <Input
               id="lastName"
               placeholder="Koné"
@@ -145,7 +145,7 @@ export default function InscriptionPage() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="phone">Numéro de téléphone</Label>
+          <Label htmlFor="phone" className="text-base">Numero de telephone</Label>
           <div className="flex">
             <span className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
               +225
@@ -163,7 +163,7 @@ export default function InscriptionPage() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">Mot de passe</Label>
+          <Label htmlFor="password" className="text-base">Mot de passe</Label>
           <div className="relative">
             <Input
               id="password"
@@ -185,7 +185,7 @@ export default function InscriptionPage() {
         </div>
 
         {error && (
-          <p className="text-sm text-destructive font-medium">{error}</p>
+          <p className="text-base text-destructive font-medium">{error}</p>
         )}
 
         <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
@@ -200,8 +200,8 @@ export default function InscriptionPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
-        Tu as déjà un compte ?{" "}
+      <p className="text-center text-base text-muted-foreground">
+        Tu as deja un compte ?{" "}
         <Link href="/connexion" className="text-primary font-medium hover:underline">
           Connecte-toi
         </Link>

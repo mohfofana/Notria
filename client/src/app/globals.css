@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 195 40% 98%;
-    --foreground: 204 28% 14%;
+    --background: 188 34% 97%;
+    --foreground: 198 28% 14%;
     --card: 0 0% 100%;
-    --card-foreground: 204 28% 14%;
+    --card-foreground: 198 28% 14%;
     --popover: 0 0% 100%;
-    --popover-foreground: 204 28% 14%;
-    --primary: 193 85% 33%;
+    --popover-foreground: 198 28% 14%;
+    --primary: 186 74% 34%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 198 30% 94%;
-    --secondary-foreground: 204 28% 14%;
-    --muted: 192 35% 95%;
-    --muted-foreground: 203 14% 40%;
-    --accent: 36 95% 56%;
-    --accent-foreground: 18 42% 14%;
+    --secondary: 192 30% 93%;
+    --secondary-foreground: 198 28% 14%;
+    --muted: 188 28% 93%;
+    --muted-foreground: 199 12% 41%;
+    --accent: 31 94% 62%;
+    --accent-foreground: 20 52% 16%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 197 24% 86%;
-    --input: 197 24% 86%;
-    --ring: 193 85% 33%;
-    --radius: 0.9rem;
+    --border: 192 21% 84%;
+    --input: 192 21% 84%;
+    --ring: 186 74% 34%;
+    --radius: 1rem;
   }
 }
 
@@ -34,10 +34,12 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body), sans-serif;
+    font-size: 17px;
+    line-height: 1.62;
     background-image:
-      radial-gradient(circle at 15% 10%, rgba(13, 148, 136, 0.12), transparent 40%),
-      radial-gradient(circle at 90% 0%, rgba(245, 158, 11, 0.15), transparent 38%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(242, 250, 250, 0.98));
+      radial-gradient(circle at 12% 8%, hsl(var(--primary) / 0.11), transparent 38%),
+      radial-gradient(circle at 90% 2%, hsl(var(--accent) / 0.12), transparent 36%),
+      linear-gradient(180deg, hsl(0 0% 100% / 0.96), hsl(189 42% 96% / 0.98));
   }
 }
 
@@ -50,6 +52,7 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display), sans-serif;
+  letter-spacing: -0.01em;
 }
 
 @keyframes floatY {
@@ -81,6 +84,47 @@ h4 {
 
 .animate-fade-slide-up {
   animation: fadeSlideUp 0.55s ease-out both;
+}
+
+@keyframes softPulse {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.18);
+  }
+  70% {
+    box-shadow: 0 0 0 14px hsl(var(--primary) / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0);
+  }
+}
+
+.soft-shell {
+  border: 1px solid hsl(var(--border));
+  background: linear-gradient(
+    180deg,
+    hsl(0 0% 100% / 0.92),
+    hsl(187 36% 97% / 0.86)
+  );
+  box-shadow:
+    0 14px 40px -22px hsl(196 42% 18% / 0.36),
+    inset 0 1px 0 hsl(0 0% 100% / 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.soft-card {
+  border: 1px solid hsl(var(--border) / 0.9);
+  background: linear-gradient(160deg, hsl(0 0% 100% / 0.95), hsl(190 35% 97% / 0.9));
+  box-shadow: 0 10px 30px -24px hsl(196 48% 18% / 0.42);
+}
+
+.soft-chip {
+  border: 1px solid hsl(var(--primary) / 0.24);
+  background: hsl(var(--primary) / 0.08);
+  color: hsl(var(--primary));
+}
+
+.soft-focus-ring {
+  animation: softPulse 2.2s infinite;
 }
 
 @keyframes chalkLineIn {

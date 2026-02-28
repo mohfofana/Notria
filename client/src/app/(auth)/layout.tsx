@@ -2,9 +2,8 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, ImageIcon, Sparkles } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { useAuth } from "@/contexts/auth-context";
 import { getNextOnboardingPath } from "@/lib/onboarding";
 
@@ -48,20 +47,19 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="relative mx-auto w-full max-w-sm">
             <div className="pointer-events-none absolute -inset-4 rounded-[2rem] border-2 border-dashed border-white/55 rotate-[-2deg]" />
             <div className="pointer-events-none absolute -inset-1 rounded-[1.7rem] border border-white/60 rotate-[1.5deg]" />
-            <div className="relative overflow-hidden rounded-[1.5rem] border-4 border-white/70 shadow-2xl">
-              <Image
-                src="/illustrations/fatou.png"
-                alt="Photo d'une eleve Notria"
-                width={900}
-                height={1200}
-                className="h-auto w-full object-cover"
-                priority
-              />
+            <div className="relative overflow-hidden rounded-[1.5rem] border-4 border-white/70 shadow-2xl bg-white/10 p-8">
+              <div className="grid aspect-[3/4] place-items-center rounded-2xl border border-dashed border-white/60 bg-white/10">
+                <div className="text-center">
+                  <ImageIcon className="h-12 w-12 mx-auto mb-3" />
+                  <p className="text-sm uppercase tracking-[0.2em]">placeholder</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <p className="text-center text-sm font-medium text-primary-foreground/90">
-            Fatou, eleve BEPC - \"Avec Prof Ada, je comprends enfin mes cours.\"
+          <p className="text-center text-base font-medium text-primary-foreground/90 flex items-center justify-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            Revision simple, seances courtes, progression visible.
           </p>
         </div>
 

@@ -197,8 +197,8 @@ export default function DashboardPage() {
   if (user.role === "student" && getNextOnboardingPath({ student, hasSchedule }) !== "/dashboard") return null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
+    <div className="min-h-screen bg-background p-4">
+      <header className="soft-shell rounded-2xl mb-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <GraduationCap className="h-7 w-7 text-primary" />
@@ -223,8 +223,8 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold mb-1">
+      <main className="max-w-3xl mx-auto px-2 py-2">
+        <h1 className="text-3xl font-bold mb-1">
           Salut {user.firstName} !
         </h1>
 
@@ -232,15 +232,15 @@ export default function DashboardPage() {
           <>
             {/* Week progress */}
             {currentWeek && (
-              <p className="text-muted-foreground mb-8">
-                Semaine {currentWeek.weekNumber}/{currentWeek.totalWeeks} de ton programme
+              <p className="text-base text-muted-foreground mb-8">
+                Semaine {currentWeek.weekNumber}/{currentWeek.totalWeeks} de ton parcours
               </p>
             )}
 
             {/* Sessions of the week */}
             {currentWeek && weeklyMathEntries.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <BookOpen className="h-5 w-5 text-primary" />
                   Sessions de maths de la semaine
                 </h2>
@@ -248,10 +248,10 @@ export default function DashboardPage() {
                   {weeklyMathEntries.map((entry) => (
                     <div
                       key={entry.id}
-                      className={`rounded-xl border p-5 transition-colors ${
+                      className={`soft-card rounded-2xl p-5 transition-colors ${
                         entry.status === "completed"
-                          ? "bg-muted/30 border-border"
-                          : "bg-card border-border hover:border-primary/30"
+                          ? "opacity-80"
+                          : "hover:border-primary/30"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-4">
@@ -261,7 +261,7 @@ export default function DashboardPage() {
                               {entry.subject}
                             </span>
                             {entry.status === "completed" && (
-                              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+                              <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">
                                 Terminé
                               </span>
                             )}
@@ -271,8 +271,8 @@ export default function DashboardPage() {
                               </span>
                             )}
                           </div>
-                          <p className="font-medium">{entry.topic}</p>
-                          <p className="text-sm text-muted-foreground mt-0.5">{entry.objective}</p>
+                          <p className="text-lg font-semibold">{entry.topic}</p>
+                          <p className="text-base text-muted-foreground mt-0.5">{entry.objective}</p>
                         </div>
                         {entry.status !== "completed" && (
                           <Button
@@ -301,39 +301,39 @@ export default function DashboardPage() {
             )}
 
             {currentWeek && weeklyMathEntries.length === 0 && (
-              <div className="mb-8 rounded-xl border bg-card p-5">
-                <p className="font-medium">Aucune session maths planifiée cette semaine.</p>
+              <div className="mb-8 soft-card rounded-2xl p-5">
+                <p className="font-medium">Aucune session de maths cette semaine.</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Utilise “Question libre” pour lancer une session de maths immédiate.
+                  Lance une question libre pour continuer a pratiquer.
                 </p>
               </div>
             )}
 
             {/* Quick actions */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="rounded-xl border bg-card p-5 flex items-center gap-4">
+              <div className="soft-card rounded-2xl p-5 flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Play className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium">
-                    {todaySession ? "Séance du jour disponible" : "Pas de séance planifiée"}
+                  <p className="text-base font-medium">
+                    {todaySession ? "Seance du jour prete" : "Pas de seance planifiee"}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     {todaySession
                       ? `${todaySession.subject} • ${todaySession.durationMinutes} min`
-                      : "Lance une session libre de mathématiques"}
+                      : "Lance une session libre de mathematiques"}
                   </p>
                 </div>
               </div>
 
-              <div className="rounded-xl border bg-card p-5 flex items-center gap-4">
+              <div className="soft-card rounded-2xl p-5 flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <BookOpen className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium">Devoirs du jour</p>
-                  <p className="text-xs text-muted-foreground">{homeworkCount} exercice(s) a traiter</p>
+                  <p className="text-base font-medium">Devoirs du jour</p>
+                  <p className="text-sm text-muted-foreground">{homeworkCount} exercice(s) a faire</p>
                 </div>
               </div>
 
@@ -341,27 +341,27 @@ export default function DashboardPage() {
                 type="button"
                 onClick={startFreeQuestion}
                 disabled={isStartingFreeQuestion}
-                className="rounded-xl border bg-card p-5 hover:border-primary/30 transition-colors group flex items-center gap-4 text-left disabled:opacity-70"
+                className="soft-card rounded-2xl p-5 hover:border-primary/30 transition-colors group flex items-center gap-4 text-left disabled:opacity-70"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <MessageSquare className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium">Question libre</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-base font-medium">Question libre</p>
+                  <p className="text-sm text-muted-foreground">
                     {isStartingFreeQuestion ? "Ouverture..." : "Demander à Prof Ada"}
                   </p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </button>
 
-              <div className="rounded-xl border bg-card p-5 flex items-center gap-4 sm:col-span-2 lg:col-span-1">
+              <div className="soft-card rounded-2xl p-5 flex items-center gap-4 sm:col-span-2 lg:col-span-1">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Target className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium">Note cible : {student.targetScore}/20</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-base font-medium">Objectif : {student.targetScore}/20</p>
+                  <p className="text-sm text-muted-foreground">
                     Parcours {student.examType} ({student.grade})
                   </p>
                 </div>
@@ -369,42 +369,42 @@ export default function DashboardPage() {
 
               <Link
                 href="/notria-vision"
-                className="rounded-xl border bg-card p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
+                className="soft-card rounded-2xl p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Camera className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium">Notria Vision</p>
-                  <p className="text-xs text-muted-foreground">Scanner et corriger un exercice</p>
+                  <p className="text-base font-medium">Notria Vision</p>
+                  <p className="text-sm text-muted-foreground">Prendre en photo et corriger un exercice</p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </Link>
 
               <Link
                 href="/examens"
-                className="rounded-xl border bg-card p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
+                className="soft-card rounded-2xl p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <FileText className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium">{student.examType} Blanc</p>
-                  <p className="text-xs text-muted-foreground">Simulation et correction détaillée</p>
+                  <p className="text-base font-medium">{student.examType} Blanc</p>
+                  <p className="text-sm text-muted-foreground">Simulation et correction detaillee</p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </Link>
 
               <Link
                 href="/paiement"
-                className="rounded-xl border bg-card p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
+                className="soft-card rounded-2xl p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <CreditCard className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium">Abonnements</p>
-                  <p className="text-xs text-muted-foreground">Gérer ton plan et paiements</p>
+                  <p className="text-base font-medium">Abonnement</p>
+                  <p className="text-sm text-muted-foreground">Gerer ton plan et tes paiements</p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </Link>

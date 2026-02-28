@@ -91,7 +91,7 @@ export default function ParentDashboardPage() {
       <div className="max-w-6xl mx-auto flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
-          <p>Chargement du suivi parental...</p>
+          <p>Chargement du suivi parent...</p>
         </div>
       </div>
     );
@@ -101,16 +101,16 @@ export default function ParentDashboardPage() {
     <div className="max-w-6xl mx-auto space-y-8 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard Parent</h1>
-          <p className="text-muted-foreground mt-1">
-            Suivi en temps reel de {dashboard.length > 1 ? "vos enfants" : "votre enfant"}
+          <h1 className="text-4xl font-bold">Espace parent</h1>
+          <p className="text-base text-muted-foreground mt-1">
+            Suivi simple de {dashboard.length > 1 ? "vos enfants" : "votre enfant"}
           </p>
         </div>
-        <Badge variant="outline">{unreadCount} notification(s) non lue(s)</Badge>
+        <Badge variant="outline" className="text-sm">{unreadCount} notification(s) non lue(s)</Badge>
       </div>
 
       {error && (
-        <Card>
+        <Card className="soft-card rounded-2xl">
           <CardContent className="pt-6">
             <p className="text-sm text-red-600">{error}</p>
           </CardContent>
@@ -118,11 +118,11 @@ export default function ParentDashboardPage() {
       )}
 
       {dashboard.length === 0 && !error && (
-        <Card>
+        <Card className="soft-card rounded-2xl">
           <CardContent className="pt-6 text-center">
             <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-            <h2 className="text-lg font-semibold">Aucun enfant lie</h2>
-            <p className="text-sm text-muted-foreground mt-1">
+            <h2 className="text-xl font-semibold">Aucun enfant lie</h2>
+            <p className="text-base text-muted-foreground mt-1">
               Relie un compte eleve pour voir l'activite et les progres.
             </p>
           </CardContent>
@@ -131,7 +131,7 @@ export default function ParentDashboardPage() {
 
       {dashboard.map((studentData) => (
         <div key={studentData.student.id} className="space-y-5">
-          <Card>
+          <Card className="soft-shell rounded-2xl">
             <CardHeader>
               <CardTitle className="flex items-center justify-between gap-3">
                 <div>
@@ -142,20 +142,20 @@ export default function ParentDashboardPage() {
                     {studentData.student.examType} • Objectif: {studentData.student.targetScore ?? "-"} / 20
                   </p>
                 </div>
-                <Badge variant="secondary">{studentData.stats.currentStreak} jours de serie</Badge>
+                <Badge variant="secondary" className="text-sm">{studentData.stats.currentStreak} jours de serie</Badge>
               </CardTitle>
             </CardHeader>
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
+            <Card className="soft-card rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-lg flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-primary" />
-                  Statistiques
+                  Chiffres cles
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              <CardContent className="space-y-3 text-base">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Serie</span>
                   <span className="font-medium">{studentData.stats.currentStreak} jours</span>
@@ -173,16 +173,16 @@ export default function ParentDashboardPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="soft-card rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-lg flex items-center gap-2">
                   <Clock className="h-4 w-4 text-primary" />
                   Activite recente
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {studentData.recentActivity.slice(0, 4).map((activity) => (
-                  <div key={activity.id} className="rounded-lg border bg-muted/40 p-2 text-sm">
+                    <div key={activity.id} className="rounded-lg border bg-muted/40 p-2 text-base">
                     <div className="flex justify-between gap-2">
                       <span className="font-medium">{activity.subject}</span>
                       <span className="text-xs text-muted-foreground">{activity.durationMinutes} min</span>
@@ -193,14 +193,14 @@ export default function ParentDashboardPage() {
                   </div>
                 ))}
                 {studentData.recentActivity.length === 0 && (
-                  <p className="text-sm text-muted-foreground">Aucune activite recente.</p>
+                  <p className="text-base text-muted-foreground">Aucune activite recente.</p>
                 )}
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="soft-card rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-lg flex items-center gap-2">
                   <Bell className="h-4 w-4 text-primary" />
                   Notifications
                 </CardTitle>
@@ -209,7 +209,7 @@ export default function ParentDashboardPage() {
                 {studentData.notifications.slice(0, 4).map((notification) => (
                   <div
                     key={notification.id}
-                    className={`rounded-lg border p-2 text-sm ${
+                    className={`rounded-lg border p-2 text-base ${
                       notification.read ? "bg-muted/30" : "bg-blue-50 border-blue-200"
                     }`}
                   >

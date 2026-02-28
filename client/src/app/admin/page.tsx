@@ -107,7 +107,7 @@ export default function AdminPage() {
   if (isLoading || loading) {
     return (
       <div className="max-w-7xl mx-auto p-6">
-        <p className="text-sm text-muted-foreground">Chargement du panel admin...</p>
+        <p className="text-base text-muted-foreground">Chargement de l'espace admin...</p>
       </div>
     );
   }
@@ -116,8 +116,8 @@ export default function AdminPage() {
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Admin Notria</h1>
-          <p className="text-muted-foreground">Supervision globale, comptes et activite.</p>
+          <h1 className="text-4xl font-bold">Espace admin Notria</h1>
+          <p className="text-base text-muted-foreground">Vue globale des comptes et de l'activite.</p>
         </div>
         <Badge variant="secondary" className="gap-1">
           <Shield className="h-3.5 w-3.5" />
@@ -126,7 +126,7 @@ export default function AdminPage() {
       </div>
 
       {error && (
-        <Card>
+        <Card className="soft-card rounded-2xl">
           <CardContent className="pt-6">
             <p className="text-sm text-red-600">{error}</p>
           </CardContent>
@@ -135,29 +135,29 @@ export default function AdminPage() {
 
       {overview && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader><CardTitle className="text-base">Utilisateurs</CardTitle></CardHeader>
+          <Card className="soft-card rounded-2xl">
+            <CardHeader><CardTitle className="text-lg">Utilisateurs</CardTitle></CardHeader>
             <CardContent className="text-2xl font-semibold">{overview.users}</CardContent>
           </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-base">Eleves / Parents</CardTitle></CardHeader>
+          <Card className="soft-card rounded-2xl">
+            <CardHeader><CardTitle className="text-lg">Eleves / Parents</CardTitle></CardHeader>
             <CardContent className="text-2xl font-semibold">{overview.students} / {overview.parents}</CardContent>
           </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-base">Conversations actives</CardTitle></CardHeader>
+          <Card className="soft-card rounded-2xl">
+            <CardHeader><CardTitle className="text-lg">Conversations actives</CardTitle></CardHeader>
             <CardContent className="text-2xl font-semibold">{overview.activeConversations}</CardContent>
           </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-base">Messages</CardTitle></CardHeader>
+          <Card className="soft-card rounded-2xl">
+            <CardHeader><CardTitle className="text-lg">Messages</CardTitle></CardHeader>
             <CardContent className="text-2xl font-semibold">{overview.messages}</CardContent>
           </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-base">Sessions 7 jours</CardTitle></CardHeader>
+          <Card className="soft-card rounded-2xl">
+            <CardHeader><CardTitle className="text-lg">Sessions (7 jours)</CardTitle></CardHeader>
             <CardContent className="text-2xl font-semibold">{overview.sessionsLast7Days}</CardContent>
           </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-base">Roles</CardTitle></CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
+          <Card className="soft-card rounded-2xl">
+            <CardHeader><CardTitle className="text-lg">Roles</CardTitle></CardHeader>
+            <CardContent className="text-base text-muted-foreground">
               {Object.entries(overview.roleBreakdown).map(([role, count]) => (
                 <p key={role}>{role}: {count}</p>
               ))}
@@ -167,7 +167,7 @@ export default function AdminPage() {
       )}
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="soft-shell rounded-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-4 w-4 text-primary" />
@@ -176,11 +176,11 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {users.map((entry) => (
-              <div key={entry.id} className="rounded-lg border p-3 flex items-center justify-between gap-3">
+              <div key={entry.id} className="rounded-lg border border-border/80 bg-white/70 p-3 flex items-center justify-between gap-3">
                 <div>
                   <p className="font-medium">{entry.firstName} {entry.lastName}</p>
-                  <p className="text-xs text-muted-foreground">{entry.phone} • {entry.role}</p>
-                </div>
+                    <p className="text-sm text-muted-foreground">{entry.phone} • {entry.role}</p>
+                  </div>
                 <Button
                   size="sm"
                   variant={entry.isActive ? "outline" : "default"}
@@ -194,7 +194,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="soft-shell rounded-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" />
@@ -208,7 +208,7 @@ export default function AdminPage() {
               </p>
               <div className="space-y-2">
                 {(activity?.recentSessions || []).slice(0, 5).map((session) => (
-                  <div key={session.id} className="rounded-md border p-2 text-sm">
+                  <div key={session.id} className="rounded-md border border-border/80 bg-white/70 p-2 text-sm">
                     {session.subject} • {session.durationMinutes} min • score {session.score ?? "-"}
                   </div>
                 ))}
@@ -220,7 +220,7 @@ export default function AdminPage() {
               </p>
               <div className="space-y-2">
                 {(activity?.recentConversations || []).slice(0, 5).map((conv) => (
-                  <div key={conv.id} className="rounded-md border p-2 text-sm">
+                  <div key={conv.id} className="rounded-md border border-border/80 bg-white/70 p-2 text-sm">
                     {conv.subject}{conv.topic ? ` • ${conv.topic}` : ""}
                   </div>
                 ))}
