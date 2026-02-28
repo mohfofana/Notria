@@ -82,9 +82,12 @@ export const ScheduleController = {
       }
     }
 
-    // Mark onboarding as completed
+    // Map duration to dailyTime and mark onboarding as completed
+    const dailyTimeMap: Record<string, string> = { "30": "30min", "45": "30min", "60": "1h" };
+    const dailyTime = dailyTimeMap[durationMinutes] ?? "30min";
+
     await db.update(schema.students)
-      .set({ onboardingCompleted: true, updatedAt: new Date() })
+      .set({ dailyTime, onboardingCompleted: true, updatedAt: new Date() })
       .where(eq(schema.students.id, student.id));
 
     return res.status(201).json({ schedules: scheduleRecords });

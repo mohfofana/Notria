@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { CheckCircle, Loader2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
 
 interface Question {
   id: string;
-  subject: string;
-  difficulty: string;
+  topic: string;
+  difficulty: "facile" | "moyen" | "difficile";
   question: string;
   options: string[];
 }
@@ -23,7 +23,6 @@ interface AssessmentResponse {
     currentQuestionIndex: number;
     totalQuestions: number;
     question?: Question;
-    results?: any;
     previousAnswer?: {
       isCorrect: boolean;
       explanation?: string;
@@ -32,17 +31,22 @@ interface AssessmentResponse {
   error?: string;
 }
 
+function formatDifficulty(difficulty: string): string {
+  if (!difficulty) return "";
+  return `${difficulty.charAt(0).toUpperCase()}${difficulty.slice(1)}`;
+}
+
 export default function AssessmentQuestion() {
   const router = useRouter();
   const params = useParams();
-  const questionNumber = parseInt(params.number as string);
+  const questionNumber = parseInt(params.number as string, 10);
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedback, setFeedback] = useState<{ isCorrect: boolean; explanation?: string } | null>(null);
-  const [totalQuestions, setTotalQuestions] = useState(10);
+  const [totalQuestions, setTotalQuestions] = useState(15);
   const [canGoNext, setCanGoNext] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,19 +61,17 @@ export default function AssessmentQuestion() {
       setError(null);
 
       const response = await api.get<AssessmentResponse>("/assessment/question");
-
       if (!response.data.success) {
         throw new Error(response.data.error || "Failed to load question");
       }
 
       const { data } = response.data;
-
       if (data.completed) {
         router.push("/assessment/results");
         return;
       }
 
-      setTotalQuestions(data.totalQuestions || 10);
+      setTotalQuestions(data.totalQuestions || 15);
       setQuestion(data.question || null);
       setSelectedAnswer(null);
       setCanGoNext(false);
@@ -94,7 +96,9 @@ export default function AssessmentQuestion() {
       return;
     }
 
-    if (selectedAnswer === null || !question) return;
+    if (selectedAnswer === null || !question) {
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -108,7 +112,6 @@ export default function AssessmentQuestion() {
       }
 
       const { data } = response.data;
-
       if (data.completed) {
         router.push("/assessment/results");
         return;
@@ -173,8 +176,12 @@ export default function AssessmentQuestion() {
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
-          <span>Question {questionNumber} sur {totalQuestions}</span>
-          <span>{question.subject} - {question.difficulty}</span>
+          <span>
+            Question {questionNumber} sur {totalQuestions}
+          </span>
+          <span>
+            {question.topic} - {formatDifficulty(question.difficulty)}
+          </span>
         </div>
         <Progress value={progress} className="w-full" />
       </div>
@@ -195,9 +202,7 @@ export default function AssessmentQuestion() {
                   : "border-border hover:border-primary/40"
               }`}
             >
-              <span className="font-medium mr-2">
-                {String.fromCharCode(65 + index)}.
-              </span>
+              <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span>
               {option}
             </button>
           ))}
@@ -213,9 +218,7 @@ export default function AssessmentQuestion() {
               ) : (
                 <XCircle className="h-5 w-5 text-red-500" />
               )}
-              <span className="font-medium">
-                {feedback.isCorrect ? "Bonne reponse !" : "Reponse incorrecte"}
-              </span>
+              <span className="font-medium">{feedback.isCorrect ? "Bonne reponse !" : "Reponse incorrecte"}</span>
             </div>
             {feedback.explanation && (
               <p className="text-sm text-muted-foreground mt-2">{feedback.explanation}</p>

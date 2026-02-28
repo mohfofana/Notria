@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { BookOpen, Clock, Loader2, Target, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Target, Clock, TrendingUp, Loader2 } from "lucide-react";
-import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
+import { api } from "@/lib/api";
 import { getNextOnboardingPath } from "@/lib/onboarding";
 
 export default function AssessmentStart() {
@@ -15,7 +14,6 @@ export default function AssessmentStart() {
   const router = useRouter();
   const [isStarting, setIsStarting] = useState(false);
 
-  // Check if user needs to complete onboarding first
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.replace("/connexion");
@@ -36,20 +34,16 @@ export default function AssessmentStart() {
       router.push("/assessment/question/1");
     } catch (error) {
       console.error("Failed to start assessment:", error);
-      // Handle error - maybe show toast
       setIsStarting(false);
     }
   };
 
-  const examType = student?.examType || "BEPC";
-  const grade = student?.grade || "3eme";
-
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">Test de Niveau Adaptatif {examType}</h1>
+        <h1 className="text-3xl font-bold">Test de Niveau BEPC Maths</h1>
         <p className="text-muted-foreground mt-2">
-          Découvrons ton niveau actuel ({grade}) pour créer ton plan personnalisé
+          Un test fiable pour construire ton plan personnalise
         </p>
       </div>
 
@@ -57,16 +51,16 @@ export default function AssessmentStart() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-primary" />
-            Comment ça fonctionne ?
+            Comment ca fonctionne ?
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-start gap-3">
             <BookOpen className="h-5 w-5 text-primary mt-0.5" />
             <div>
-              <h3 className="font-semibold">10 questions adaptatives</h3>
+              <h3 className="font-semibold">15 questions de Mathematiques</h3>
               <p className="text-sm text-muted-foreground">
-                La difficulté s'ajuste selon tes réponses pour une évaluation précise
+                Le test couvre les domaines BEPC 3eme et ajuste la difficulte sur les domaines piliers
               </p>
             </div>
           </div>
@@ -74,9 +68,9 @@ export default function AssessmentStart() {
           <div className="flex items-start gap-3">
             <TrendingUp className="h-5 w-5 text-primary mt-0.5" />
             <div>
-              <h3 className="font-semibold">Ciblé Mathématiques</h3>
+              <h3 className="font-semibold">Programme officiel CI</h3>
               <p className="text-sm text-muted-foreground">
-                Questions uniquement en maths selon ton niveau actuel
+                Questions 100% alignees BEPC 3eme Maths (Pythagore, Thales, equations, fonctions, etc.)
               </p>
             </div>
           </div>
@@ -84,9 +78,9 @@ export default function AssessmentStart() {
           <div className="flex items-start gap-3">
             <Clock className="h-5 w-5 text-primary mt-0.5" />
             <div>
-              <h3 className="font-semibold">8-12 minutes</h3>
+              <h3 className="font-semibold">10-15 minutes</h3>
               <p className="text-sm text-muted-foreground">
-                Un test rapide pour identifier tes forces et axes d'amélioration
+                Une evaluation rapide pour identifier tes forces et tes lacunes
               </p>
             </div>
           </div>
@@ -95,19 +89,18 @@ export default function AssessmentStart() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Prêt à commencer ?</CardTitle>
+          <CardTitle>Pret a commencer ?</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-6">
-            Réponds honnêtement sans chercher sur internet. L'objectif est d'évaluer
-            ton niveau réel pour adapter ton programme d'étude.
+            Reponds honnetement sans aide exterieure. L'objectif est de mesurer ton niveau reel pour adapter ton parcours.
           </p>
 
           <Button onClick={handleStartAssessment} size="lg" className="w-full" disabled={isStarting}>
             {isStarting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Démarrage du test...
+                Demarrage du test...
               </>
             ) : (
               "Commencer le test"

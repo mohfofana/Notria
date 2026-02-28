@@ -65,7 +65,7 @@ export const StudentService = {
     return updated;
   },
 
-  async onboardingStep3(userId: number, input: { targetScore: number; dailyTime: "15min" | "30min" | "1h" }) {
+  async onboardingStep3(userId: number, input: { targetScore: number }) {
     const student = await db.query.students.findFirst({ where: eq(schema.students.userId, userId) });
     if (!student) return null;
 
@@ -73,7 +73,6 @@ export const StudentService = {
       .update(schema.students)
       .set({
         targetScore: input.targetScore,
-        dailyTime: input.dailyTime,
         updatedAt: new Date(),
       })
       .where(eq(schema.students.id, student.id))
