@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { Manrope, Baloo_2 } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-body",
+  weight: ["400", "500", "600", "700"],
 });
 
-const spaceGrotesk = Space_Grotesk({
+const baloo = Baloo_2({
   subsets: ["latin"],
   variable: "--font-display",
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -26,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
+      <body className={`${manrope.variable} ${baloo.variable}`}>
         <Providers>{children}</Providers>
       </body>
     </html>

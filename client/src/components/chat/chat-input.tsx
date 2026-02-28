@@ -48,7 +48,7 @@ export function ChatInput({ onSend, disabled, isStreaming, placeholder }: ChatIn
           placeholder={placeholder || "Écris ta question..."}
           disabled={disabled || isStreaming}
           rows={1}
-          className="flex-1 resize-none rounded-xl border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50"
+          className="flex-1 resize-none rounded-xl border border-input bg-background px-4 py-3 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50"
         />
         <Button
           onClick={handleSubmit}

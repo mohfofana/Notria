@@ -50,7 +50,7 @@ export function NewConversationDialog({ open, onClose, onCreate }: NewConversati
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-primary" />
-            <h2 className="font-semibold">Nouvelle conversation</h2>
+            <h2 className="text-lg font-semibold">Nouvelle conversation</h2>
           </div>
           <button onClick={handleClose} className="text-muted-foreground hover:text-foreground">
             <X className="h-5 w-5" />
@@ -59,9 +59,9 @@ export function NewConversationDialog({ open, onClose, onCreate }: NewConversati
 
         <div className="p-4 space-y-4">
           <div>
-            <p className="text-sm font-medium mb-2">Matière active</p>
+            <p className="text-sm font-medium mb-2">Matiere</p>
             <div className="rounded-lg border-2 border-primary bg-primary/5 px-3 py-2 text-sm font-medium text-primary">
-              Mathématiques
+              Mathematiques
             </div>
           </div>
 
@@ -70,7 +70,7 @@ export function NewConversationDialog({ open, onClose, onCreate }: NewConversati
               Sujet libre <span className="text-muted-foreground font-normal">(optionnel)</span>
             </p>
             <Input
-              placeholder="Ex: Calcul numérique, Pythagore, Fractions..."
+              placeholder="Ex: Pythagore, Fractions, Calcul numerique..."
               value={customTopic}
               onChange={(e) => setCustomTopic(e.target.value)}
               disabled={isCreating}
@@ -80,7 +80,7 @@ export function NewConversationDialog({ open, onClose, onCreate }: NewConversati
           {topics.length > 0 && (
             <div>
               <p className="text-sm font-medium mb-2">
-                Ou choisis un chapitre de maths
+                Ou choisis un chapitre
               </p>
               <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
                 {topics.map((t) => (
@@ -110,10 +110,10 @@ export function NewConversationDialog({ open, onClose, onCreate }: NewConversati
             {isCreating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Création...
+                Creation...
               </>
             ) : (
-              "Commencer à discuter"
+              "Commencer"
             )}
           </Button>
         </div>

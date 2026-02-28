@@ -1,475 +1,314 @@
 import Link from "next/link";
-import Image from "next/image";
 import {
   ArrowRight,
-  Camera,
-  CheckCircle2,
-  Clock3,
+  Check,
   GraduationCap,
-  Mic,
+  ImageIcon,
+  MessageSquare,
   ShieldCheck,
   Sparkles,
   Target,
   Users,
-  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const pillars = [
+const stats = [
+  { value: "4 500+", label: "eleves de 3e actifs" },
+  { value: "12k+", label: "seances chaque semaine" },
+  { value: "87%", label: "objectifs valides" },
+  { value: "4.8/5", label: "satisfaction familles" },
+];
+
+const promises = [
+  "Des explications courtes et simples",
+  "Des exercices guides, pas du blabla",
+  "Un suivi clair pour l'eleve et le parent",
+];
+
+const faq = [
   {
-    title: "Prof Ada",
-    description:
-      "Des explications pas a pas en francais simple, adaptees au niveau BEPC.",
-    icon: Sparkles,
+    q: "Notria est pour qui ?",
+    a: "Pour les eleves de 3e qui veulent progresser en maths et preparer le BEPC.",
   },
   {
-    title: "Notria Vision",
-    description:
-      "Prends un exercice en photo et recois une explication simple, sans rester bloque.",
-    icon: Camera,
+    q: "Combien de temps par jour ?",
+    a: "10 a 20 minutes suffisent pour garder un bon rythme.",
   },
   {
-    title: "Suivi parent transparent",
-    description:
-      "Le parent voit le temps d'etude, les progres et les points d'attention en temps reel.",
-    icon: Users,
-  },
-  {
-    title: "Planning simple et adapte",
-    description:
-      "Un planning clair selon ton niveau et ta date d'examen.",
-    icon: Clock3,
+    q: "Le parent peut suivre ?",
+    a: "Oui. Le parent voit les efforts, les progres et les points a renforcer.",
   },
 ];
 
-const outcomes = [
-  "Cours bases sur le programme officiel ivoirien",
-  "Exercices progressifs avec correction claire",
-  "BEPC blancs avec conseils simples",
-  "Suivi eleve + parent dans la meme application",
-];
-
-const testimonials = [
-  {
-    quote:
-      "Avant Notria, je revisais sans methode. Maintenant j'ai un plan clair chaque semaine et j'avance.",
-    name: "Kouassi B.",
-    role: "Eleve de 3eme",
-  },
-  {
-    quote:
-      "Je peux enfin suivre le travail de ma fille sans stress. Le tableau parent est tres rassurant.",
-    name: "Ahou M.",
-    role: "Parent d'eleve",
-  },
-  {
-    quote:
-      "Le mode photo m'a sauvee en maths. Les explications sont directes et faciles a retenir.",
-    name: "Fatou K.",
-    role: "Terminale D",
-  },
-];
-
-const faqs = [
-  {
-    q: "Notria est-elle adaptee au programme BEPC ivoirien ?",
-    a: "Oui. Notria est faite pour le BEPC ivoirien, avec des explications simples et proches du cours.",
-  },
-  {
-    q: "Un parent peut-il suivre la progression en direct ?",
-    a: "Oui. L'espace parent montre le temps d'etude, les progres et les alertes importantes.",
-  },
-  {
-    q: "Puis-je commencer gratuitement ?",
-    a: "Oui. L'inscription est rapide et permet de tester le parcours complet des le premier jour.",
-  },
-];
-
-function SectionArrow() {
+function PlaceholderCard({
+  tag,
+  title,
+  text,
+}: {
+  tag: string;
+  title: string;
+  text: string;
+}) {
   return (
-    <div className="pointer-events-none flex justify-center py-0">
-      <svg
-        width="36"
-        height="64"
-        viewBox="0 0 36 64"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="opacity-75"
-      >
-        <path
-          d="M18 6C17 14 19 20 18 29C17 38 19 45 18 54"
-          stroke="#0F766E"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-        <path
-          d="M11 47L18 56"
-          stroke="#0F766E"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-        <path
-          d="M25 47L18 56"
-          stroke="#0F766E"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-      </svg>
-    </div>
+    <article className="soft-card rounded-3xl p-5 sm:p-6">
+      <div className="aspect-[16/10] rounded-2xl border border-border/70 bg-gradient-to-br from-white via-muted/20 to-muted/80 p-3">
+        <div className="grid h-full w-full place-items-center rounded-xl border border-dashed border-border/80 bg-white/70">
+          <div className="text-center text-muted-foreground">
+            <ImageIcon className="mx-auto mb-2 h-8 w-8" />
+            <p className="text-xs uppercase tracking-[0.18em]">{tag}</p>
+          </div>
+        </div>
+      </div>
+      <p className="mt-4 text-2xl font-semibold leading-tight">{title}</p>
+      <p className="mt-2 text-base text-muted-foreground">{text}</p>
+    </article>
   );
 }
 
-type TabletFrameProps = {
-  src: string;
-  alt: string;
-  sizes: string;
-  maxWidthClass?: string;
-};
-
-function TabletFrame({ src, alt, sizes, maxWidthClass = "max-w-full" }: TabletFrameProps) {
+function MiniBoard() {
   return (
-    <div
-      className={`relative mx-auto w-full ${maxWidthClass} rounded-[1.8rem] border-[6px] border-[#F8FBFA] bg-[#F8FBFA] p-1 shadow-[0_14px_30px_-16px_rgba(15,23,42,0.35)] ring-1 ring-slate-300`}
-    >
-      <span className="pointer-events-none absolute left-1/2 top-1 h-1.5 w-10 -translate-x-1/2 rounded-full bg-slate-300" />
-      <div className="relative aspect-[16/9] overflow-hidden rounded-[1.3rem] border border-slate-200 bg-white">
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          quality={100}
-          sizes={sizes}
-          className="object-cover object-top"
-        />
+    <article className="soft-shell rounded-3xl p-6 sm:p-8">
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-lg font-semibold">Tableau de resolution</p>
+        <span className="soft-chip rounded-full px-3 py-1 text-xs">cours anime</span>
       </div>
-    </div>
+
+      <div className="chalkboard-root">
+        <div className="chalkboard-panel">
+          <p className="chalk-title chalk-line" style={{ animationDelay: "0.1s" }}>
+            Pythagore en 4 etapes
+          </p>
+          <p className="chalk-formula chalk-line" style={{ animationDelay: "0.45s" }}>
+            AC^2 = AB^2 + BC^2
+          </p>
+          <p className="chalk-formula chalk-line" style={{ animationDelay: "0.8s" }}>
+            AC^2 = 3^2 + 4^2
+          </p>
+          <p className="chalk-formula chalk-line" style={{ animationDelay: "1.1s" }}>
+            AC^2 = 9 + 16 = 25
+          </p>
+          <p className="chalk-formula chalk-highlight chalk-line" style={{ animationDelay: "1.45s" }}>
+            AC = sqrt(25) = 5 cm
+          </p>
+        </div>
+      </div>
+    </article>
   );
 }
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#F8FBFA] text-foreground">
-      <header className="fixed inset-x-0 top-4 z-50 px-4 sm:px-6">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between rounded-2xl border border-border/70 bg-white/90 px-4 shadow-lg backdrop-blur sm:px-6">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground">
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[540px] overflow-hidden">
+        <div className="absolute left-[6%] top-12 h-52 w-52 rounded-full bg-primary/18 blur-3xl" />
+        <div className="absolute right-[8%] top-16 h-56 w-56 rounded-full bg-accent/25 blur-3xl" />
+      </div>
+
+      <header className="fixed inset-x-0 top-3 z-50 px-4 sm:px-6">
+        <div className="soft-shell mx-auto flex h-16 max-w-6xl items-center justify-between rounded-2xl px-5 sm:px-7">
+          <Link href="/" className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground">
               <GraduationCap className="h-5 w-5" />
             </span>
-            <span className="font-display text-lg tracking-tight">Notria</span>
+            <span className="text-2xl font-semibold tracking-tight">Notria</span>
           </Link>
-          <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-            <a href="#fonctionnalites" className="hover:text-foreground">
-              Fonctionnalites
-            </a>
-            <a href="#vision" className="hover:text-foreground">
-              Vision
-            </a>
-            <a href="#faq" className="hover:text-foreground">
-              FAQ
-            </a>
+
+          <nav className="hidden items-center gap-8 text-base text-muted-foreground md:flex">
+            <a href="#pourquoi" className="transition-colors hover:text-foreground">Pourquoi</a>
+            <a href="#espaces" className="transition-colors hover:text-foreground">Espaces</a>
+            <a href="#faq" className="transition-colors hover:text-foreground">FAQ</a>
           </nav>
+
           <div className="flex items-center gap-2">
             <Link href="/connexion">
-              <Button variant="ghost" size="sm">
-                Connexion
-              </Button>
+              <Button variant="ghost" className="h-10 px-4 text-sm">Connexion</Button>
             </Link>
             <Link href="/inscription">
-              <Button size="sm">Commencer</Button>
+              <Button className="h-10 px-5 text-sm">Essayer</Button>
             </Link>
           </div>
         </div>
       </header>
 
-      <section className="relative px-4 pb-12 pt-28 sm:px-6 sm:pt-32">
-        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-2">
-          <div className="animate-fade-slide-up space-y-7">
-            <p className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/85 px-4 py-1 text-sm font-medium text-primary">
+      <section className="px-4 pb-20 pt-32 sm:px-6 sm:pt-36">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="animate-fade-slide-up">
+            <p className="soft-chip inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
               <ShieldCheck className="h-4 w-4" />
-              Soutien scolaire pour eleves ivoiriens
-            </p>
-            <h1 className="max-w-xl text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
-              Aider chaque eleve a reussir son BEPC.
-            </h1>
-            <p className="max-w-xl text-lg text-muted-foreground">
-              Notria aide chaque eleve a apprendre tous les jours, avec des explications claires.
+              Specialement pense pour les eleves de 3e
             </p>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <h1 className="mt-6 text-5xl font-semibold leading-[1.02] sm:text-6xl lg:text-7xl">
+              Reviser les maths
+              <br />
+              sans stress.
+            </h1>
+
+            <p className="mt-6 max-w-xl text-xl text-muted-foreground sm:text-2xl">
+              Tu avances pas a pas, tu pratiques tout de suite, et tu comprends vraiment avant le BEPC.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/inscription">
-                <Button className="h-12 px-6 text-base">
-                  Creer mon compte
+                <Button className="soft-focus-ring h-12 px-7 text-base">
+                  Commencer gratuitement
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/chat">
-                <Button variant="outline" className="h-12 px-6 text-base">
-                  Tester Prof Ada
-                </Button>
+                <Button variant="outline" className="h-12 px-7 text-base">Voir un exemple</Button>
               </Link>
             </div>
 
-            <div className="flex flex-wrap gap-5 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                Inscription en quelques minutes
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                Disponible 24h/24
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                Suivi eleve + parent
-              </span>
-            </div>
-          </div>
-
-          <div className="animate-float-y relative w-full max-w-[420px] p-3 lg:ml-auto lg:mr-0">
-            <div className="pointer-events-none absolute -inset-1 rounded-[2.1rem] border-2 border-primary/35 rotate-[-1.5deg]" />
-            <div className="pointer-events-none absolute -inset-2 rounded-[2.2rem] border border-primary/25 rotate-[1.2deg]" />
-            <div className="pointer-events-none absolute -inset-3 rounded-[2.3rem] border border-dashed border-primary/30 rotate-[-0.8deg]" />
-            <div className="relative overflow-hidden rounded-[1.6rem] border-2 border-white/80 bg-muted/20 shadow-xl shadow-primary/15">
-              <Image
-                src="/illustrations/fatou_sucess.png"
-                alt="Fatou, eleve ayant reussi son diplome grace a Notria"
-                width={900}
-                height={1200}
-                className="h-auto w-full aspect-[4/5] object-cover"
-                priority
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <SectionArrow />
-
-      <section className="px-4 py-12 sm:px-6">
-        <div className="mx-auto w-full max-w-6xl">
-          <div className="mb-7">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-              Apercu de l'application
-            </p>
-            <h2 className="mt-2 text-3xl font-semibold sm:text-4xl">
-              Les ecrans de l'application
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-            <article className="overflow-hidden rounded-2xl border-2 border-slate-300 bg-white shadow-sm lg:col-span-7">
-              <div className="px-2 pt-2">
-                <TabletFrame
-                  src="/illustrations/chat_eleve.png"
-                  alt="Conversation eleve avec Prof Ada"
-                  sizes="(max-width: 1024px) 100vw, 58vw"
-                />
-              </div>
-              <div className="p-4">
-                <p className="font-medium">Chat eleve avec Prof Ada</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Le cours, les exercices et les explications sont au meme endroit.
-                </p>
-              </div>
-            </article>
-
-            <article className="overflow-hidden rounded-2xl border-2 border-slate-300 bg-white shadow-sm lg:col-span-5">
-              <div className="px-2 pt-2">
-                <TabletFrame
-                  src="/illustrations/notria_vision.png"
-                  alt="Notria Vision pour corriger un devoir BEPC"
-                  sizes="(max-width: 1024px) 100vw, 42vw"
-                />
-              </div>
-              <div className="p-4">
-                <p className="font-medium">Notria Vision</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Tu prends une photo du devoir, Notria t'explique la correction.
-                </p>
-              </div>
-            </article>
-
-            <article className="overflow-hidden rounded-2xl border-2 border-slate-300 bg-white shadow-sm lg:col-span-12">
-              <div className="px-2 pt-2">
-                <TabletFrame
-                  src="/illustrations/inscription.png"
-                  alt="Inscription Notria"
-                  sizes="(max-width: 1024px) 100vw, 66vw"
-                  maxWidthClass="max-w-[980px]"
-                />
-              </div>
-              <div className="p-4">
-                <p className="font-medium">Inscription rapide</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Le parcours de creation de compte est court et guide.
-                </p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <SectionArrow />
-
-      <section id="fonctionnalites" className="px-4 py-12 sm:px-6">
-        <div className="mx-auto w-full max-w-6xl">
-          <div className="mb-8">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">Fonctionnalites</p>
-            <h2 className="mt-2 text-3xl font-semibold sm:text-4xl">
-              Tout ce qu'il faut pour bien preparer le BEPC
-            </h2>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {pillars.map((pillar) => (
-              <article key={pillar.title} className="rounded-2xl border border-border/80 bg-white/90 p-5">
-                <pillar.icon className="mb-3 h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold">{pillar.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{pillar.description}</p>
-              </article>
-            ))}
-          </div>
-
-          <div className="mt-8 rounded-2xl border border-border bg-white/85 p-5">
-            <p className="mb-3 text-sm font-medium">Ce que les eleves obtiennent concretement</p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {outcomes.map((outcome) => (
-                <p key={outcome} className="inline-flex items-start gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  {outcome}
-                </p>
+            <div className="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {stats.map((item) => (
+                <article key={item.label} className="soft-card rounded-2xl px-4 py-3">
+                  <p className="text-2xl font-semibold sm:text-3xl">{item.value}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{item.label}</p>
+                </article>
               ))}
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-2">
-            <article className="overflow-hidden rounded-2xl border border-border bg-white/90">
-              <div className="px-2 pt-2">
-                <TabletFrame
-                  src="/illustrations/espace_bepc.png"
-                  alt="Notria Vision pour corriger un devoir BEPC"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
+          <div className="animate-float-y">
+            <div className="soft-shell rounded-3xl p-5 sm:p-6">
+              <div className="rounded-2xl border border-border/80 bg-gradient-to-br from-white via-muted/20 to-muted/65 p-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground">
+                      <Sparkles className="h-4 w-4" />
+                    </span>
+                    <p className="text-xl font-semibold">Seance du jour</p>
+                  </div>
+                  <span className="rounded-full border border-border/70 bg-white px-3 py-1 text-xs">Maths 3e</span>
+                </div>
+
+                <div className="space-y-3 text-base">
+                  <div className="rounded-xl border border-border/80 bg-white/85 p-4">
+                    Salut. On fait une seance courte de calcul numerique. Tu preferes rappel ou exercice ?
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="soft-chip rounded-full px-3 py-1 text-xs">Rappel rapide</span>
+                    <span className="soft-chip rounded-full px-3 py-1 text-xs">Exercice guide</span>
+                    <span className="soft-chip rounded-full px-3 py-1 text-xs">Je suis bloque</span>
+                  </div>
+                </div>
               </div>
-              <div className="p-4">
-                <p className="font-medium">Notria Vision, tres simple</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  1 photo du devoir, puis Notria t'explique clairement chaque etape.
-                </p>
+
+              <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-xl border border-border/80 bg-white/75 p-3">
+                  <p className="font-medium">Objectif</p>
+                  <p className="mt-1 text-muted-foreground">Comprendre vite et retenir mieux.</p>
+                </div>
+                <div className="rounded-xl border border-border/80 bg-white/75 p-3">
+                  <p className="font-medium">Duree</p>
+                  <p className="mt-1 text-muted-foreground">10 a 20 min par seance.</p>
+                </div>
               </div>
-            </article>
-            <article className="overflow-hidden rounded-2xl border border-border bg-white/90">
-              <div className="px-2 pt-2">
-                <TabletFrame
-                  src="/illustrations/espace_parent.png"
-                  alt="Espace parent Notria avec suivi de progression"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-              </div>
-              <div className="p-4">
-                <p className="font-medium">Espace parent</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Progres, alertes et rapport de la semaine.
-                </p>
-              </div>
-            </article>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="vision" className="px-4 py-12 sm:px-6">
-        <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-2">
-          <article className="rounded-3xl border border-border bg-white/90 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">Notre vision</p>
-            <h2 className="mt-2 text-3xl font-semibold">Aider plus d'eleves a reussir</h2>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Nous voulons une application utile, locale et facile a utiliser pour chaque famille.
-              Le plus important: comprendre ses cours et progresser chaque semaine.
-            </p>
-            <div className="mt-5 grid gap-3">
-              <div className="rounded-xl border border-border bg-muted/35 p-4">
-                <p className="flex items-center gap-2 font-medium">
-                  <Target className="h-4 w-4 text-primary" />
-                  Priorite resultat
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Plus de regularite, plus de confiance, plus de reussite a l'examen.
-                </p>
-              </div>
-              <div className="rounded-xl border border-border bg-muted/35 p-4">
-                <p className="flex items-center gap-2 font-medium">
-                  <Zap className="h-4 w-4 text-primary" />
-                  Priorite simplicite
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Une application claire et utile des le premier jour.
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <article className="rounded-3xl border border-border bg-primary p-6 text-primary-foreground">
-            <h3 className="text-2xl font-semibold">Pourquoi les familles choisissent Notria</h3>
-            <div className="mt-5 space-y-3 text-sm text-primary-foreground/90">
-              <p className="inline-flex items-start gap-2">
-                <Mic className="mt-0.5 h-4 w-4 shrink-0" />
-                Echange simple par message, avec un accompagnement motive.
-              </p>
-              <p className="inline-flex items-start gap-2">
-                <Camera className="mt-0.5 h-4 w-4 shrink-0" />
-                Tu prends ton devoir en photo, et Notria montre ou tu t'es trompe.
-              </p>
-              <p className="inline-flex items-start gap-2">
-                <Users className="mt-0.5 h-4 w-4 shrink-0" />
-                Visibilite parentale claire sur le travail de l'eleve.
-              </p>
-            </div>
-            <Link href="/inscription" className="mt-6 inline-flex">
-              <Button className="bg-white text-primary hover:bg-white/90">
-                Commencer gratuitement
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </article>
-        </div>
-      </section>
-
-      <section className="px-4 py-12 sm:px-6">
-        <div className="mx-auto w-full max-w-6xl">
-          <h2 className="mb-6 text-3xl font-semibold">Ils parlent de leur progression</h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            {testimonials.map((item) => (
-              <article key={item.name} className="rounded-2xl border border-border bg-white/90 p-5">
-                <p className="text-sm text-muted-foreground">"{item.quote}"</p>
-                <p className="mt-4 font-medium">{item.name}</p>
-                <p className="text-xs text-muted-foreground">{item.role}</p>
+      <section id="pourquoi" className="px-4 py-14 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-4xl font-semibold sm:text-5xl">Ce que Notria change pour un eleve de 3e</h2>
+          <div className="mt-7 grid gap-4 md:grid-cols-3">
+            {promises.map((item) => (
+              <article key={item} className="soft-card rounded-3xl p-6">
+                <Check className="h-5 w-5 text-primary" />
+                <p className="mt-4 text-lg font-semibold leading-snug">{item}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="faq" className="px-4 pb-16 pt-12 sm:px-6">
-        <div className="mx-auto w-full max-w-6xl rounded-3xl border border-border bg-white/90 p-6 sm:p-8">
-          <h2 className="text-3xl font-semibold">Questions frequentes</h2>
-          <div className="mt-6 space-y-3">
-            {faqs.map((faq) => (
-              <article key={faq.q} className="rounded-xl border border-border p-4">
-                <p className="font-medium">{faq.q}</p>
-                <p className="mt-2 text-sm text-muted-foreground">{faq.a}</p>
+      <section id="espaces" className="px-4 py-14 sm:px-6">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.02fr_0.98fr]">
+          <div className="space-y-4">
+            <PlaceholderCard
+              tag="eleve"
+              title="Espace eleve"
+              text="Cours, exercices et recap au meme endroit pour rester concentre."
+            />
+            <PlaceholderCard
+              tag="parent"
+              title="Espace parent"
+              text="Vision simple des progres, des efforts et des notions a retravailler."
+            />
+          </div>
+
+          <div className="space-y-4">
+            <MiniBoard />
+            <article className="soft-card rounded-3xl p-6">
+              <div className="flex items-start gap-3">
+                <MessageSquare className="mt-1 h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-xl font-semibold">Un langage simple</p>
+                  <p className="mt-2 text-base text-muted-foreground">
+                    Notria explique comme un bon prof: peu de texte, une question, puis une action.
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" className="px-4 pb-20 pt-10 sm:px-6">
+        <div className="soft-shell mx-auto max-w-6xl rounded-3xl p-6 sm:p-8">
+          <h2 className="text-4xl font-semibold sm:text-5xl">Questions frequentes</h2>
+
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            {faq.map((item) => (
+              <article key={item.q} className="soft-card rounded-2xl p-5">
+                <p className="text-lg font-semibold">{item.q}</p>
+                <p className="mt-2 text-base text-muted-foreground">{item.a}</p>
               </article>
             ))}
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4">
-            <p className="text-sm">Pret a commencer avec Prof Ada ?</p>
-            <Link href="/inscription">
-              <Button>
-                Je commence maintenant
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/25 bg-primary/10 p-5">
+            <div>
+              <p className="text-xl font-semibold">Pret pour la prochaine etape ?</p>
+              <p className="text-base text-muted-foreground">Lance une premiere seance en quelques minutes.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link href="/parent/dashboard">
+                <Button variant="outline" className="h-11 px-5">
+                  <Users className="mr-2 h-4 w-4" />
+                  Espace parent
+                </Button>
+              </Link>
+              <Link href="/inscription">
+                <Button className="h-11 px-5">
+                  Commencer
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-20 sm:px-6">
+        <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-3">
+          <article className="soft-card rounded-2xl p-5">
+            <Target className="h-5 w-5 text-primary" />
+            <p className="mt-3 text-lg font-semibold">Focus BEPC</p>
+            <p className="mt-1 text-sm text-muted-foreground">Notions importantes, methodes claires, exos cibles.</p>
+          </article>
+          <article className="soft-card rounded-2xl p-5">
+            <Users className="h-5 w-5 text-primary" />
+            <p className="mt-3 text-lg font-semibold">Eleve + parent</p>
+            <p className="mt-1 text-sm text-muted-foreground">Un meme parcours, deux vues adaptees.</p>
+          </article>
+          <article className="soft-card rounded-2xl p-5">
+            <ShieldCheck className="h-5 w-5 text-primary" />
+            <p className="mt-3 text-lg font-semibold">Simple et rassurant</p>
+            <p className="mt-1 text-sm text-muted-foreground">Aucune complexite inutile, juste ce qui aide a reussir.</p>
+          </article>
         </div>
       </section>
     </main>

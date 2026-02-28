@@ -38,13 +38,13 @@ export function ChatMessages({
             <GraduationCap className="h-8 w-8 text-primary" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-1">
+            <h2 className="text-xl font-semibold mb-1">
               {activeSubject ? `${activeSubject} ${activeTopic ? `• ${activeTopic}` : ""}` : "Prof Ada est prete"}
             </h2>
-            <p className="text-sm text-muted-foreground max-w-sm">
+            <p className="text-base text-muted-foreground max-w-sm">
               {activeSubject
-                ? "Pose ta premiere question pour demarrer la seance."
-                : "Cree ou selectionne une conversation pour demarrer ton cours."}
+                ? "Pose ta premiere question pour demarrer."
+                : "Choisis une conversation pour commencer."}
             </p>
           </div>
         </div>
@@ -104,7 +104,7 @@ function MessageBubble({
         )}
       </div>
       <div
-        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+        className={`max-w-[82%] rounded-2xl px-4 py-3 text-base leading-relaxed ${
           isUser
             ? "bg-primary text-primary-foreground"
             : "bg-muted"

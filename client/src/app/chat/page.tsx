@@ -62,7 +62,6 @@ function buildContextualReplies(params: {
   lastAssistantMessage?: string;
   preferQuestionFlow?: boolean;
 }): string[] {
-  const normalizedUser = (params.lastUserMessage || "").toLowerCase();
   const assistant = params.lastAssistantMessage || "";
   const topic = params.topic?.trim();
   const question = extractAssistantQuestion(assistant);
@@ -84,17 +83,6 @@ function buildContextualReplies(params: {
   if (topic) {
     replies.push(`On continue sur ${topic}`);
     replies.push(`Donne un exercice BEPC sur ${topic}`);
-  }
-
-  if (normalizedUser.includes("pas compris") || normalizedUser.includes("je comprends pas")) {
-    replies.push("Reprends très lentement depuis le début");
-    replies.push("Donne une analogie très simple");
-  } else {
-    replies.push("Donne un exemple concret");
-    replies.push("Fais une vérification rapide");
-    replies.push("Donne-moi un mini exercice");
-    replies.push("Donne un indice sans la réponse");
-    replies.push("Fais un résumé en 3 phrases");
   }
 
   return uniq(replies).slice(0, 6);
@@ -274,8 +262,8 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="h-screen flex bg-background">
-      <div className="hidden md:flex md:w-80 border-r flex-col">
+    <div className="h-screen flex bg-background p-3 gap-3">
+      <div className="hidden md:flex md:w-80 soft-shell rounded-2xl overflow-hidden flex-col">
         <ChatSidebar
           conversations={conversations}
           activeId={activeId}
@@ -303,29 +291,24 @@ export default function ChatPage() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="border-b px-4 py-3 flex items-center gap-3">
+      <div className="flex-1 flex flex-col min-w-0 soft-shell rounded-2xl overflow-hidden">
+        <header className="border-b border-border/70 px-4 py-3 flex items-center gap-3 bg-white/55">
           <button
             onClick={() => setSidebarOpen(true)}
             className="md:hidden text-muted-foreground hover:text-foreground"
           >
             <Menu className="h-5 w-5" />
           </button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push("/dashboard")}
-            className="hidden md:flex"
-          >
+          <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")} className="hidden md:flex">
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Dashboard
+            Retour
           </Button>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <GraduationCap className="h-5 w-5 text-primary shrink-0" />
-            <span className="font-semibold truncate">
-              {activeConv ? activeConv.title || activeConv.subject : "Prof Ada"}
-            </span>
-          </div>
+              <span className="font-semibold truncate tracking-wide">
+                {activeConv ? activeConv.title || activeConv.subject : "Prof Ada"}
+              </span>
+            </div>
           <div className="hidden sm:flex items-center gap-2">
             <Button
               variant="outline"
@@ -341,7 +324,7 @@ export default function ChatPage() {
               onClick={() => router.push("/chat?voice=1")}
             >
               <Mic className="h-4 w-4 mr-1" />
-              Vocal (MVP)
+              Vocal
             </Button>
           </div>
         </header>
@@ -361,17 +344,17 @@ export default function ChatPage() {
                 <div className="flex items-center gap-2 min-w-0">
                   <BookOpen className="h-4 w-4 text-primary shrink-0" />
                   <span className="font-medium truncate">
-                    Session: {activeConv?.subject || "Mathématiques"}
+                    Cours: {activeConv?.subject || "Mathématiques"}
                     {activeConv?.topic ? ` • ${activeConv.topic}` : ""}
                   </span>
-                  <span className="text-muted-foreground">({messages.filter((m) => m.role !== "system").length} msgs)</span>
+                  <span className="text-muted-foreground">({messages.filter((m) => m.role !== "system").length} messages)</span>
                 </div>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => router.push("/session/today")}
                 >
-                  Voir la séance guidée
+                  Voir ma séance
                 </Button>
               </div>
             </div>
@@ -380,14 +363,14 @@ export default function ChatPage() {
                 <div className="max-w-3xl mx-auto flex flex-wrap gap-2">
                   <div className="w-full flex items-center gap-1 text-xs text-muted-foreground mb-1">
                     <Sparkles className="h-3.5 w-3.5" />
-                    Réponses prêtes à envoyer
+                    Idées de réponses
                   </div>
                   {quickReplies.map((choice) => (
                     <button
                       key={choice}
                       type="button"
                       onClick={() => handleSend(choice)}
-                      className="rounded-full border border-border bg-background px-3 py-1.5 text-sm hover:bg-muted max-w-full truncate"
+                      className="rounded-full border border-border bg-white px-3 py-1.5 text-sm hover:bg-muted max-w-full truncate transition-colors"
                       title={choice}
                     >
                       {choice}
@@ -399,20 +382,20 @@ export default function ChatPage() {
             <ChatInput
               onSend={handleSend}
               isStreaming={isStreaming}
-              placeholder="Écris comme si tu parlais à un prof..."
+              placeholder="Ecris ta reponse ou ta question..."
             />
           </>
         ) : (
           <div className="border-t px-4 py-8">
             <div className="max-w-3xl mx-auto rounded-2xl border border-border bg-white/80 p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-2">
-                Comment Notria fonctionne
+                Comment ca marche
               </p>
-              <h3 className="text-lg font-semibold mb-4">Une séance type en 4 étapes</h3>
+              <h3 className="text-lg font-semibold mb-4">Une seance simple en 4 etapes</h3>
               <div className="grid gap-3 sm:grid-cols-4">
                 {[
-                  "Cours guidé",
-                  "Vérification rapide",
+                  "Explication courte",
+                  "Question rapide",
                   "Exercices BEPC",
                   "Correction + recap",
                 ].map((step, idx) => (
@@ -424,7 +407,7 @@ export default function ChatPage() {
                 ))}
               </div>
               <Button className="mt-5" onClick={() => setShowNewDialog(true)}>
-                Démarrer une nouvelle conversation
+                Demarrer une conversation
               </Button>
             </div>
           </div>

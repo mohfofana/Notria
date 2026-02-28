@@ -68,15 +68,15 @@ export default function ConnexionPage() {
   return (
     <>
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Content de te revoir</h1>
-        <p className="text-muted-foreground">
-          Connecte-toi pour continuer à apprendre
+        <h1 className="text-3xl font-bold tracking-tight">Content de te revoir</h1>
+        <p className="text-base text-muted-foreground">
+          Connecte-toi pour reprendre tes revisions
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="phone">Numéro de téléphone</Label>
+          <Label htmlFor="phone" className="text-base">Numero de telephone</Label>
           <div className="flex">
             <span className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
               +225
@@ -94,7 +94,7 @@ export default function ConnexionPage() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">Mot de passe</Label>
+          <Label htmlFor="password" className="text-base">Mot de passe</Label>
           <div className="relative">
             <Input
               id="password"
@@ -116,7 +116,7 @@ export default function ConnexionPage() {
         </div>
 
         {error && (
-          <p className="text-sm text-destructive font-medium">{error}</p>
+          <p className="text-base text-destructive font-medium">{error}</p>
         )}
 
         <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
@@ -131,10 +131,10 @@ export default function ConnexionPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-base text-muted-foreground">
         Pas encore de compte ?{" "}
         <Link href="/inscription" className="text-primary font-medium hover:underline">
-          Inscris-toi gratuitement
+          Inscris-toi
         </Link>
       </p>
     </>
