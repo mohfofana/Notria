@@ -9,6 +9,7 @@ export const createConversationSchema = z.object({
 export const sendMessageSchema = z.object({
   conversationId: z.number(),
   content: z.string().min(1, "Le message ne peut pas être vide"),
+  internal: z.boolean().optional(),
 });
 
 export const generateHomeworkSchema = z.object({

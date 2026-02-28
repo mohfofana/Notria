@@ -1,11 +1,15 @@
 import { Router } from "express";
 import { AssessmentController } from "../controllers/assessment.controller.js";
-import { authenticate } from "../middleware/auth.js";
+import { authenticate, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
 // All assessment routes require authentication
 router.use(authenticate);
+router.use(requireRole(["student"]));
+
+// Assessment overview for exam section
+router.get("/overview", AssessmentController.getOverview);
 
 // Start assessment
 router.post("/start", AssessmentController.startAssessment);

@@ -36,6 +36,82 @@ interface AssessmentProgress {
 }
 
 export const AssessmentService = {
+  async getExamOverview(userId: number) {
+    const student = await db.query.students.findFirst({
+      where: eq(schema.students.userId, userId),
+    });
+    if (!student) {
+      throw new Error("Student not found");
+    }
+
+    const studyPlan = await db.query.studyPlans.findFirst({
+      where: eq(schema.studyPlans.studentId, student.id),
+    });
+
+    let weekEntries: Array<typeof schema.studyPlanWeeks.$inferSelect> = [];
+    if (studyPlan) {
+      weekEntries = await db.query.studyPlanWeeks.findMany({
+        where: and(
+          eq(schema.studyPlanWeeks.studyPlanId, studyPlan.id),
+          eq(schema.studyPlanWeeks.weekNumber, studyPlan.currentWeek)
+        ),
+      });
+    }
+
+    const prioritizedSubjects = Array.isArray(student.prioritySubjects)
+      ? (student.prioritySubjects as string[])
+      : [];
+    const subjects = Array.from(
+      new Set([
+        ...weekEntries.map((entry) => entry.subject),
+        ...prioritizedSubjects,
+        "Mathématiques",
+      ])
+    );
+
+    const recentAssessments = await db.query.studySessions.findMany({
+      where: and(
+        eq(schema.studySessions.studentId, student.id),
+        eq(schema.studySessions.type, "assessment")
+      ),
+      orderBy: [desc(schema.studySessions.createdAt)],
+      limit: 20,
+    });
+
+    const latestResult = await db.query.levelAssessments.findFirst({
+      where: eq(schema.levelAssessments.studentId, student.id),
+      orderBy: [desc(schema.levelAssessments.completedAt), desc(schema.levelAssessments.createdAt)],
+    });
+
+    const exams = subjects.map((subject) => {
+      const recentForSubject = recentAssessments.find((session) => session.subject === subject);
+      return {
+        subject,
+        title: `${student.examType} Blanc - ${subject}`,
+        durationMinutes: subject === "Mathématiques" ? 120 : 90,
+        progress: recentForSubject ? "Terminé" : "Non démarré",
+        lastScore: recentForSubject?.score ?? null,
+        lastDate: recentForSubject?.createdAt ?? null,
+      };
+    });
+
+    return {
+      examType: student.examType,
+      grade: student.grade,
+      targetScore: student.targetScore ?? null,
+      currentWeek: studyPlan?.currentWeek ?? null,
+      totalWeeks: studyPlan?.totalWeeks ?? null,
+      exams,
+      lastAssessment: latestResult
+        ? {
+            score: latestResult.score ?? null,
+            level: latestResult.level ?? null,
+            completedAt: latestResult.completedAt ?? latestResult.createdAt,
+          }
+        : null,
+    };
+  },
+
   async startAssessment(userId: number): Promise<AssessmentProgress> {
     // Get student profile
     const student = await db.query.students.findFirst({
@@ -46,8 +122,8 @@ export const AssessmentService = {
       throw new Error("Student not found");
     }
 
-    // Get priority subjects or all subjects for exam type
-    const subjects = student.prioritySubjects as string[] || this.getDefaultSubjects(student);
+    // MVP maths-only mode: force a single assessment subject.
+    const subjects = ["Mathématiques"];
 
     // Initialize progress
     const subjectProgress: Record<string, { correct: number; total: number; currentDifficulty: string; questionsAsked: number }> = {};
@@ -339,21 +415,7 @@ export const AssessmentService = {
   },
 
   getDefaultSubjects(student: any): string[] {
-    // Return default subjects based on exam type and series
-    if (student.examType === "BEPC") {
-      return ["Mathématiques", "Français", "Histoire-Géographie", "SVT", "Physique-Chimie", "Anglais"];
-    } else { // BAC
-      switch (student.series) {
-        case "C":
-          return ["Mathématiques", "Physique-Chimie", "SVT", "Philosophie", "Français", "Anglais"];
-        case "D":
-          return ["Mathématiques", "SVT", "Philosophie", "Français", "Anglais", "Espagnol"];
-        case "A1":
-        case "A2":
-          return ["Mathématiques", "Philosophie", "Français", "Anglais", "SVT", "Histoire-Géographie"];
-        default:
-          return ["Mathématiques", "Français", "Philosophie", "Anglais"];
-      }
-    }
+    // MVP maths-only mode.
+    return ["Mathématiques"];
   },
 };

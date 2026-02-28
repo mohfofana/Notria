@@ -41,12 +41,15 @@ export default function AssessmentStart() {
     }
   };
 
+  const examType = student?.examType || "BEPC";
+  const grade = student?.grade || "3eme";
+
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">Test de Niveau Adaptatif</h1>
+        <h1 className="text-3xl font-bold">Test de Niveau Adaptatif {examType}</h1>
         <p className="text-muted-foreground mt-2">
-          Découvrons ton niveau actuel pour créer ton plan personnalisé
+          Découvrons ton niveau actuel ({grade}) pour créer ton plan personnalisé
         </p>
       </div>
 
@@ -71,9 +74,9 @@ export default function AssessmentStart() {
           <div className="flex items-start gap-3">
             <TrendingUp className="h-5 w-5 text-primary mt-0.5" />
             <div>
-              <h3 className="font-semibold">Par matière</h3>
+              <h3 className="font-semibold">Ciblé Mathématiques</h3>
               <p className="text-sm text-muted-foreground">
-                Questions en Maths, SVT et autres matières selon ton profil
+                Questions uniquement en maths selon ton niveau actuel
               </p>
             </div>
           </div>

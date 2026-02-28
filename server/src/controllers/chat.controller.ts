@@ -79,6 +79,7 @@ export const ChatController = {
     const parsed = sendMessageSchema.safeParse({
       conversationId,
       content: req.body.content,
+      internal: req.body.internal,
     });
     if (!parsed.success) {
       return res.status(400).json({ error: "Message invalide", details: parsed.error.flatten() });
@@ -99,6 +100,7 @@ export const ChatController = {
       conversationId,
       studentId,
       parsed.data.content,
+      { internal: req.body.internal === true },
       // onChunk: send each token as SSE data
       (chunk) => {
         res.write(`data: ${JSON.stringify({ type: "chunk", content: chunk })}\n\n`);

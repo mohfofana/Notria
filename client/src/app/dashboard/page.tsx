@@ -35,11 +35,47 @@ interface CurrentWeekData {
   entries: WeekEntry[];
 }
 
+interface TodaySessionResponse {
+  success: boolean;
+  data: {
+    hasSession: boolean;
+    session?: {
+      id: number;
+      subject: string;
+      startTime: string;
+      durationMinutes: number;
+      conversationId: number;
+    };
+  };
+}
+
+interface TodayHomeworkResponse {
+  success: boolean;
+  data: {
+    homework: Array<{ id: number }>;
+    count: number;
+  };
+}
+
+interface ChatConversationSummary {
+  id: number;
+  subject: string;
+  topic?: string | null;
+  title?: string | null;
+}
+
+const MATH_SUBJECT = "Mathématiques";
+
 export default function DashboardPage() {
   const { user, student, hasSchedule, isLoading, isAuthenticated, logout } = useAuth();
   const router = useRouter();
   const [currentWeek, setCurrentWeek] = useState<CurrentWeekData | null>(null);
+  const [chatConversations, setChatConversations] = useState<ChatConversationSummary[]>([]);
+  const [todaySession, setTodaySession] = useState<TodaySessionResponse["data"]["session"] | null>(null);
+  const [homeworkCount, setHomeworkCount] = useState<number>(0);
   const [isStarting, setIsStarting] = useState<number | null>(null);
+  const [isStartingFreeQuestion, setIsStartingFreeQuestion] = useState(false);
+  const weeklyMathEntries = currentWeek?.entries.filter((entry) => entry.subject === MATH_SUBJECT) ?? [];
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -49,6 +85,14 @@ export default function DashboardPage() {
     if (!isLoading && isAuthenticated && user?.role === "student") {
       const next = getNextOnboardingPath({ student, hasSchedule });
       if (next !== "/dashboard") router.replace(next);
+      return;
+    }
+    if (!isLoading && isAuthenticated && user?.role === "parent") {
+      router.replace("/parent/dashboard");
+      return;
+    }
+    if (!isLoading && isAuthenticated && user?.role === "admin") {
+      router.replace("/admin");
     }
   }, [isLoading, isAuthenticated, user, student, hasSchedule, router]);
 
@@ -58,23 +102,83 @@ export default function DashboardPage() {
       api.get("/study-plans/current-week").then(({ data }) => {
         setCurrentWeek(data);
       }).catch(() => {});
+
+      api.get<TodaySessionResponse>("/sessions/today").then(({ data }) => {
+        setTodaySession(data?.data?.session ?? null);
+      }).catch(() => {
+        setTodaySession(null);
+      });
+
+      api.get<TodayHomeworkResponse>("/sessions/homework/today").then(({ data }) => {
+        setHomeworkCount(data?.data?.count ?? 0);
+      }).catch(() => {
+        setHomeworkCount(0);
+      });
+
+      api.get<{ conversations: ChatConversationSummary[] }>("/chat").then(({ data }) => {
+        setChatConversations(data?.conversations ?? []);
+      }).catch(() => {
+        setChatConversations([]);
+      });
     }
   }, [isLoading, isAuthenticated, user, student]);
+
+  function normalizeText(value?: string | null) {
+    return (value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+  }
+
+  function findExistingConversation(entry: WeekEntry) {
+    const subjectKey = normalizeText(entry.subject);
+    const topicKey = normalizeText(entry.topic);
+
+    return chatConversations.find((conv) => {
+      const sameSubject = normalizeText(conv.subject) === subjectKey;
+      if (!sameSubject) return false;
+
+      const convTopic = normalizeText(conv.topic);
+      const convTitle = normalizeText(conv.title);
+      return convTopic === topicKey || convTitle.includes(topicKey);
+    });
+  }
 
   async function startSession(entry: WeekEntry) {
     setIsStarting(entry.id);
     try {
+      const existing = findExistingConversation(entry);
+      if (existing) {
+        router.push(`/chat?id=${existing.id}`);
+        return;
+      }
+
       // Create conversation tied to this study plan topic
       const { data } = await api.post("/chat", {
         subject: entry.subject,
         topic: entry.topic,
       });
+      setChatConversations((prev) => [data.conversation, ...prev]);
       // Navigate to chat with auto-start flag
       const subject = encodeURIComponent(entry.subject);
       const topic = encodeURIComponent(entry.topic);
       router.push(`/chat?id=${data.conversation.id}&autostart=1&subject=${subject}&topic=${topic}`);
     } catch {
       setIsStarting(null);
+    }
+  }
+
+  async function startFreeQuestion() {
+    setIsStartingFreeQuestion(true);
+    try {
+      const { data } = await api.post("/chat", {
+        subject: "Mathématiques",
+        topic: "Question libre",
+      });
+      router.push(`/chat?id=${data.conversation.id}`);
+    } catch {
+      setIsStartingFreeQuestion(false);
     }
   }
 
@@ -134,14 +238,14 @@ export default function DashboardPage() {
             )}
 
             {/* Sessions of the week */}
-            {currentWeek && currentWeek.entries.length > 0 && (
+            {currentWeek && weeklyMathEntries.length > 0 && (
               <div className="mb-8">
                 <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <BookOpen className="h-5 w-5 text-primary" />
-                  Sessions de la semaine
+                  Sessions de maths de la semaine
                 </h2>
                 <div className="space-y-3">
-                  {currentWeek.entries.map((entry) => (
+                  {weeklyMathEntries.map((entry) => (
                     <div
                       key={entry.id}
                       className={`rounded-xl border p-5 transition-colors ${
@@ -182,7 +286,9 @@ export default function DashboardPage() {
                             ) : (
                               <>
                                 <Play className="h-4 w-4 mr-1" />
-                                Commencer
+                                {entry.status === "in_progress" || findExistingConversation(entry)
+                                  ? "Continuer"
+                                  : "Commencer"}
                               </>
                             )}
                           </Button>
@@ -194,30 +300,69 @@ export default function DashboardPage() {
               </div>
             )}
 
+            {currentWeek && weeklyMathEntries.length === 0 && (
+              <div className="mb-8 rounded-xl border bg-card p-5">
+                <p className="font-medium">Aucune session maths planifiée cette semaine.</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Utilise “Question libre” pour lancer une session de maths immédiate.
+                </p>
+              </div>
+            )}
+
             {/* Quick actions */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <Link
-                href="/chat"
-                className="rounded-xl border bg-card p-5 hover:border-primary/30 transition-colors group flex items-center gap-4"
+              <div className="rounded-xl border bg-card p-5 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Play className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium">
+                    {todaySession ? "Séance du jour disponible" : "Pas de séance planifiée"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {todaySession
+                      ? `${todaySession.subject} • ${todaySession.durationMinutes} min`
+                      : "Lance une session libre de mathématiques"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-xl border bg-card p-5 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium">Devoirs du jour</p>
+                  <p className="text-xs text-muted-foreground">{homeworkCount} exercice(s) a traiter</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={startFreeQuestion}
+                disabled={isStartingFreeQuestion}
+                className="rounded-xl border bg-card p-5 hover:border-primary/30 transition-colors group flex items-center gap-4 text-left disabled:opacity-70"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <MessageSquare className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium">Question libre</p>
-                  <p className="text-xs text-muted-foreground">Demander à Prof Ada</p>
+                  <p className="text-xs text-muted-foreground">
+                    {isStartingFreeQuestion ? "Ouverture..." : "Demander à Prof Ada"}
+                  </p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
+              </button>
 
-              <div className="rounded-xl border bg-card p-5 flex items-center gap-4">
+              <div className="rounded-xl border bg-card p-5 flex items-center gap-4 sm:col-span-2 lg:col-span-1">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Target className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium">Note cible : {student.targetScore}/20</p>
                   <p className="text-xs text-muted-foreground">
-                    Parcours BEPC (3eme)
+                    Parcours {student.examType} ({student.grade})
                   </p>
                 </div>
               </div>
@@ -244,7 +389,7 @@ export default function DashboardPage() {
                   <FileText className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium">BEPC Blanc</p>
+                  <p className="font-medium">{student.examType} Blanc</p>
                   <p className="text-xs text-muted-foreground">Simulation et correction détaillée</p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />

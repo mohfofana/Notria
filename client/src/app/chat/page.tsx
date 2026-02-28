@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { GraduationCap, ArrowLeft, Menu, Mic, Camera, ChevronRight } from "lucide-react";
+import { GraduationCap, ArrowLeft, Menu, Mic, Camera, ChevronRight, BookOpen, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { streamChat } from "@/lib/sse";
@@ -10,55 +10,102 @@ import { ChatSidebar } from "@/components/chat/chat-sidebar";
 import { ChatMessages } from "@/components/chat/chat-messages";
 import { ChatInput } from "@/components/chat/chat-input";
 import { NewConversationDialog } from "@/components/chat/new-conversation-dialog";
-import { CourseSessionDemo } from "@/components/chat/course-session-demo";
 import type { Conversation, Message } from "@notria/shared";
 
-type CourseStarter = {
-  id: string;
-  subject: string;
-  topic: string;
-};
+function uniq(items: string[]): string[] {
+  return Array.from(new Set(items.map((item) => item.trim()).filter(Boolean)));
+}
 
-const COURSE_STARTERS: CourseStarter[] = [
-  {
-    id: "demo-fractions",
-    subject: "Mathématiques",
-    topic: "Fractions: addition et simplification",
-  },
-  {
-    id: "demo-grammaire",
-    subject: "Français",
-    topic: "Accord du participe passé",
-  },
-  {
-    id: "demo-histoire",
-    subject: "Histoire-Géo",
-    topic: "Indépendance de la Côte d'Ivoire",
-  },
-  {
-    id: "demo-physique",
-    subject: "Physique-Chimie",
-    topic: "Circuits en série et en dérivation",
-  },
-];
+function extractQuickReplies(content: string): string[] {
+  const choices: string[] = [];
+  const lineMatches = content.matchAll(/(?:^|\n)\s*Choix\s*:\s*(.+)$/gim);
+  for (const match of lineMatches) {
+    if (!match[1]) continue;
+    choices.push(
+      ...match[1]
+        .split("|")
+        .map((choice) => choice.replace(/^[-*]\s*/, "").trim())
+        .filter((choice) => choice.length > 0)
+    );
+  }
 
-const DEMO_DATE = "2026-02-21T08:00:00.000Z";
+  // Fallback parser: bullet list recommendations in assistant responses
+  const bulletMatches = content.matchAll(/(?:^|\n)\s*[-*]\s+(.{3,120})$/gim);
+  for (const match of bulletMatches) {
+    const candidate = match[1]?.trim();
+    if (candidate) choices.push(candidate);
+  }
 
-const DEMO_CONVERSATIONS: Conversation[] = COURSE_STARTERS.map((starter, index) => ({
-  id: -(index + 1),
-  studentId: 0,
-  subject: starter.subject,
-  topic: starter.topic,
-  title: `${starter.subject} - ${starter.topic}`,
-  isActive: true,
-  createdAt: DEMO_DATE,
-  updatedAt: DEMO_DATE,
-}));
+  return uniq(choices).slice(0, 6);
+}
+
+function extractAssistantQuestion(content: string): string | null {
+  const lines = content
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const questionLine = [...lines].reverse().find((line) => line.includes("?"));
+  return questionLine || null;
+}
+
+function extractEquation(content: string): string | null {
+  const eqLine = content
+    .split("\n")
+    .map((line) => line.trim())
+    .find((line) => /=|√|\\sqrt|[a-zA-Z]\^2/.test(line));
+  return eqLine || null;
+}
+
+function buildContextualReplies(params: {
+  topic?: string;
+  lastUserMessage?: string;
+  lastAssistantMessage?: string;
+  preferQuestionFlow?: boolean;
+}): string[] {
+  const normalizedUser = (params.lastUserMessage || "").toLowerCase();
+  const assistant = params.lastAssistantMessage || "";
+  const topic = params.topic?.trim();
+  const question = extractAssistantQuestion(assistant);
+  const equation = extractEquation(assistant);
+
+  const replies: string[] = [];
+
+  if (question && params.preferQuestionFlow) {
+    replies.push("Je tente: ...");
+    replies.push("Je ne suis pas sûr, aide-moi");
+    replies.push("Peux-tu reformuler la question ?");
+  }
+
+  if (equation) {
+    replies.push(`Explique cette ligne: ${equation}`);
+    replies.push("Refais le calcul étape par étape");
+  }
+
+  if (topic) {
+    replies.push(`On continue sur ${topic}`);
+    replies.push(`Donne un exercice BEPC sur ${topic}`);
+  }
+
+  if (normalizedUser.includes("pas compris") || normalizedUser.includes("je comprends pas")) {
+    replies.push("Reprends très lentement depuis le début");
+    replies.push("Donne une analogie très simple");
+  } else {
+    replies.push("Donne un exemple concret");
+    replies.push("Fais une vérification rapide");
+    replies.push("Donne-moi un mini exercice");
+    replies.push("Donne un indice sans la réponse");
+    replies.push("Fais un résumé en 3 phrases");
+  }
+
+  return uniq(replies).slice(0, 6);
+}
 
 export default function ChatPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const autostartDone = useRef(false);
+  const tempMessageIdRef = useRef(-1);
+  const streamBufferRef = useRef("");
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<number | null>(null);
@@ -67,14 +114,24 @@ export default function ChatPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [courseUnlockedByConversation, setCourseUnlockedByConversation] = useState<Record<number, boolean>>({});
 
-  const allConversations = [...conversations, ...DEMO_CONVERSATIONS];
-
-  const activeConv = allConversations.find((c) => c.id === activeId) || null;
-  const hasMessages = messages.length > 0;
-  const needsCourseUnlock = Boolean(activeId && !hasMessages && !courseUnlockedByConversation[activeId]);
-  const showDemoCourse = Boolean(activeConv && activeConv.id < 0 && !hasMessages);
+  const activeConv = conversations.find((c) => c.id === activeId) || null;
+  const latestVisible = [...messages].reverse().find((msg) => msg.role !== "system");
+  const latestUser = [...messages].reverse().find((msg) => msg.role === "user");
+  const latestAssistant = latestVisible?.role === "assistant" ? latestVisible : null;
+  const aiQuickReplies = isStreaming || !latestAssistant ? [] : extractQuickReplies(latestAssistant.content);
+  const contextualReplies = latestAssistant
+    ? buildContextualReplies({
+        topic: activeConv?.topic,
+        lastUserMessage: latestUser?.content,
+        lastAssistantMessage: latestAssistant.content,
+        preferQuestionFlow: aiQuickReplies.length > 0,
+      })
+    : [];
+  const quickReplies =
+    aiQuickReplies.length > 0
+      ? uniq([...aiQuickReplies, ...contextualReplies]).slice(0, 6)
+      : contextualReplies;
 
   const loadConversations = useCallback(async () => {
     try {
@@ -103,20 +160,10 @@ export default function ChatPage() {
       return;
     }
 
-    if (currentId < 0) {
-      setMessages([]);
-      return;
-    }
-
-    const resolvedId = currentId as number;
-
     async function load() {
       try {
-        const { data } = await api.get(`/chat/${resolvedId}`);
+        const { data } = await api.get(`/chat/${currentId}`);
         setMessages(data.messages);
-        if ((data.messages || []).length > 0) {
-          setCourseUnlockedByConversation((prev) => ({ ...prev, [resolvedId]: true }));
-        }
       } catch {
         setMessages([]);
       }
@@ -124,23 +171,15 @@ export default function ChatPage() {
     load();
   }, [activeId]);
 
-  async function ensureRealConversationId(id: number): Promise<number> {
-    if (id > 0) return id;
-
-    const demoConv = DEMO_CONVERSATIONS.find((conv) => conv.id === id);
-    if (!demoConv) return id;
-
-    const { data } = await api.post("/chat", {
-      subject: demoConv.subject,
-      topic: demoConv.topic,
-    });
-
-    const created: Conversation = data.conversation;
-    setConversations((prev) => [created, ...prev]);
-    setActiveId(created.id);
-    setCourseUnlockedByConversation((prev) => ({ ...prev, [created.id]: true }));
-    return created.id;
-  }
+  const reloadActiveConversation = useCallback(async () => {
+    if (!activeId) return;
+    try {
+      const { data } = await api.get(`/chat/${activeId}`);
+      setMessages(data.messages || []);
+    } catch {
+      // Ignore refresh errors
+    }
+  }, [activeId]);
 
   // Auto-start: when coming from dashboard, send the first message automatically
   useEffect(() => {
@@ -161,73 +200,62 @@ export default function ChatPage() {
 
       autostartDone.current = true;
       const prompt = topic
-        ? `Nous commencons la session guidee sur "${topic}" en ${subject}. Donne directement un mini-cours structure (definitions, methode, exemple type BAC/BEPC Cote d'Ivoire), puis 2 questions de verification et 1 exercice d'application.`
-        : `Nous commencons la session guidee en ${subject}. Donne directement un mini-cours structure, puis 2 questions de verification et 1 exercice d'application.`;
-      handleSend(prompt);
+        ? `On commence une séance guidée sur ${topic} en ${subject}.`
+        : `On commence une séance guidée en ${subject}.`;
+      handleSend(prompt, { internal: true });
     }
   }, [activeId, messages, conversations, searchParams, isStreaming]);
 
-  async function handleSend(content: string) {
-    if (!activeId || isStreaming || needsCourseUnlock) return;
+  async function handleSend(content: string, options?: { internal?: boolean }) {
+    if (!activeId || isStreaming) return;
 
-    const targetConversationId = await ensureRealConversationId(activeId);
-    if (targetConversationId < 0) return;
+    if (!options?.internal) {
+      const tempUserId = tempMessageIdRef.current--;
+      const tempUserMsg: Message = {
+        id: tempUserId,
+        conversationId: activeId,
+        role: "user",
+        content,
+        createdAt: new Date().toISOString(),
+      };
 
-    const tempUserMsg: Message = {
-      id: Date.now(),
-      conversationId: targetConversationId,
-      role: "user",
-      content,
-      createdAt: new Date().toISOString(),
-    };
-
-    setMessages((prev) => [...prev, tempUserMsg]);
+      setMessages((prev) => [...prev, tempUserMsg]);
+    }
     setIsStreaming(true);
     setStreamingContent("");
+    streamBufferRef.current = "";
 
-    await streamChat(targetConversationId, content, {
+    await streamChat(activeId, content, { internal: options?.internal === true }, {
       onChunk(chunk) {
+        streamBufferRef.current += chunk;
         setStreamingContent((prev) => prev + chunk);
       },
-      onDone() {
-        setStreamingContent((current) => {
-          if (current) {
-            const assistantMsg: Message = {
-              id: Date.now() + 1,
-              conversationId: targetConversationId,
-              role: "assistant",
-              content: current,
-              createdAt: new Date().toISOString(),
-            };
-            setMessages((prev) => [...prev, assistantMsg]);
-          }
-          return "";
-        });
+      async onDone() {
+        setStreamingContent("");
+        streamBufferRef.current = "";
         setIsStreaming(false);
-        setCourseUnlockedByConversation((prev) => ({ ...prev, [targetConversationId]: true }));
         loadConversations();
+        await reloadActiveConversation();
       },
       onError(error) {
         console.error("Stream error:", error);
         setStreamingContent("");
+        streamBufferRef.current = "";
         setIsStreaming(false);
       },
     });
   }
 
-  async function handleCreate(subject: string, topic?: string) {
-    const { data } = await api.post("/chat", { subject, topic });
+  async function handleCreate(topic?: string) {
+    const { data } = await api.post("/chat", { subject: "Mathématiques", topic });
     setConversations((prev) => [data.conversation, ...prev]);
     setActiveId(data.conversation.id);
-    setCourseUnlockedByConversation((prev) => ({ ...prev, [data.conversation.id]: false }));
     setShowNewDialog(false);
     setSidebarOpen(false);
     setMessages([]);
   }
 
   async function handleDelete(id: number) {
-    if (id < 0) return;
-
     try {
       await api.delete(`/chat/${id}`);
       setConversations((prev) => prev.filter((c) => c.id !== id));
@@ -245,25 +273,15 @@ export default function ChatPage() {
     setSidebarOpen(false);
   }
 
-  function handleStartCourse(starter: CourseStarter) {
-    const target = DEMO_CONVERSATIONS.find((conv) => conv.topic === starter.topic && conv.subject === starter.subject);
-    if (!target) return;
-    setActiveId(target.id);
-    setMessages([]);
-    setSidebarOpen(false);
-  }
-
   return (
     <div className="h-screen flex bg-background">
       <div className="hidden md:flex md:w-80 border-r flex-col">
         <ChatSidebar
-          conversations={allConversations}
+          conversations={conversations}
           activeId={activeId}
           onSelect={handleSelect}
           onNew={() => setShowNewDialog(true)}
           onDelete={handleDelete}
-          starters={COURSE_STARTERS}
-          onStartCourse={handleStartCourse}
         />
       </div>
 
@@ -272,7 +290,7 @@ export default function ChatPage() {
           <div className="absolute inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
           <div className="relative w-80 h-full bg-background border-r">
             <ChatSidebar
-              conversations={allConversations}
+              conversations={conversations}
               activeId={activeId}
               onSelect={handleSelect}
               onNew={() => {
@@ -280,8 +298,6 @@ export default function ChatPage() {
                 setSidebarOpen(false);
               }}
               onDelete={handleDelete}
-              starters={COURSE_STARTERS}
-              onStartCourse={handleStartCourse}
             />
           </div>
         </div>
@@ -330,44 +346,62 @@ export default function ChatPage() {
           </div>
         </header>
 
-        {showDemoCourse ? (
-          <CourseSessionDemo
-            subject={activeConv?.subject || "Mathématiques"}
-            topic={activeConv?.topic}
-            unlocked={Boolean(activeId && courseUnlockedByConversation[activeId])}
-            onUnlock={() => {
-              if (!activeId) return;
-              const currentId = activeId;
-              setCourseUnlockedByConversation((prev) => ({ ...prev, [currentId]: true }));
-            }}
-          />
-        ) : (
-          <ChatMessages
-            messages={messages}
-            streamingContent={streamingContent}
-            isStreaming={isStreaming}
-            activeSubject={activeConv?.subject}
-            activeTopic={activeConv?.topic}
-            isCourseUnlocked={Boolean(activeId && courseUnlockedByConversation[activeId])}
-            onUnlockCourse={() => {
-              if (!activeId) return;
-              const currentId = activeId;
-              setCourseUnlockedByConversation((prev) => ({ ...prev, [currentId]: true }));
-            }}
-          />
-        )}
+        <ChatMessages
+          messages={messages}
+          streamingContent={streamingContent}
+          isStreaming={isStreaming}
+          activeSubject={activeConv?.subject}
+          activeTopic={activeConv?.topic}
+        />
 
         {activeId ? (
-          <ChatInput
-            onSend={handleSend}
-            isStreaming={isStreaming}
-            disabled={needsCourseUnlock}
-            placeholder={
-              needsCourseUnlock
-                ? "Lis d'abord le mini-cours (swipe), puis débloque les questions."
-                : "Écris ta question sur le cours..."
-            }
-          />
+          <>
+            <div className="border-t px-4 py-3 bg-muted/20">
+              <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-between gap-3 text-sm">
+                <div className="flex items-center gap-2 min-w-0">
+                  <BookOpen className="h-4 w-4 text-primary shrink-0" />
+                  <span className="font-medium truncate">
+                    Session: {activeConv?.subject || "Mathématiques"}
+                    {activeConv?.topic ? ` • ${activeConv.topic}` : ""}
+                  </span>
+                  <span className="text-muted-foreground">({messages.filter((m) => m.role !== "system").length} msgs)</span>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => router.push("/session/today")}
+                >
+                  Voir la séance guidée
+                </Button>
+              </div>
+            </div>
+            {messages.length > 0 && quickReplies.length > 0 && (
+              <div className="border-t px-4 pt-3">
+                <div className="max-w-3xl mx-auto flex flex-wrap gap-2">
+                  <div className="w-full flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Réponses prêtes à envoyer
+                  </div>
+                  {quickReplies.map((choice) => (
+                    <button
+                      key={choice}
+                      type="button"
+                      onClick={() => handleSend(choice)}
+                      className="rounded-full border border-border bg-background px-3 py-1.5 text-sm hover:bg-muted max-w-full truncate"
+                      title={choice}
+                    >
+                      {choice}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <ChatInput
+              onSend={handleSend}
+              isStreaming={isStreaming}
+              placeholder="Écris comme si tu parlais à un prof..."
+            />
+          </>
         ) : (
           <div className="border-t px-4 py-8">
             <div className="max-w-3xl mx-auto rounded-2xl border border-border bg-white/80 p-5">

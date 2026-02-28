@@ -180,3 +180,60 @@ export interface RagSearchResult {
   similarity: number;
   metadata: Record<string, unknown> | null;
 }
+
+export type GuidedSessionState =
+  | "INTRO"
+  | "EXPLAIN"
+  | "CHECK"
+  | "PRACTICE"
+  | "VALIDATE"
+  | "NEXT_CONCEPT"
+  | "RECAP";
+
+export type GuidedInteractionType = "choice" | "short_text" | "number" | "voice_or_text";
+export type GuidedVisualType = "formula" | "diagram" | "exercise_card";
+
+export interface GuidedChoiceOption {
+  id: string;
+  label: string;
+}
+
+export interface GuidedStepVisual {
+  type: GuidedVisualType;
+  title?: string;
+  content: string;
+}
+
+export interface GuidedStepInteraction {
+  type: GuidedInteractionType;
+  ctaLabel: string;
+  placeholder?: string;
+  choices?: GuidedChoiceOption[];
+}
+
+export interface GuidedStep {
+  id: string;
+  state: GuidedSessionState;
+  coachLines: string[];
+  prompt: string;
+  visual?: GuidedStepVisual;
+  interaction: GuidedStepInteraction;
+  feedback?: string;
+}
+
+export interface GuidedSessionProgress {
+  correctAnswers: number;
+  totalChecks: number;
+  completionPercent: number;
+}
+
+export interface GuidedSessionStartResponse {
+  sessionId: string;
+  step: GuidedStep;
+  progress: GuidedSessionProgress;
+}
+
+export interface GuidedSessionRespondResponse {
+  step: GuidedStep;
+  progress: GuidedSessionProgress;
+}
