@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { desc, eq } from "drizzle-orm";
 import { db, schema } from "../db/index.js";
 import { AIService } from "./ai.service.js";
+import { CourseProgramService } from "./course-program.service.js";
 
 type Difficulty = "facile" | "moyen" | "difficile";
 
@@ -276,6 +277,24 @@ function resolveTopic(domainKey: string, questionTopic: string): string {
   return domain?.topic ?? questionTopic;
 }
 
+/**
+ * Shuffle a question's options array and update correctAnswer index accordingly.
+ * This prevents the correct answer from always being in position 0 (option A).
+ */
+function shuffleOptions<T extends { options: string[]; correctAnswer: number }>(
+  question: T,
+): T {
+  const correctText = question.options[question.correctAnswer];
+  // Fisher-Yates shuffle
+  const shuffled = [...question.options];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  const newCorrectIndex = shuffled.indexOf(correctText);
+  return { ...question, options: shuffled, correctAnswer: newCorrectIndex };
+}
+
 function createQuestionPlan(): PlannedQuestion[] {
   const usedIds = new Set<string>();
   const plan: PlannedQuestion[] = [];
@@ -283,7 +302,7 @@ function createQuestionPlan(): PlannedQuestion[] {
   const shuffledDomains = [...DOMAIN_CONFIG].sort(() => Math.random() - 0.5);
 
   for (const domain of shuffledDomains) {
-    const firstQuestion = pickQuestion(domain.key, "moyen", usedIds);
+    const firstQuestion = shuffleOptions(pickQuestion(domain.key, "moyen", usedIds));
     usedIds.add(firstQuestion.id);
     plan.push({
       ...firstQuestion,
@@ -295,7 +314,7 @@ function createQuestionPlan(): PlannedQuestion[] {
   }
 
   for (const domain of shuffledDomains.filter((item) => item.count === 2)) {
-    const secondQuestion = pickQuestion(domain.key, "moyen", usedIds);
+    const secondQuestion = shuffleOptions(pickQuestion(domain.key, "moyen", usedIds));
     usedIds.add(secondQuestion.id);
     plan.push({
       ...secondQuestion,
@@ -331,6 +350,27 @@ function computeDomainLevel(
 }
 
 export const AssessmentService = {
+  async getExamOverview(userId: number) {
+    const student = await db.query.students.findFirst({
+      where: eq(schema.students.userId, userId),
+    });
+    if (!student) throw new Error("Student not found");
+
+    return {
+      examType: student.examType,
+      grade: student.grade,
+      subject: "Mathematiques",
+      totalQuestions: REQUIRED_TOTAL_QUESTIONS,
+      domains: DOMAIN_CONFIG.map((d) => ({
+        key: d.key,
+        topic: d.topic,
+        questionCount: d.count,
+      })),
+      estimatedMinutes: 15,
+      assessmentCompleted: student.assessmentCompleted,
+    };
+  },
+
   async startAssessment(userId: number): Promise<AssessmentProgress> {
     const student = await db.query.students.findFirst({
       where: eq(schema.students.userId, userId),
@@ -404,7 +444,7 @@ export const AssessmentService = {
         const usedIds = new Set(progress.questions.map((question) => question.id));
         usedIds.delete(nextQuestion.id);
 
-        const replacement = pickQuestion(currentQuestion.domainKey, desiredDifficulty, usedIds);
+        const replacement = shuffleOptions(pickQuestion(currentQuestion.domainKey, desiredDifficulty, usedIds));
         progress.questions[secondQuestionIndex] = {
           ...replacement,
           topic: resolveTopic(currentQuestion.domainKey, replacement.topic),
@@ -476,6 +516,13 @@ export const AssessmentService = {
           updatedAt: new Date(),
         })
         .where(eq(schema.students.id, student.id));
+
+      // Program generation is handled by Prof Ada after assessment completion.
+      try {
+        await CourseProgramService.generateProgram(userId);
+      } catch (programError) {
+        console.error("Auto program generation failed after assessment:", programError);
+      }
     }
 
     return { subjectLevels, overallAverage, personalizedPlan };

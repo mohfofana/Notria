@@ -15,6 +15,7 @@ import parentRouter from "./routes/parent.routes.js";
 import ragRouter from "./routes/rag.routes.js";
 import guidedSessionRouter from "./routes/guided-session.routes.js";
 import adminRouter from "./routes/admin.routes.js";
+import courseProgramRouter from "./routes/course-program.routes.js";
 
 const app = express();
 const BASE_PORT = Number(process.env.PORT || process.env.SERVER_PORT || 3001);
@@ -45,6 +46,7 @@ app.use("/api/parent", parentRouter);
 app.use("/api/rag", ragRouter);
 app.use("/api/guided-sessions", guidedSessionRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/course-program", courseProgramRouter);
 
 // Health check
 app.get("/health", (req, res) => {

@@ -66,7 +66,7 @@ export default function AssessmentResultsPage() {
 
   const handleContinue = async () => {
     await refreshMe();
-    router.push("/dashboard");
+    router.push("/programme");
   };
 
   if (loading) {
