@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   BookOpen,
   Bot,
   CheckCircle2,
+  MessageCircle,
   Mic,
   PencilLine,
   SquarePen,
-  SquareSigma,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -63,33 +63,24 @@ interface GuidedSessionProgress {
   completionPercent: number;
 }
 
-interface TodaySessionApiResponse {
-  success: boolean;
-  data: {
-    hasSession: boolean;
-    session?: {
-      id: number;
-      subject: string;
-      startTime: string;
-      durationMinutes: number;
-      conversationId: number;
-    };
-  };
+interface ProgramSession {
+  id: number;
+  topic: string;
+  type: "lesson" | "exercise" | "quiz" | "recap" | "revision" | "evaluation";
+  title: string;
+  durationMinutes: number;
+  status: "upcoming" | "in_progress" | "completed" | "skipped";
 }
 
-const STEP_ORDER: Record<string, number> = {
-  "intro-level": 1,
-  "explain-context": 2,
-  "formula-gate": 3,
-  "angle-90-explain": 3,
-  "check-ac2": 4,
-  "check-ac2-hint": 4,
-  "check-ac": 4,
-  "practice-step-1": 5,
-  "practice-step-2": 5,
-  "practice-step-3": 5,
-  recap: 6,
-};
+interface NextProgramSessionResponse {
+  success: boolean;
+  data: {
+    hasNextSession: boolean;
+    weekNumber?: number;
+    weekTheme?: string;
+    session?: ProgramSession;
+  };
+}
 
 const STEP_LABELS: Record<GuidedSessionState, string> = {
   INTRO: "Accroche",
@@ -101,53 +92,93 @@ const STEP_LABELS: Record<GuidedSessionState, string> = {
   RECAP: "Recap",
 };
 
+const STATE_ORDER: Record<GuidedSessionState, number> = {
+  INTRO: 1,
+  EXPLAIN: 2,
+  CHECK: 3,
+  PRACTICE: 4,
+  VALIDATE: 4,
+  NEXT_CONCEPT: 5,
+  RECAP: 6,
+};
+
+function getTypeLabel(type: ProgramSession["type"]) {
+  switch (type) {
+    case "lesson":
+      return "Cours";
+    case "exercise":
+      return "Exercice";
+    case "quiz":
+      return "Quiz";
+    case "recap":
+      return "Recap";
+    case "revision":
+      return "Revision";
+    case "evaluation":
+      return "Evaluation";
+  }
+}
+
 export default function SessionTodayPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [step, setStep] = useState<GuidedStep | null>(null);
   const [progress, setProgress] = useState<GuidedSessionProgress | null>(null);
-  const [scheduledSession, setScheduledSession] = useState<TodaySessionApiResponse["data"]["session"]>();
   const [pending, setPending] = useState(false);
-  const [loadingToday, setLoadingToday] = useState(true);
+  const [loadingNext, setLoadingNext] = useState(true);
+  const [nextSession, setNextSession] = useState<NextProgramSessionResponse["data"] | null>(null);
   const [topic, setTopic] = useState("seance du jour");
   const [textAnswer, setTextAnswer] = useState("");
+  const [questionText, setQuestionText] = useState("");
+  const [showQuestionBox, setShowQuestionBox] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const canSubmitResponse = useMemo(() => textAnswer.trim().length > 0, [textAnswer]);
-  const currentScreen = step ? STEP_ORDER[step.id] ?? 1 : 0;
+  const currentScreen = step ? STATE_ORDER[step.state] ?? 1 : 0;
+  const isFinalExercise = nextSession?.session?.type === "evaluation";
 
   useEffect(() => {
-    const loadTodaySession = async () => {
-      setLoadingToday(true);
+    const loadNextSession = async () => {
+      setLoadingNext(true);
       try {
-        const { data } = await api.get<TodaySessionApiResponse>("/sessions/today");
-        const session = data?.data?.session;
-        setScheduledSession(session);
-        if (session?.subject) setTopic(session.subject);
+        const { data } = await api.get<NextProgramSessionResponse>("/course-program/next-session");
+        const next = data?.data ?? null;
+        setNextSession(next);
+        if (next?.session?.topic) setTopic(next.session.topic);
       } catch {
-        setScheduledSession(undefined);
+        setNextSession(null);
       } finally {
-        setLoadingToday(false);
+        setLoadingNext(false);
       }
     };
-    loadTodaySession();
+    loadNextSession();
   }, []);
 
   async function startSession() {
     setPending(true);
     setError(null);
     try {
-      if (scheduledSession?.id) {
-        await api.post("/sessions/start", { sessionId: scheduledSession.id });
-      }
-      const sessionTopic = topic.trim().length > 0 ? topic.trim() : "seance du jour";
-      const { data } = await api.post("/guided-sessions/start", { topic: sessionTopic });
+      const forcedProgramSessionIdRaw = searchParams.get("programSessionId");
+      const forcedProgramSessionId = forcedProgramSessionIdRaw ? parseInt(forcedProgramSessionIdRaw, 10) : undefined;
+
+      const defaultSessionId = nextSession?.session?.id;
+      const programSessionId =
+        forcedProgramSessionId && !Number.isNaN(forcedProgramSessionId)
+          ? forcedProgramSessionId
+          : defaultSessionId;
+
+      const payload = programSessionId
+        ? { courseProgramSessionId: programSessionId }
+        : { topic: topic.trim().length > 0 ? topic.trim() : "seance du jour" };
+
+      const { data } = await api.post("/guided-sessions/start", payload);
       setSessionId(data.sessionId);
       setStep(data.step);
       setProgress(data.progress);
       setTextAnswer("");
-    } catch {
-      setError("Impossible de demarrer la seance guidee.");
+    } catch (e: any) {
+      setError(e?.response?.data?.error || "Impossible de demarrer la seance guidee.");
     } finally {
       setPending(false);
     }
@@ -162,9 +193,25 @@ export default function SessionTodayPage() {
       setStep(data.step);
       setProgress(data.progress);
       setTextAnswer("");
+      if (choiceId === "ask_question") {
+        setShowQuestionBox(false);
+      }
     } catch {
       setError("Impossible d'envoyer ta reponse.");
     } finally {
+      setPending(false);
+    }
+  }
+
+  async function completeAndReturnToDashboard() {
+    if (!sessionId) return;
+    setPending(true);
+    setError(null);
+    try {
+      await api.post(`/guided-sessions/${sessionId}/complete`);
+      router.push("/dashboard");
+    } catch (e: any) {
+      setError(e?.response?.data?.error || "Impossible de finaliser la session.");
       setPending(false);
     }
   }
@@ -196,14 +243,17 @@ export default function SessionTodayPage() {
 
     return (
       <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
-        <p className="mb-2 text-sm font-semibold text-emerald-800">{step.visual.title || "Exercice type BEPC"}</p>
+        <p className="mb-2 text-sm font-semibold text-emerald-800">{step.visual.title || "Exercice"}</p>
         <p className="text-sm text-emerald-900">{step.visual.content}</p>
       </div>
     );
   }
 
   function renderInteraction() {
-    if (!step) return null;
+    if (!step || step.state === "RECAP") return null;
+
+    // EXPLAIN = pas de champ texte, l'eleve utilise uniquement les boutons d'aide
+    if (step.state === "EXPLAIN") return null;
 
     if (step.interaction.type === "choice") {
       return (
@@ -264,6 +314,92 @@ export default function SessionTodayPage() {
     );
   }
 
+  function renderSupportActions() {
+    if (!step || step.state === "INTRO" || step.state === "RECAP") return null;
+
+    const supportButtons: Array<{ id: string; label: string }> = [];
+
+    if (step.state === "EXPLAIN") {
+      supportButtons.push(
+        { id: "not_understood", label: "Je n'ai pas compris" },
+        { id: "understood_continue", label: "J'ai compris, on continue" },
+        { id: "need_example", label: "Donne un exemple" },
+        { id: "ask_question", label: "J'ai une question" },
+      );
+    } else if (step.state === "CHECK") {
+      supportButtons.push(
+        { id: "not_understood", label: "Je n'ai pas compris" },
+        { id: "need_example", label: "Donne un exemple" },
+        { id: "ask_question", label: "J'ai une question" },
+      );
+    } else if (step.state === "PRACTICE" || step.state === "VALIDATE") {
+      supportButtons.push(
+        { id: "need_hint", label: "Donne un indice" },
+        { id: "need_example", label: "Donne un exemple" },
+        { id: "not_understood", label: "Je n'ai pas compris" },
+        { id: "ask_question", label: "J'ai une question" },
+      );
+    }
+
+    if (supportButtons.length === 0) return null;
+
+    return (
+      <div className="rounded-xl border bg-muted/30 p-3 space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Aides rapides
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {supportButtons.map((btn) => (
+            <Button
+              key={btn.id}
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={pending}
+              onClick={() => {
+                if (btn.id === "ask_question") {
+                  setShowQuestionBox((prev) => !prev);
+                  return;
+                }
+                submit(btn.id);
+              }}
+            >
+              {btn.label}
+            </Button>
+          ))}
+        </div>
+
+        {showQuestionBox && (
+          <div className="space-y-2">
+            <Input
+              value={questionText}
+              disabled={pending}
+              onChange={(event) => setQuestionText(event.target.value)}
+              placeholder="Ecris ta question..."
+            />
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                size="sm"
+                disabled={pending || questionText.trim().length < 3}
+                onClick={() => {
+                  submit("ask_question", questionText.trim());
+                  setQuestionText("");
+                }}
+              >
+                Envoyer ma question
+              </Button>
+              <Button type="button" size="sm" variant="secondary" disabled>
+                <Mic className="h-4 w-4 mr-1" />
+                Question vocale bientot
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   if (!step) {
     return (
       <div className="mx-auto max-w-4xl p-6">
@@ -276,21 +412,36 @@ export default function SessionTodayPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Format actif: Accroche → Explication → Verification → Exercice → Recap.
+              Format actif: Accroche - Explication - Verification - Exercice - Recap.
             </p>
-            {loadingToday ? (
-              <p className="text-sm text-muted-foreground">Chargement de la seance du jour...</p>
-            ) : scheduledSession ? (
-              <div className="rounded-xl border bg-muted/30 p-3 text-sm">
-                <p className="font-medium">{scheduledSession.subject}</p>
-                <p className="text-muted-foreground">Duree: {scheduledSession.durationMinutes} min</p>
+            {loadingNext ? (
+              <p className="text-sm text-muted-foreground">Chargement de la prochaine micro-session...</p>
+            ) : nextSession?.hasNextSession && nextSession.session ? (
+              <div className="rounded-xl border bg-muted/30 p-3 text-sm space-y-1">
+                <p className="font-medium">{nextSession.session.title}</p>
+                <p className="text-muted-foreground">
+                  {nextSession.weekTheme || nextSession.session.topic}
+                </p>
+                <p className="text-muted-foreground">
+                  Duree: {nextSession.session.durationMinutes} min - {getTypeLabel(nextSession.session.type)}
+                </p>
+                <p className="text-xs text-muted-foreground pt-1">
+                  Ordre strict: termine cette micro-session pour debloquer la suivante.
+                </p>
+                {isFinalExercise && (
+                  <p className="text-xs font-semibold text-amber-800">
+                    Exo final obligatoire: ce topic doit etre valide avant le prochain.
+                  </p>
+                )}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">Aucune seance planifiee, tu peux lancer une seance libre.</p>
+              <p className="text-sm text-muted-foreground">
+                Aucune session programme en attente, tu peux lancer une session libre.
+              </p>
             )}
             <Input
               value={topic}
-              disabled={pending}
+              disabled={pending || Boolean(nextSession?.hasNextSession)}
               onChange={(event) => setTopic(event.target.value)}
               placeholder="Sujet de la seance"
             />
@@ -319,6 +470,14 @@ export default function SessionTodayPage() {
             <span>Score: {progress?.correctAnswers ?? 0}/{progress?.totalChecks ?? 0}</span>
             <span>Progression: {progress?.completionPercent ?? 0}%</span>
           </div>
+          <div className="text-xs text-muted-foreground">
+            Termine la session en entier pour debloquer la micro-session suivante.
+          </div>
+          {isFinalExercise && (
+            <div className="inline-flex w-fit items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">
+              Exo final obligatoire de ce topic
+            </div>
+          )}
         </CardHeader>
         <CardContent className="space-y-4 p-5">
           <div className="flex items-start gap-3 rounded-2xl border-2 border-primary/20 bg-primary/5 p-4">
@@ -336,45 +495,35 @@ export default function SessionTodayPage() {
           </div>
 
           {step.feedback && (
-            <div className="rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-              {step.feedback}
+            <div className="flex items-start gap-3 rounded-2xl border-2 border-violet-200 bg-violet-50 p-4">
+              <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-violet-500 text-white">
+                <MessageCircle className="h-4 w-4" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-violet-600">Prof Ada</p>
+                <p className="text-sm text-violet-900">{step.feedback}</p>
+              </div>
             </div>
           )}
 
           {renderVisual()}
-
-          {step.id === "check-ac2" && (
-            <div className="rounded-xl border bg-slate-50 p-4 text-sm font-mono">
-              <p>AC^2 = AB^2 + BC^2</p>
-              <p>AC^2 = 3^2 + 4^2</p>
-              <p>AC^2 = ?</p>
-            </div>
-          )}
-
-          {step.id.startsWith("practice-step") && (
-            <div className="rounded-xl border bg-white p-4 text-sm">
-              <div className="grid gap-2 sm:grid-cols-3">
-                <div className="rounded-lg border p-2">Etape 1: Ecris la formule</div>
-                <div className="rounded-lg border p-2">Etape 2: Remplace les valeurs</div>
-                <div className="rounded-lg border p-2">Etape 3: Calcule AC</div>
-              </div>
-            </div>
-          )}
-
           {renderInteraction()}
+          {renderSupportActions()}
 
           {step.state === "RECAP" && (
             <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-4">
-              <p className="mb-2 text-sm font-semibold text-emerald-900">Ce qu'on a vu</p>
-              <div className="space-y-1 text-sm text-emerald-900">
-                <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4" /> Theoreme de Pythagore</p>
-                <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4" /> AC^2 = AB^2 + BC^2</p>
-                <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4" /> Triangle rectangle uniquement</p>
-                <p className="flex items-center gap-2"><SquareSigma className="h-4 w-4" /> Penser a la racine a la fin</p>
-              </div>
+              <p className="mb-2 text-sm font-semibold text-emerald-900">Session terminee</p>
+              <p className="text-sm text-emerald-900 mb-3">
+                Termine pour valider cette micro-session dans ton programme.
+              </p>
               <div className="mt-3 flex gap-2">
-                <Button variant="outline" onClick={() => router.push("/dashboard")}>Terminer</Button>
-                <Button onClick={startSession} disabled={pending}>Encore 1 exercice</Button>
+                <Button variant="outline" onClick={completeAndReturnToDashboard} disabled={pending}>
+                  <CheckCircle2 className="h-4 w-4 mr-1" />
+                  Terminer
+                </Button>
+                <Button onClick={() => submit("restart")} disabled={pending}>
+                  Encore 1 exercice
+                </Button>
               </div>
             </div>
           )}

@@ -185,7 +185,8 @@ export interface RagSearchResult {
 export type CourseProgramStatus = "active" | "completed" | "abandoned";
 export type CourseProgramWeekStatus = "upcoming" | "in_progress" | "completed";
 export type CourseProgramSessionStatus = "upcoming" | "in_progress" | "completed" | "skipped";
-export type CourseProgramSessionType = "lesson" | "exercise" | "revision" | "evaluation";
+export type CourseProgramSessionType = "lesson" | "exercise" | "quiz" | "recap" | "revision" | "evaluation";
+export type EngagementMode = "discovery" | "quick_win" | "challenge" | "exam_drill";
 export type TopicPriority = "high" | "medium" | "low";
 
 export interface DomainAssessment {
@@ -243,6 +244,7 @@ export interface CourseProgramSession {
   sessionOrder: number;
   topic: string;
   type: CourseProgramSessionType;
+  engagementMode: EngagementMode;
   title: string;
   description?: string;
   durationMinutes: number;

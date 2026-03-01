@@ -55,7 +55,8 @@ interface ProgramSession {
   dayNumber: number;
   sessionOrder: number;
   topic: string;
-  type: "lesson" | "exercise" | "revision" | "evaluation";
+  type: "lesson" | "exercise" | "quiz" | "recap" | "revision" | "evaluation";
+  engagementMode: "discovery" | "quick_win" | "challenge" | "exam_drill";
   title: string;
   description?: string;
   durationMinutes: number;
@@ -122,6 +123,8 @@ function getTypeIcon(type: ProgramSession["type"]) {
   switch (type) {
     case "lesson": return <BookOpen className="h-4 w-4" />;
     case "exercise": return <Brain className="h-4 w-4" />;
+    case "quiz": return <Zap className="h-4 w-4" />;
+    case "recap": return <Lightbulb className="h-4 w-4" />;
     case "revision": return <TrendingUp className="h-4 w-4" />;
     case "evaluation": return <Trophy className="h-4 w-4" />;
   }
@@ -131,6 +134,8 @@ function getTypeColor(type: ProgramSession["type"]) {
   switch (type) {
     case "lesson": return "bg-blue-100 text-blue-700";
     case "exercise": return "bg-purple-100 text-purple-700";
+    case "quiz": return "bg-amber-100 text-amber-700";
+    case "recap": return "bg-teal-100 text-teal-700";
     case "revision": return "bg-orange-100 text-orange-700";
     case "evaluation": return "bg-emerald-100 text-emerald-700";
   }
@@ -140,8 +145,23 @@ function getTypeLabel(type: ProgramSession["type"]) {
   switch (type) {
     case "lesson": return "Cours";
     case "exercise": return "Exercices";
+    case "quiz": return "Quiz";
+    case "recap": return "Recap";
     case "revision": return "Revision";
     case "evaluation": return "Evaluation";
+  }
+}
+
+function getEngagementModeStyle(mode: ProgramSession["engagementMode"]) {
+  switch (mode) {
+    case "discovery":
+      return { label: "Discovery", cls: "bg-blue-50 text-blue-700 border-blue-200" };
+    case "quick_win":
+      return { label: "Quick win", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+    case "challenge":
+      return { label: "Challenge", cls: "bg-orange-50 text-orange-700 border-orange-200" };
+    case "exam_drill":
+      return { label: "Exam drill", cls: "bg-red-50 text-red-700 border-red-200" };
   }
 }
 
@@ -183,9 +203,7 @@ export default function ProgrammePage() {
   const { user, student, isLoading: authLoading } = useAuth();
   const [program, setProgram] = useState<ProgramData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
   const [expandedWeek, setExpandedWeek] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -209,31 +227,6 @@ export default function ProgrammePage() {
       console.error("Failed to load program:", err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const generateProgram = async () => {
-    try {
-      setGenerating(true);
-      setError(null);
-      const { data } = await api.post("/course-program/generate");
-      if (data.success) {
-        await loadProgram();
-      }
-    } catch (err: any) {
-      console.error("Failed to generate program:", err);
-      setError(err.response?.data?.error ?? "Erreur lors de la generation du programme");
-    } finally {
-      setGenerating(false);
-    }
-  };
-
-  const completeSession = async (sessionId: number) => {
-    try {
-      await api.patch(`/course-program/session/${sessionId}/complete`);
-      await loadProgram();
-    } catch (err) {
-      console.error("Failed to complete session:", err);
     }
   };
 
@@ -281,44 +274,14 @@ export default function ProgrammePage() {
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
               <Sparkles className="h-10 w-10 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold">Ton programme personnalise</h1>
+            <h1 className="text-3xl font-bold">Programme en preparation</h1>
             <p className="text-muted-foreground max-w-md mx-auto">
-              Prof Ada va analyser tes resultats de test et creer un programme de cours sur mesure de 4 semaines
-              pour t&apos;aider a atteindre ton objectif de {student?.targetScore ?? 14}/20.
+              Ton programme est genere par Prof Ada apres ton assessment.
+              Il apparaitra ici des qu&apos;il est pret.
             </p>
-
-            {error && (
-              <Card className="border-destructive/50 bg-destructive/5">
-                <CardContent className="pt-4 text-center text-destructive text-sm">
-                  {error}
-                </CardContent>
-              </Card>
-            )}
-
-            <Button
-              size="lg"
-              onClick={generateProgram}
-              disabled={generating}
-              className="px-8"
-            >
-              {generating ? (
-                <>
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  Generation en cours...
-                </>
-              ) : (
-                <>
-                  <Zap className="h-5 w-5 mr-2" />
-                  Generer mon programme
-                </>
-              )}
-            </Button>
-
-            {generating && (
-              <p className="text-sm text-muted-foreground animate-pulse">
-                Prof Ada analyse tes lacunes et prepare un programme adapte...
-              </p>
-            )}
+            <p className="text-sm text-muted-foreground">
+              Si ce message persiste, retourne au dashboard puis reessaie dans quelques instants.
+            </p>
           </div>
         </div>
       </div>
@@ -561,79 +524,85 @@ export default function ProgrammePage() {
                       </div>
                     )}
 
-                    {/* Sessions List */}
-                    <div className="space-y-2">
+                    {/* Sessions List grouped by day */}
+                    <div className="space-y-3">
                       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        Sessions ({week.sessions.length})
+                        Micro-sessions ({week.sessions.length})
                       </p>
-                      {week.sessions.map((session) => (
-                        <div
-                          key={session.id}
-                          className={`rounded-xl border p-4 transition-colors ${
-                            session.status === "completed"
-                              ? "bg-emerald-50/50 border-emerald-200/60 opacity-80"
-                              : "bg-white/80 hover:border-primary/30"
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${getTypeColor(session.type)}`}>
-                              {getTypeIcon(session.type)}
+                      {Object.entries(
+                        week.sessions.reduce((acc, s) => {
+                          if (!acc[s.dayNumber]) acc[s.dayNumber] = [];
+                          acc[s.dayNumber].push(s);
+                          return acc;
+                        }, {} as Record<number, ProgramSession[]>)
+                      )
+                        .sort(([a], [b]) => Number(a) - Number(b))
+                        .map(([day, daySessions]) => (
+                          <div key={day} className="rounded-xl border bg-muted/20 p-3">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                              Jour {day} - {daySessions.length} micro-sessions
+                            </p>
+                            <div className="space-y-2">
+                              {daySessions
+                                .sort((a, b) => a.sessionOrder - b.sessionOrder)
+                                .map((session) => {
+                                  const mode = getEngagementModeStyle(session.engagementMode);
+                                  return (
+                                    <div
+                                      key={session.id}
+                                      className={`rounded-xl border p-4 transition-colors ${
+                                        session.status === "completed"
+                                          ? "bg-emerald-50/50 border-emerald-200/60 opacity-80"
+                                          : "bg-white/80 hover:border-primary/30"
+                                      }`}
+                                    >
+                                      <div className="flex items-start gap-3">
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${getTypeColor(session.type)}`}>
+                                          {getTypeIcon(session.type)}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center gap-2 flex-wrap">
+                                            <span className="font-medium text-sm">{session.title}</span>
+                                            <span className={`text-xs ${getDifficultyColor(session.difficulty)}`}>
+                                              {getDifficultyLabel(session.difficulty)}
+                                            </span>
+                                          </div>
+                                          {session.description && (
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                              {session.description}
+                                            </p>
+                                          )}
+                                          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground flex-wrap">
+                                            <span className="flex items-center gap-1 text-sm font-semibold text-foreground">
+                                              <Clock className="h-3.5 w-3.5" />
+                                              {session.durationMinutes} min
+                                            </span>
+                                            <span className={`px-1.5 py-0.5 rounded ${getTypeColor(session.type)} text-xs`}>
+                                              {getTypeLabel(session.type)}
+                                            </span>
+                                            <span className={`px-1.5 py-0.5 rounded border text-xs ${mode.cls}`}>
+                                              {mode.label}
+                                            </span>
+                                            {session.status === "completed" && (
+                                              <span className="flex items-center gap-1 text-emerald-600">
+                                                <CheckCircle2 className="h-3 w-3" />
+                                                Termine
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+                                        {session.status === "in_progress" && (
+                                          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0">
+                                            A faire depuis le dashboard
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-medium text-sm">{session.title}</span>
-                                <span className={`text-xs ${getDifficultyColor(session.difficulty)}`}>
-                                  {getDifficultyLabel(session.difficulty)}
-                                </span>
-                              </div>
-                              {session.description && (
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {session.description}
-                                </p>
-                              )}
-                              <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  {session.durationMinutes} min
-                                </span>
-                                <span className={`px-1.5 py-0.5 rounded ${getTypeColor(session.type)} text-xs`}>
-                                  {getTypeLabel(session.type)}
-                                </span>
-                                {session.status === "completed" && (
-                                  <span className="flex items-center gap-1 text-emerald-600">
-                                    <CheckCircle2 className="h-3 w-3" />
-                                    Termine
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            {/* Action button */}
-                            {session.status !== "completed" && week.status !== "upcoming" && (
-                              <Button
-                                size="sm"
-                                variant={session.status === "in_progress" ? "default" : "outline"}
-                                onClick={() => {
-                                  // For now, mark as completed - later integrate with chat
-                                  completeSession(session.id);
-                                }}
-                                className="shrink-0"
-                              >
-                                {session.status === "in_progress" ? (
-                                  <>
-                                    <Play className="h-3.5 w-3.5 mr-1" />
-                                    Continuer
-                                  </>
-                                ) : (
-                                  <>
-                                    <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-                                    Terminer
-                                  </>
-                                )}
-                              </Button>
-                            )}
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </div>
                 )}
@@ -642,12 +611,11 @@ export default function ProgrammePage() {
           })}
         </div>
 
-        {/* Back to Dashboard */}
+        {/* Continue */}
         <div className="text-center pt-4 pb-8">
           <Link href="/dashboard">
-            <Button variant="outline" size="lg">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour au dashboard
+            <Button size="lg">
+              Continuer vers le dashboard
             </Button>
           </Link>
         </div>

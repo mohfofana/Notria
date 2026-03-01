@@ -1,43 +1,32 @@
 import { and, desc, eq } from "drizzle-orm";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+
 import { openai, CHAT_MODEL } from "../lib/openai.js";
 import { db, schema } from "../db/index.js";
 import { RagService } from "./rag.service.js";
 import { PedagogicalContentService } from "./pedagogical-content.service.js";
 import type { Student } from "../db/schema.js";
 
-// ── Assessment domain → Curriculum topic mapping ──────────────────────────
 const DOMAIN_TO_TOPIC: Record<string, string> = {
-  "Calcul numerique": "Calcul numérique",
-  "Calcul litteral": "Calcul littéral",
-  "Equations et inequations": "Équations et inéquations",
-  "Systemes d'equations": "Systèmes d'équations",
-  "Fonctions lineaires et affines": "Fonctions linéaires et affines",
+  "Calcul numerique": "Calcul numerique",
+  "Calcul litteral": "Calcul litteral",
+  "Equations et inequations": "Equations et inequations",
+  "Systemes d'equations": "Systemes d'equations",
+  "Fonctions lineaires et affines": "Fonctions lineaires et affines",
   "Statistiques": "Statistiques",
-  "Theoreme de Pythagore": "Géométrie plane",
-  "Theoreme de Thales": "Géométrie plane",
-  "Trigonometrie": "Trigonométrie",
-  "Problemes de la vie courante": "Problèmes de la vie courante",
+  "Theoreme de Pythagore": "Geometrie plane",
+  "Theoreme de Thales": "Geometrie plane",
+  Trigonometrie: "Trigonometrie",
+  "Problemes de la vie courante": "Problemes de la vie courante",
 };
 
-function normalizeText(input: string): string {
-  return input
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-}
+type Difficulty = "facile" | "moyen" | "difficile";
+type ProgramSessionType = "lesson" | "exercise" | "quiz" | "recap" | "revision" | "evaluation";
+type EngagementMode = "discovery" | "quick_win" | "challenge" | "exam_drill";
 
-function mapDomainToTopic(domain: string): string {
-  // Try exact match first
-  if (DOMAIN_TO_TOPIC[domain]) return DOMAIN_TO_TOPIC[domain];
-  // Try normalized match
-  const normalized = normalizeText(domain);
-  for (const [key, value] of Object.entries(DOMAIN_TO_TOPIC)) {
-    if (normalizeText(key) === normalized) return value;
-  }
-  return domain;
-}
+type SessionStatus = "upcoming" | "in_progress" | "completed" | "skipped";
+type WeekStatus = "upcoming" | "in_progress" | "completed";
+type ProgramStatus = "active" | "completed" | "abandoned";
 
 interface DomainResult {
   domain: string;
@@ -51,7 +40,21 @@ interface TopicAllocation {
   level: string;
   percentage: number;
   sessionsAllocated: number;
-  difficulty: "facile" | "moyen" | "difficile";
+  difficulty: Difficulty;
+}
+
+interface ProgramSessionPlan {
+  dayNumber: number;
+  sessionOrder: number;
+  topic: string;
+  type: ProgramSessionType;
+  engagementMode: EngagementMode;
+  title: string;
+  description: string;
+  durationMinutes: number;
+  difficulty: Difficulty;
+  objectives: string[];
+  content: { keyConcepts: string[]; exercises: string[]; ragSources: string[] };
 }
 
 interface WeekPlan {
@@ -59,21 +62,15 @@ interface WeekPlan {
   theme: string;
   objectives: string[];
   focusTopics: Array<{ topic: string; priority: "high" | "medium" | "low"; hoursAllocated: number }>;
-  sessions: Array<{
-    dayNumber: number;
-    sessionOrder: number;
-    topic: string;
-    type: "lesson" | "exercise" | "revision" | "evaluation";
-    title: string;
-    description: string;
-    durationMinutes: number;
-    difficulty: "facile" | "moyen" | "difficile";
-    objectives: string[];
-    content: { keyConcepts: string[]; exercises: string[]; ragSources: string[] };
-  }>;
+  sessions: ProgramSessionPlan[];
 }
 
-/** Parse JSON from OpenAI responses that may be wrapped in ```json ... ``` */
+interface MicroTemplate {
+  type: ProgramSessionType;
+  durationMinutes: number;
+  engagementMode: EngagementMode;
+}
+
 function parseJsonResponse(content: string): unknown {
   let cleaned = content.trim();
   const match = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -81,31 +78,41 @@ function parseJsonResponse(content: string): unknown {
   return JSON.parse(cleaned);
 }
 
-// ── Core Service ──────────────────────────────────────────────────────────
+function normalizeText(input: string): string {
+  return input
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function mapDomainToTopic(domain: string): string {
+  if (DOMAIN_TO_TOPIC[domain]) return DOMAIN_TO_TOPIC[domain];
+  const normalized = normalizeText(domain);
+  for (const [key, value] of Object.entries(DOMAIN_TO_TOPIC)) {
+    if (normalizeText(key) === normalized) return value;
+  }
+  return domain;
+}
+
 export const CourseProgramService = {
-  /**
-   * Generate a personalized 4-week course program based on assessment results.
-   */
   async generateProgram(userId: number): Promise<{
     program: typeof schema.coursePrograms.$inferSelect;
     weeks: Array<typeof schema.courseProgramWeeks.$inferSelect & {
       sessions: Array<typeof schema.courseProgramSessions.$inferSelect>;
     }>;
   }> {
-    // 1. Fetch student profile
     const student = await db.query.students.findFirst({
       where: eq(schema.students.userId, userId),
     });
     if (!student) throw new Error("Student not found");
 
-    // 2. Fetch latest assessment results
     const assessment = await db.query.levelAssessments.findFirst({
       where: eq(schema.levelAssessments.studentId, student.id),
       orderBy: [desc(schema.levelAssessments.createdAt)],
     });
     if (!assessment) throw new Error("No assessment found. Complete the placement test first.");
 
-    // 3. Fetch student's schedule to know available sessions per week
     const studentSchedules = await db.query.schedules.findMany({
       where: and(
         eq(schema.schedules.studentId, student.id),
@@ -113,29 +120,24 @@ export const CourseProgramService = {
       ),
     });
 
-    const weeklySessionCount = Math.max(studentSchedules.length, 3); // minimum 3 sessions/week
+    const weeklySessionCount = Math.max(studentSchedules.length, 3);
     const sessionDuration = studentSchedules[0]?.durationMinutes ?? 45;
 
-    // 4. Analyze assessment results → classify domains
-    const { weaknesses, intermediates, strengths, overallLevel } =
-      this.analyzeAssessmentResults(assessment);
+    const { weaknesses, intermediates, strengths, overallLevel } = this.analyzeAssessmentResults(assessment);
 
-    // 5. Allocate sessions per topic based on weaknesses
     const topicAllocations = this.allocateTopicSessions(
       weaknesses,
       intermediates,
       strengths,
-      weeklySessionCount * 4, // total sessions over 4 weeks
+      weeklySessionCount * 4,
     );
 
-    // 6. Generate AI-powered recommendations
     const aiRecommendations = await this.getAIRecommendations(
       student,
       { weaknesses, intermediates, strengths },
       topicAllocations,
     );
 
-    // 7. Build the 4-week plan with RAG content
     const weekPlans = await this.buildWeekPlans(
       topicAllocations,
       weeklySessionCount,
@@ -143,7 +145,6 @@ export const CourseProgramService = {
       aiRecommendations,
     );
 
-    // 8. Persist everything to DB
     return this.persistProgram(
       student,
       assessment,
@@ -157,16 +158,9 @@ export const CourseProgramService = {
     );
   },
 
-  /**
-   * Analyze assessment results and classify each domain by level.
-   */
   analyzeAssessmentResults(assessment: typeof schema.levelAssessments.$inferSelect) {
-    const questions = (assessment.questionsJson as Array<{
-      topic?: string;
-      isCorrect?: boolean;
-    }>) ?? [];
+    const questions = (assessment.questionsJson as Array<{ topic?: string; isCorrect?: boolean }>) ?? [];
 
-    // Recompute per-topic stats
     const topicStats: Record<string, { correct: number; total: number }> = {};
     for (const q of questions) {
       const topic = q.topic ?? "Mathematiques";
@@ -181,11 +175,7 @@ export const CourseProgramService = {
 
     for (const [domain, stats] of Object.entries(topicStats)) {
       const percentage = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
-      let level: string;
-      if (percentage < 50) level = "debutant";
-      else if (percentage < 80) level = "intermediaire";
-      else level = "avance";
-
+      const level = percentage < 50 ? "debutant" : percentage < 80 ? "intermediaire" : "avance";
       const result: DomainResult = { domain, level, percentage };
 
       if (percentage < 50) weaknesses.push(result);
@@ -193,21 +183,14 @@ export const CourseProgramService = {
       else strengths.push(result);
     }
 
-    // Sort weaknesses by percentage ascending (worst first)
     weaknesses.sort((a, b) => a.percentage - b.percentage);
 
     const overallAvg = assessment.score ?? 0;
-    let overallLevel = "intermediaire";
-    if (overallAvg < 50) overallLevel = "debutant";
-    else if (overallAvg >= 80) overallLevel = "avance";
+    const overallLevel = overallAvg < 50 ? "debutant" : overallAvg >= 80 ? "avance" : "intermediaire";
 
     return { weaknesses, intermediates, strengths, overallLevel };
   },
 
-  /**
-   * Allocate sessions across topics based on weakness priority.
-   * Weak topics get ~55% of sessions, intermediate ~30%, strong ~15%.
-   */
   allocateTopicSessions(
     weaknesses: DomainResult[],
     intermediates: DomainResult[],
@@ -216,12 +199,10 @@ export const CourseProgramService = {
   ): TopicAllocation[] {
     const allocations: TopicAllocation[] = [];
 
-    // Calculate session distribution
     const weakSessionPool = Math.ceil(totalSessions * 0.55);
     const interSessionPool = Math.ceil(totalSessions * 0.30);
     const strongSessionPool = Math.max(1, totalSessions - weakSessionPool - interSessionPool);
 
-    // Distribute weak sessions
     if (weaknesses.length > 0) {
       const perWeak = Math.max(2, Math.floor(weakSessionPool / weaknesses.length));
       for (const w of weaknesses) {
@@ -236,7 +217,6 @@ export const CourseProgramService = {
       }
     }
 
-    // Distribute intermediate sessions
     if (intermediates.length > 0) {
       const perInter = Math.max(1, Math.floor(interSessionPool / intermediates.length));
       for (const i of intermediates) {
@@ -251,7 +231,6 @@ export const CourseProgramService = {
       }
     }
 
-    // Distribute strong sessions (light review)
     if (strengths.length > 0) {
       const perStrong = Math.max(1, Math.floor(strongSessionPool / strengths.length));
       for (const s of strengths) {
@@ -266,13 +245,11 @@ export const CourseProgramService = {
       }
     }
 
-    // Deduplicate topics (e.g., Pythagore & Thales both map to Géométrie plane)
     const merged = new Map<string, TopicAllocation>();
     for (const alloc of allocations) {
       const existing = merged.get(alloc.topic);
       if (existing) {
         existing.sessionsAllocated += alloc.sessionsAllocated;
-        // Keep the higher priority
         if (alloc.priority === "high" || (alloc.priority === "medium" && existing.priority === "low")) {
           existing.priority = alloc.priority;
           existing.difficulty = alloc.difficulty;
@@ -286,9 +263,6 @@ export const CourseProgramService = {
     return Array.from(merged.values());
   },
 
-  /**
-   * Get AI-generated recommendations for the program.
-   */
   async getAIRecommendations(
     student: Student,
     results: { weaknesses: DomainResult[]; intermediates: DomainResult[]; strengths: DomainResult[] },
@@ -300,54 +274,26 @@ export const CourseProgramService = {
     motivation: string;
   }> {
     const curriculumContext = await PedagogicalContentService.getCurriculumContext(
-      "Mathématiques",
+      "Mathematiques",
       student.examType as "BEPC" | "BAC",
     );
 
-    const systemPrompt = `Tu es Prof Ada, conseillère pédagogique experte pour le système éducatif ivoirien.
-Tu dois créer des recommandations personnalisées pour un programme de cours de 4 semaines (1 mois).
-
-PROFIL ÉLÈVE :
-- Examen : ${student.examType}
-- Classe : ${student.grade}
-- Objectif : ${student.targetScore ?? 14}/20
-
-RÉSULTATS DU TEST DIAGNOSTIQUE :
-Points faibles (à renforcer en priorité) :
-${results.weaknesses.map((w) => `- ${w.domain} : ${w.percentage}% (${w.level})`).join("\n") || "Aucun point faible majeur"}
-
-Niveau intermédiaire (à approfondir) :
-${results.intermediates.map((i) => `- ${i.domain} : ${i.percentage}% (${i.level})`).join("\n") || "Aucun"}
-
-Points forts (à maintenir) :
-${results.strengths.map((s) => `- ${s.domain} : ${s.percentage}% (${s.level})`).join("\n") || "Aucun"}
-
-ALLOCATION DES SESSIONS :
-${allocations.map((a) => `- ${a.topic} : ${a.sessionsAllocated} sessions (priorité ${a.priority})`).join("\n")}
-
-CONTEXTE PÉDAGOGIQUE :
-${curriculumContext}
-
-GÉNÈRE un JSON avec :
+    const systemPrompt = `Tu es Prof Ada. Genere des recommandations JSON pour un programme de 4 semaines.
+Profil: ${student.examType}, ${student.grade}, objectif ${student.targetScore ?? 14}/20.
+Faiblesses: ${results.weaknesses.map((w) => `${w.domain} ${w.percentage}%`).join(", ") || "aucune"}.
+Allocations: ${allocations.map((a) => `${a.topic}(${a.priority}:${a.sessionsAllocated})`).join(", ")}.
+Contexte: ${curriculumContext}.
+Format strict JSON:
 {
-  "summary": "Résumé personnalisé du diagnostic et du plan en 2-3 phrases, adressé directement à l'élève (tu/toi)",
-  "weeklyThemes": ["Thème semaine 1", "Thème semaine 2", "Thème semaine 3", "Thème semaine 4"],
-  "tips": ["Conseil 1 pour réussir", "Conseil 2", "Conseil 3"],
-  "motivation": "Message de motivation personnalisé pour l'élève"
-}
-
-IMPORTANT :
-- Les thèmes doivent progresser logiquement sur 4 semaines
-- Semaine 1 : Renforcement des bases faibles
-- Semaine 2 : Consolidation et pratique
-- Semaine 3 : Approfondissement et exercices d'examen
-- Semaine 4 : Révision intensive et évaluation
-- Adapte au contexte ivoirien et au programme BEPC/BAC officiel
-- Utilise un langage encourageant et adapté à un élève ivoirien`;
+"summary":"...",
+"weeklyThemes":["...","...","...","..."],
+"tips":["...","...","..."],
+"motivation":"..."
+}`;
 
     const messages: ChatCompletionMessageParam[] = [
       { role: "system", content: systemPrompt },
-      { role: "user", content: "Génère les recommandations personnalisées pour ce programme de 4 semaines." },
+      { role: "user", content: "Genere les recommandations." },
     ];
 
     try {
@@ -355,12 +301,11 @@ IMPORTANT :
         model: CHAT_MODEL,
         messages,
         temperature: 0.4,
-        max_tokens: 1000,
+        max_tokens: 900,
       });
 
       const content = response.choices[0]?.message?.content;
       if (!content) throw new Error("No AI response");
-
       return parseJsonResponse(content) as {
         summary: string;
         weeklyThemes: string[];
@@ -381,26 +326,23 @@ IMPORTANT :
     const weakTopics = results.weaknesses.map((w) => mapDomainToTopic(w.domain)).join(", ");
     return {
       summary: weakTopics
-        ? `Ton test montre des lacunes en ${weakTopics}. Ce programme de 4 semaines va t'aider à renforcer ces bases et progresser vers ton objectif.`
-        : "Ton niveau est correct, ce programme va t'aider à approfondir et consolider tes connaissances.",
+        ? `Ton test montre des lacunes en ${weakTopics}. On va les traiter en micro-sprints pour garder le rythme.`
+        : "Bon niveau global. Le programme va consolider et accelerer ta progression.",
       weeklyThemes: [
-        "Renforcement des fondamentaux",
-        "Consolidation et pratique guidée",
-        "Approfondissement et exercices type examen",
-        "Révision intensive et évaluation finale",
+        "Renforcement des bases",
+        "Consolidation et pratique",
+        "Approfondissement",
+        "Revision et simulation",
       ],
       tips: [
-        "Travaille régulièrement, même 30 minutes par jour font la différence",
-        "Refais les exercices où tu as fait des erreurs pour bien comprendre",
-        "N'hésite pas à demander de l'aide à Prof Ada quand tu bloques",
+        "Travaille court mais regulierement.",
+        "Vise une petite victoire a chaque session.",
+        "Corrige tes erreurs le jour meme.",
       ],
-      motivation: "Chaque effort que tu fais te rapproche de ton objectif. Tu as le potentiel, il faut juste la méthode !",
+      motivation: "Tu progresses mieux avec des etapes courtes et precises. On garde le cap.",
     };
   },
 
-  /**
-   * Build 4 weekly plans with sessions, using RAG for content enrichment.
-   */
   async buildWeekPlans(
     allocations: TopicAllocation[],
     weeklySessionCount: number,
@@ -409,37 +351,31 @@ IMPORTANT :
   ): Promise<WeekPlan[]> {
     const weeks: WeekPlan[] = [];
 
-    // Sort allocations: high priority first, then medium, then low
     const priorityOrder = { high: 0, medium: 1, low: 2 };
     const sortedAllocations = [...allocations].sort(
       (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority],
     );
 
-    // Create a session queue distributed across weeks
-    const sessionQueue: Array<{ topic: string; difficulty: "facile" | "moyen" | "difficile"; priority: "high" | "medium" | "low" }> = [];
+    const sessionQueue: Array<{ topic: string; difficulty: Difficulty; priority: "high" | "medium" | "low" }> = [];
     for (const alloc of sortedAllocations) {
       for (let i = 0; i < alloc.sessionsAllocated; i++) {
-        sessionQueue.push({
-          topic: alloc.topic,
-          difficulty: alloc.difficulty,
-          priority: alloc.priority,
-        });
+        sessionQueue.push({ topic: alloc.topic, difficulty: alloc.difficulty, priority: alloc.priority });
       }
     }
 
-    // Distribute sessions across 4 weeks
-    const weekSessions: Array<typeof sessionQueue> = [[], [], [], []];
+    const weekSlots: Array<typeof sessionQueue> = [[], [], [], []];
     for (let i = 0; i < sessionQueue.length; i++) {
-      const weekIdx = i % 4;
-      weekSessions[weekIdx].push(sessionQueue[i]);
+      weekSlots[i % 4].push(sessionQueue[i]);
     }
 
-    // Ensure each week has at least weeklySessionCount sessions
     for (let w = 0; w < 4; w++) {
-      while (weekSessions[w].length < weeklySessionCount) {
-        // Fill with high-priority topics from weak areas
-        const fillTopic = sortedAllocations[0] ?? { topic: "Révision générale", difficulty: "moyen" as const, priority: "medium" as const };
-        weekSessions[w].push({
+      while (weekSlots[w].length < weeklySessionCount) {
+        const fillTopic = sortedAllocations[0] ?? {
+          topic: "Revision generale",
+          difficulty: "moyen" as Difficulty,
+          priority: "medium" as const,
+        };
+        weekSlots[w].push({
           topic: fillTopic.topic,
           difficulty: fillTopic.difficulty,
           priority: fillTopic.priority,
@@ -447,60 +383,56 @@ IMPORTANT :
       }
     }
 
-    // Build each week
     for (let weekNum = 1; weekNum <= 4; weekNum++) {
       const weekIdx = weekNum - 1;
       const theme = aiRecs.weeklyThemes[weekIdx] ?? `Semaine ${weekNum}`;
-      const sessionsForWeek = weekSessions[weekIdx].slice(0, weeklySessionCount);
+      const slotsForWeek = weekSlots[weekIdx].slice(0, weeklySessionCount);
 
-      // Determine session types based on week progression
-      const sessionTypes = this.getSessionTypesForWeek(weekNum, sessionsForWeek.length);
-
-      // Build objectives for the week
-      const weekTopics = [...new Set(sessionsForWeek.map((s) => s.topic))];
+      const weekTopics = [...new Set(slotsForWeek.map((s) => s.topic))];
       const objectives = this.getWeekObjectives(weekNum, weekTopics);
 
-      // Build focus topics
       const focusTopics = weekTopics.map((topic) => {
         const alloc = sortedAllocations.find((a) => a.topic === topic);
-        const sessionsForTopic = sessionsForWeek.filter((s) => s.topic === topic).length;
+        const slotCountForTopic = slotsForWeek.filter((s) => s.topic === topic).length;
+        const avgSlotMinutes = this.estimateMicroMinutesPerSlot(sessionDuration, weekNum);
         return {
           topic,
           priority: alloc?.priority ?? ("medium" as const),
-          hoursAllocated: Math.round((sessionsForTopic * sessionDuration) / 60 * 10) / 10,
+          hoursAllocated: Math.round((slotCountForTopic * avgSlotMinutes) / 60 * 10) / 10,
         };
       });
 
-      // Build individual sessions with RAG content
-      const sessions = await Promise.all(
-        sessionsForWeek.map(async (session, idx) => {
-          const type = sessionTypes[idx] ?? "lesson";
+      const sessions: ProgramSessionPlan[] = [];
+      for (let dayIdx = 0; dayIdx < slotsForWeek.length; dayIdx++) {
+        const slot = slotsForWeek[dayIdx];
 
-          // Progressively increase difficulty across weeks
-          let difficulty = session.difficulty;
-          if (weekNum >= 3 && difficulty === "facile") difficulty = "moyen";
-          if (weekNum === 4 && difficulty === "moyen") difficulty = "difficile";
+        let baseDifficulty = slot.difficulty;
+        if (weekNum >= 3 && baseDifficulty === "facile") baseDifficulty = "moyen";
+        if (weekNum === 4 && baseDifficulty === "moyen") baseDifficulty = "difficile";
 
-          // Fetch RAG content for this topic
-          const ragContent = await this.fetchRagContent(session.topic, type);
+        const microBlueprint = this.buildDailyMicroSessions(weekNum, sessionDuration, dayIdx + 1);
 
-          const title = this.generateSessionTitle(session.topic, type);
-          const description = this.generateSessionDescription(session.topic, type, difficulty);
+        for (const micro of microBlueprint) {
+          const difficulty = this.resolveDifficultyForType(baseDifficulty, micro.type, weekNum);
+          const ragContent = await this.fetchRagContent(slot.topic, micro.type);
 
-          return {
-            dayNumber: idx + 1,
-            sessionOrder: 1,
-            topic: session.topic,
-            type,
-            title,
-            description,
-            durationMinutes: sessionDuration,
+          sessions.push({
+            dayNumber: dayIdx + 1,
+            sessionOrder: micro.sessionOrder,
+            topic: slot.topic,
+            type: micro.type,
+            engagementMode: micro.engagementMode,
+            title: this.generateSessionTitle(slot.topic, micro.type, micro.engagementMode),
+            description: this.generateSessionDescription(slot.topic, micro.type, difficulty, micro.engagementMode),
+            durationMinutes: micro.durationMinutes,
             difficulty,
-            objectives: this.getSessionObjectives(session.topic, type, weekNum),
+            objectives: this.getSessionObjectives(slot.topic, micro.type, weekNum),
             content: ragContent,
-          };
-        }),
-      );
+          });
+        }
+      }
+
+      this.enforceWeeklyVariety(weekNum, sessions);
 
       weeks.push({
         weekNumber: weekNum,
@@ -514,33 +446,89 @@ IMPORTANT :
     return weeks;
   },
 
-  /**
-   * Determine session types based on week number and progression.
-   */
-  getSessionTypesForWeek(
-    weekNum: number,
-    sessionCount: number,
-  ): Array<"lesson" | "exercise" | "revision" | "evaluation"> {
-    const types: Array<"lesson" | "exercise" | "revision" | "evaluation"> = [];
+  estimateMicroMinutesPerSlot(slotDuration: number, weekNum: number): number {
+    const plan = this.buildDailyMicroSessions(weekNum, slotDuration, 1);
+    return plan.reduce((sum, p) => sum + p.durationMinutes, 0);
+  },
 
-    for (let i = 0; i < sessionCount; i++) {
-      if (weekNum === 1) {
-        // Week 1: Focus on lessons and basic exercises
-        types.push(i % 2 === 0 ? "lesson" : "exercise");
-      } else if (weekNum === 2) {
-        // Week 2: Mix of exercises and some lessons
-        types.push(i % 3 === 0 ? "lesson" : "exercise");
-      } else if (weekNum === 3) {
-        // Week 3: Exercises and revision
-        types.push(i % 3 === 0 ? "revision" : "exercise");
-      } else {
-        // Week 4: Revision and final evaluation
-        if (i === sessionCount - 1) types.push("evaluation");
-        else types.push(i % 2 === 0 ? "revision" : "exercise");
+  buildDailyMicroSessions(
+    weekNum: number,
+    slotDuration: number,
+    dayNumber: number,
+  ): Array<{ sessionOrder: number; type: ProgramSessionType; durationMinutes: number; engagementMode: EngagementMode }> {
+    const blueprint30: MicroTemplate[] = [
+      { type: "lesson", durationMinutes: 8, engagementMode: "discovery" },
+      { type: "exercise", durationMinutes: 8, engagementMode: dayNumber % 2 === 0 ? "challenge" : "quick_win" },
+      { type: "recap", durationMinutes: 4, engagementMode: "discovery" },
+      // Exo final obligatoire avant de changer de topic.
+      { type: "evaluation", durationMinutes: 10, engagementMode: "challenge" },
+    ];
+
+    const blueprint45: MicroTemplate[] = [
+      { type: "lesson", durationMinutes: 10, engagementMode: "discovery" },
+      { type: "exercise", durationMinutes: 12, engagementMode: dayNumber % 2 === 0 ? "challenge" : "quick_win" },
+      { type: "quiz", durationMinutes: 8, engagementMode: "challenge" },
+      { type: "recap", durationMinutes: 5, engagementMode: "discovery" },
+      // Exo final obligatoire avant de changer de topic.
+      { type: "evaluation", durationMinutes: 10, engagementMode: "challenge" },
+    ];
+
+    const blueprint60: MicroTemplate[] = [
+      { type: "lesson", durationMinutes: 12, engagementMode: "discovery" },
+      { type: "exercise", durationMinutes: 14, engagementMode: "quick_win" },
+      { type: "quiz", durationMinutes: 8, engagementMode: "challenge" },
+      { type: "exercise", durationMinutes: 10, engagementMode: "challenge" },
+      { type: "recap", durationMinutes: 4, engagementMode: "discovery" },
+      // Exo final obligatoire avant de changer de topic.
+      { type: "evaluation", durationMinutes: 12, engagementMode: "challenge" },
+    ];
+
+    const raw = slotDuration >= 60 ? blueprint60 : slotDuration >= 45 ? blueprint45 : blueprint30;
+
+    const transformed = weekNum >= 3
+      ? raw.map((item) => item.type === "lesson" ? { ...item, type: "revision" as ProgramSessionType } : item)
+      : raw;
+
+    return transformed.map((item, index) => ({
+      sessionOrder: index + 1,
+      type: item.type,
+      durationMinutes: item.durationMinutes,
+      engagementMode: item.engagementMode,
+    }));
+  },
+
+  enforceWeeklyVariety(weekNum: number, sessions: ProgramSessionPlan[]) {
+    if (!sessions.some((s) => s.engagementMode === "quick_win")) {
+      const ex = sessions.find((s) => s.type === "exercise");
+      if (ex) {
+        ex.engagementMode = "quick_win";
+        ex.title = this.generateSessionTitle(ex.topic, ex.type, ex.engagementMode);
       }
     }
 
-    return types;
+    if (!sessions.some((s) => s.engagementMode === "challenge")) {
+      const quiz = sessions.find((s) => s.type === "quiz");
+      if (quiz) {
+        quiz.engagementMode = "challenge";
+        quiz.title = this.generateSessionTitle(quiz.topic, quiz.type, quiz.engagementMode);
+      } else {
+        const ex = sessions.find((s) => s.type === "exercise");
+        if (ex) {
+          ex.engagementMode = "challenge";
+          ex.title = this.generateSessionTitle(ex.topic, ex.type, ex.engagementMode);
+        }
+      }
+    }
+
+    if (weekNum === 4 && !sessions.some((s) => s.engagementMode === "exam_drill")) {
+      const candidate = [...sessions].reverse().find((s) => s.type === "evaluation" || s.type === "revision" || s.type === "exercise");
+      if (candidate) {
+        candidate.engagementMode = "exam_drill";
+        candidate.type = "evaluation";
+        candidate.durationMinutes = Math.max(15, Math.min(20, candidate.durationMinutes + 5));
+        candidate.title = this.generateSessionTitle(candidate.topic, candidate.type, candidate.engagementMode);
+      }
+    }
   },
 
   getWeekObjectives(weekNum: number, topics: string[]): string[] {
@@ -549,114 +537,144 @@ IMPORTANT :
       case 1:
         return [
           `Revoir les notions fondamentales : ${topicList}`,
-          "Identifier et corriger les erreurs fréquentes",
-          "Résoudre des exercices de base avec méthode",
+          "Identifier et corriger les erreurs frequentes",
+          "Construire des automatismes sans surcharge",
         ];
       case 2:
         return [
           `Consolider les acquis : ${topicList}`,
-          "Pratiquer avec des exercices de difficulté progressive",
-          "Développer des automatismes de résolution",
+          "Pratiquer en micro-sprints regulierement",
+          "Transformer les points faibles en points stables",
         ];
       case 3:
         return [
-          `Approfondir et s'entraîner : ${topicList}`,
-          "S'exercer sur des sujets type BEPC",
-          "Travailler la rapidité et la précision",
+          `Approfondir : ${topicList}`,
+          "Monter en difficulte progressivement",
+          "Ameliorer vitesse et precision",
         ];
       case 4:
         return [
-          "Révision intensive de tous les chapitres",
-          "Évaluation finale pour mesurer la progression",
-          "Corriger les dernières lacunes avant l'examen",
+          "Revision intensive ciblee",
+          "Simulations courtes type examen",
+          "Finaliser les derniers ajustements",
         ];
       default:
         return [`Travailler : ${topicList}`];
     }
   },
 
-  getSessionObjectives(
-    topic: string,
-    type: "lesson" | "exercise" | "revision" | "evaluation",
-    weekNum: number,
-  ): string[] {
+  getSessionObjectives(topic: string, type: ProgramSessionType, weekNum: number): string[] {
     switch (type) {
       case "lesson":
         return [
-          `Comprendre les concepts clés de : ${topic}`,
-          "Mémoriser les formules et propriétés importantes",
-          "Voir des exemples résolus étape par étape",
+          `Comprendre les concepts cles de : ${topic}`,
+          "Retenir les methodes essentielles",
+          "Valider avec un exemple simple",
         ];
       case "exercise":
         return [
-          `Pratiquer des exercices sur : ${topic}`,
-          weekNum <= 2
-            ? "Commencer par des exercices guidés"
-            : "Résoudre des exercices de manière autonome",
-          "Vérifier ses réponses et comprendre les erreurs",
+          `Pratiquer sur : ${topic}`,
+          weekNum <= 2 ? "Exercices guides" : "Exercices plus autonomes",
+          "Corriger les erreurs immediatement",
+        ];
+      case "quiz":
+        return [
+          `Tester les automatismes sur : ${topic}`,
+          "Repondre sous mini-contrainte de temps",
+          "Identifier les derniers points a revoir",
+        ];
+      case "recap":
+        return [
+          `Synthese rapide de : ${topic}`,
+          "Fixer 2-3 points memorisables",
+          "Repartir avec un plan clair pour la suite",
         ];
       case "revision":
         return [
-          `Réviser et consolider : ${topic}`,
-          "Refaire les exercices clés du chapitre",
-          "S'entraîner sur des extraits d'annales BEPC",
+          `Reviser et consolider : ${topic}`,
+          "Refaire les exercices cles",
+          "Verifier la robustesse des acquis",
         ];
       case "evaluation":
         return [
-          "Évaluation de fin de programme",
-          "Résoudre un mini-sujet dans les conditions d'examen",
-          "Mesurer sa progression depuis le test initial",
+          `Exo final sur : ${topic}`,
+          "Verifier que le topic est compris avant le suivant",
+          "Identifier les derniers ajustements",
         ];
     }
   },
 
-  generateSessionTitle(
-    topic: string,
-    type: "lesson" | "exercise" | "revision" | "evaluation",
-  ): string {
-    const typeLabels = {
+  generateSessionTitle(topic: string, type: ProgramSessionType, engagementMode: EngagementMode): string {
+    const typeLabels: Record<ProgramSessionType, string> = {
       lesson: "Cours",
-      exercise: "Exercices",
-      revision: "Révision",
-      evaluation: "Évaluation",
+      exercise: "Exercice",
+      quiz: "Quiz",
+      recap: "Recap",
+      revision: "Revision",
+      evaluation: "Evaluation",
     };
-    return `${typeLabels[type]} : ${topic}`;
+    const modeLabels: Record<EngagementMode, string> = {
+      discovery: "Decouverte",
+      quick_win: "Quick win",
+      challenge: "Challenge",
+      exam_drill: "Exam drill",
+    };
+    if (type === "evaluation" && engagementMode !== "exam_drill") {
+      return `Exo final (${modeLabels[engagementMode]}) : ${topic}`;
+    }
+    return `${typeLabels[type]} (${modeLabels[engagementMode]}) : ${topic}`;
+  },
+
+  resolveDifficultyForType(
+    baseDifficulty: Difficulty,
+    type: ProgramSessionType,
+    weekNum: number,
+  ): Difficulty {
+    if (type === "recap") return "facile";
+    if (type === "quiz") return weekNum <= 2 ? "moyen" : "difficile";
+    if (type === "evaluation") return weekNum >= 4 ? "difficile" : "moyen";
+    return baseDifficulty;
   },
 
   generateSessionDescription(
     topic: string,
-    type: "lesson" | "exercise" | "revision" | "evaluation",
-    difficulty: "facile" | "moyen" | "difficile",
+    type: ProgramSessionType,
+    difficulty: Difficulty,
+    engagementMode: EngagementMode,
   ): string {
-    const diffLabels = { facile: "fondamental", moyen: "intermédiaire", difficile: "avancé" };
+    const diffLabels = { facile: "fondamental", moyen: "intermediaire", difficile: "avance" };
+
     switch (type) {
       case "lesson":
-        return `Leçon sur ${topic} — niveau ${diffLabels[difficulty]}. Revois les concepts clés, les formules et les méthodes de résolution avec Prof Ada.`;
+        return `Cours court sur ${topic}, niveau ${diffLabels[difficulty]} (${engagementMode}).`;
       case "exercise":
-        return `Entraîne-toi sur ${topic} avec des exercices de niveau ${diffLabels[difficulty]}. Prof Ada te guide pas à pas.`;
+        return `Bloc d'exercices guides sur ${topic}, niveau ${diffLabels[difficulty]} (${engagementMode}).`;
+      case "quiz":
+        return `Quiz chrono sur ${topic} (${engagementMode}).`;
+      case "recap":
+        return `Recap express de ${topic} pour fixer les acquis.`;
       case "revision":
-        return `Révision complète de ${topic}. Refais les exercices importants et consolide tes acquis avant de passer à la suite.`;
+        return `Revision ciblee de ${topic}, niveau ${diffLabels[difficulty]} (${engagementMode}).`;
       case "evaluation":
-        return `Évaluation finale sur ${topic}. Teste tes connaissances dans les conditions d'examen pour mesurer ta progression.`;
+        if (engagementMode === "exam_drill") {
+          return `Evaluation type examen sur ${topic} (${engagementMode}).`;
+        }
+        return `Exo final de validation sur ${topic} avant passage au topic suivant (${engagementMode}).`;
     }
   },
 
-  /**
-   * Fetch relevant RAG content for a topic and session type.
-   */
   async fetchRagContent(
     topic: string,
-    type: "lesson" | "exercise" | "revision" | "evaluation",
+    type: ProgramSessionType,
   ): Promise<{ keyConcepts: string[]; exercises: string[]; ragSources: string[] }> {
     const keyConcepts: string[] = [];
     const exercises: string[] = [];
     const ragSources: string[] = [];
 
     try {
-      // Search for course content
-      if (type === "lesson" || type === "revision") {
+      if (type === "lesson" || type === "revision" || type === "recap") {
         const coursResults = await RagService.search(
-          `cours ${topic} BEPC 3eme mathématiques`,
+          `cours ${topic} BEPC 3eme mathematiques`,
           3,
           { sourceType: "cours", grade: "3eme" },
         );
@@ -666,8 +684,7 @@ IMPORTANT :
         }
       }
 
-      // Search for exercises
-      if (type === "exercise" || type === "revision" || type === "evaluation") {
+      if (type === "exercise" || type === "revision" || type === "evaluation" || type === "quiz") {
         const exerciseResults = await RagService.search(
           `exercice ${topic} BEPC 3eme`,
           3,
@@ -679,10 +696,9 @@ IMPORTANT :
         }
       }
 
-      // For evaluation, also look at past exam papers (annales)
       if (type === "evaluation") {
         const annaleResults = await RagService.search(
-          `annale BEPC mathématiques ${topic}`,
+          `annale BEPC mathematiques ${topic}`,
           2,
           { sourceType: "annale", grade: "3eme" },
         );
@@ -702,9 +718,6 @@ IMPORTANT :
     };
   },
 
-  /**
-   * Persist the generated program to the database.
-   */
   async persistProgram(
     student: Student,
     assessment: typeof schema.levelAssessments.$inferSelect,
@@ -718,36 +731,34 @@ IMPORTANT :
   ) {
     const now = new Date();
     const startDate = new Date(now);
-    // Start next Monday
     const dayOfWeek = startDate.getDay();
     const daysUntilMonday = dayOfWeek === 0 ? 1 : dayOfWeek === 1 ? 0 : 8 - dayOfWeek;
     startDate.setDate(startDate.getDate() + daysUntilMonday);
     startDate.setHours(0, 0, 0, 0);
 
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 27); // 4 weeks = 28 days
+    endDate.setDate(endDate.getDate() + 27);
 
-    // Deactivate any existing active programs
     const existingPrograms = await db.query.coursePrograms.findMany({
       where: and(
         eq(schema.coursePrograms.studentId, student.id),
-        eq(schema.coursePrograms.status, "active"),
+        eq(schema.coursePrograms.status, "active" as ProgramStatus),
       ),
     });
+
     for (const existing of existingPrograms) {
       await db
         .update(schema.coursePrograms)
-        .set({ status: "abandoned", updatedAt: now })
+        .set({ status: "abandoned" as ProgramStatus, updatedAt: now })
         .where(eq(schema.coursePrograms.id, existing.id));
     }
 
-    // Insert program
     const [program] = await db
       .insert(schema.coursePrograms)
       .values({
         studentId: student.id,
         assessmentId: assessment.id,
-        title: `Programme personnalisé — ${overallLevel === "debutant" ? "Renforcement des bases" : overallLevel === "avance" ? "Perfectionnement" : "Progression vers l'objectif"}`,
+        title: `Programme personnalise - ${overallLevel === "debutant" ? "Renforcement des bases" : overallLevel === "avance" ? "Perfectionnement" : "Progression"}`,
         totalWeeks: 4,
         startDate,
         endDate,
@@ -760,7 +771,6 @@ IMPORTANT :
       })
       .returning();
 
-    // Insert weeks and sessions
     const weeksWithSessions = [];
 
     for (const weekPlan of weekPlans) {
@@ -772,7 +782,7 @@ IMPORTANT :
           theme: weekPlan.theme,
           objectives: weekPlan.objectives,
           focusTopics: weekPlan.focusTopics,
-          status: weekPlan.weekNumber === 1 ? "in_progress" : "upcoming",
+          status: weekPlan.weekNumber === 1 ? ("in_progress" as WeekStatus) : ("upcoming" as WeekStatus),
         })
         .returning();
 
@@ -786,6 +796,7 @@ IMPORTANT :
             sessionOrder: sessionPlan.sessionOrder,
             topic: sessionPlan.topic,
             type: sessionPlan.type,
+            engagementMode: sessionPlan.engagementMode,
             title: sessionPlan.title,
             description: sessionPlan.description,
             durationMinutes: sessionPlan.durationMinutes,
@@ -804,9 +815,6 @@ IMPORTANT :
     return { program, weeks: weeksWithSessions };
   },
 
-  /**
-   * Get the current active program for a student.
-   */
   async getCurrentProgram(userId: number) {
     const student = await db.query.students.findFirst({
       where: eq(schema.students.userId, userId),
@@ -816,7 +824,7 @@ IMPORTANT :
     const program = await db.query.coursePrograms.findFirst({
       where: and(
         eq(schema.coursePrograms.studentId, student.id),
-        eq(schema.coursePrograms.status, "active"),
+        eq(schema.coursePrograms.status, "active" as ProgramStatus),
       ),
       orderBy: [desc(schema.coursePrograms.createdAt)],
     });
@@ -832,7 +840,11 @@ IMPORTANT :
         const sessions = await db.query.courseProgramSessions.findMany({
           where: eq(schema.courseProgramSessions.weekId, week.id),
         });
-        return { ...week, sessions };
+
+        return {
+          ...week,
+          sessions: sessions.sort((a, b) => (a.dayNumber - b.dayNumber) || (a.sessionOrder - b.sessionOrder)),
+        };
       }),
     );
 
@@ -842,9 +854,6 @@ IMPORTANT :
     };
   },
 
-  /**
-   * Get a specific week's details.
-   */
   async getWeekDetails(userId: number, weekNumber: number) {
     const program = await this.getCurrentProgram(userId);
     if (!program) throw new Error("No active program found");
@@ -855,16 +864,44 @@ IMPORTANT :
     return week;
   },
 
-  /**
-   * Mark a session as completed.
-   */
-  async completeSession(userId: number, sessionId: number, score?: number) {
+  async getNextSession(userId: number) {
+    const program = await this.getCurrentProgram(userId);
+    if (!program) return null;
+
+    const orderedSessions = program.weeks
+      .slice()
+      .sort((a, b) => a.weekNumber - b.weekNumber)
+      .flatMap((week) =>
+        (week.sessions ?? [])
+          .slice()
+          .sort((a, b) => (a.dayNumber - b.dayNumber) || (a.sessionOrder - b.sessionOrder))
+          .map((session) => ({
+            session,
+            weekNumber: week.weekNumber,
+            weekTheme: week.theme,
+          })),
+      );
+
+    const next = orderedSessions.find(
+      (item) => item.session.status === "upcoming" || item.session.status === "in_progress",
+    );
+
+    if (!next) return null;
+
+    return {
+      programId: program.id,
+      weekNumber: next.weekNumber,
+      weekTheme: next.weekTheme,
+      session: next.session,
+    };
+  },
+
+  async startSession(userId: number, sessionId: number) {
     const student = await db.query.students.findFirst({
       where: eq(schema.students.userId, userId),
     });
     if (!student) throw new Error("Student not found");
 
-    // Verify the session belongs to the student's program
     const session = await db.query.courseProgramSessions.findFirst({
       where: eq(schema.courseProgramSessions.id, sessionId),
     });
@@ -880,49 +917,160 @@ IMPORTANT :
     });
     if (!program || program.studentId !== student.id) throw new Error("Unauthorized");
 
-    // Update session status
+    const allWeeks = await db.query.courseProgramWeeks.findMany({
+      where: eq(schema.courseProgramWeeks.programId, program.id),
+    });
+    const weekIds = allWeeks.map((w) => w.id);
+
+    const allSessions = await Promise.all(
+      weekIds.map((weekId) =>
+        db.query.courseProgramSessions.findMany({
+          where: eq(schema.courseProgramSessions.weekId, weekId),
+        }),
+      ),
+    );
+
+    const weekById = new Map(allWeeks.map((w) => [w.id, w]));
+    const orderedSessions = allSessions
+      .flat()
+      .sort((a, b) => {
+        const weekA = weekById.get(a.weekId);
+        const weekB = weekById.get(b.weekId);
+        const weekOrder = (weekA?.weekNumber ?? 0) - (weekB?.weekNumber ?? 0);
+        if (weekOrder !== 0) return weekOrder;
+        const dayOrder = a.dayNumber - b.dayNumber;
+        if (dayOrder !== 0) return dayOrder;
+        return a.sessionOrder - b.sessionOrder;
+      });
+
+    const nextPending = orderedSessions.find(
+      (s) => s.status === "upcoming" || s.status === "in_progress",
+    );
+
+    if (!nextPending) {
+      throw new Error("No pending session in this program");
+    }
+
+    if (nextPending.id !== sessionId) {
+      throw new Error("Session must follow the program order");
+    }
+
+    if (session.status === "completed" || session.status === "skipped") {
+      throw new Error("Session already closed");
+    }
+
+    let startedSession = session;
+    if (session.status === "upcoming") {
+      const [updated] = await db
+        .update(schema.courseProgramSessions)
+        .set({
+          status: "in_progress" as SessionStatus,
+          updatedAt: new Date(),
+        })
+        .where(eq(schema.courseProgramSessions.id, sessionId))
+        .returning();
+      startedSession = updated ?? session;
+    }
+
+    return {
+      programId: program.id,
+      weekNumber: week.weekNumber,
+      weekTheme: week.theme,
+      session: startedSession,
+    };
+  },
+
+  async completeSession(userId: number, sessionId: number, score?: number) {
+    const student = await db.query.students.findFirst({
+      where: eq(schema.students.userId, userId),
+    });
+    if (!student) throw new Error("Student not found");
+
+    const session = await db.query.courseProgramSessions.findFirst({
+      where: eq(schema.courseProgramSessions.id, sessionId),
+    });
+    if (!session) throw new Error("Session not found");
+
+    const week = await db.query.courseProgramWeeks.findFirst({
+      where: eq(schema.courseProgramWeeks.id, session.weekId),
+    });
+    if (!week) throw new Error("Week not found");
+
+    const program = await db.query.coursePrograms.findFirst({
+      where: eq(schema.coursePrograms.id, week.programId),
+    });
+    if (!program || program.studentId !== student.id) throw new Error("Unauthorized");
+
+    const allWeeks = await db.query.courseProgramWeeks.findMany({
+      where: eq(schema.courseProgramWeeks.programId, program.id),
+    });
+    const weekById = new Map(allWeeks.map((w) => [w.id, w]));
+    const allSessions = await Promise.all(
+      allWeeks.map((w) =>
+        db.query.courseProgramSessions.findMany({
+          where: eq(schema.courseProgramSessions.weekId, w.id),
+        }),
+      ),
+    );
+
+    const orderedSessions = allSessions
+      .flat()
+      .sort((a, b) => {
+        const weekA = weekById.get(a.weekId);
+        const weekB = weekById.get(b.weekId);
+        const weekOrder = (weekA?.weekNumber ?? 0) - (weekB?.weekNumber ?? 0);
+        if (weekOrder !== 0) return weekOrder;
+        const dayOrder = a.dayNumber - b.dayNumber;
+        if (dayOrder !== 0) return dayOrder;
+        return a.sessionOrder - b.sessionOrder;
+      });
+    const nextPending = orderedSessions.find(
+      (s) => s.status === "upcoming" || s.status === "in_progress",
+    );
+
+    if (!nextPending || nextPending.id !== sessionId) {
+      throw new Error("Session must follow the program order");
+    }
+
     await db
       .update(schema.courseProgramSessions)
       .set({
-        status: "completed",
+        status: "completed" as SessionStatus,
         completedAt: new Date(),
         scoreAtCompletion: score ?? null,
         updatedAt: new Date(),
       })
       .where(eq(schema.courseProgramSessions.id, sessionId));
 
-    // Check if all sessions in the week are completed
-    const allSessions = await db.query.courseProgramSessions.findMany({
+    const weekSessions = await db.query.courseProgramSessions.findMany({
       where: eq(schema.courseProgramSessions.weekId, week.id),
     });
-    const allCompleted = allSessions.every(
+    const allCompleted = weekSessions.every(
       (s) => s.id === sessionId || s.status === "completed" || s.status === "skipped",
     );
 
     if (allCompleted) {
-      // Mark week as completed
       await db
         .update(schema.courseProgramWeeks)
-        .set({ status: "completed", updatedAt: new Date() })
+        .set({ status: "completed" as WeekStatus, updatedAt: new Date() })
         .where(eq(schema.courseProgramWeeks.id, week.id));
 
-      // Activate next week if exists
       const nextWeek = await db.query.courseProgramWeeks.findFirst({
         where: and(
           eq(schema.courseProgramWeeks.programId, program.id),
           eq(schema.courseProgramWeeks.weekNumber, week.weekNumber + 1),
         ),
       });
+
       if (nextWeek) {
         await db
           .update(schema.courseProgramWeeks)
-          .set({ status: "in_progress", updatedAt: new Date() })
+          .set({ status: "in_progress" as WeekStatus, updatedAt: new Date() })
           .where(eq(schema.courseProgramWeeks.id, nextWeek.id));
       } else {
-        // All weeks completed → mark program as completed
         await db
           .update(schema.coursePrograms)
-          .set({ status: "completed", updatedAt: new Date() })
+          .set({ status: "completed" as ProgramStatus, updatedAt: new Date() })
           .where(eq(schema.coursePrograms.id, program.id));
       }
     }

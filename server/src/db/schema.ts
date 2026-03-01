@@ -336,7 +336,10 @@ export const courseProgramSessions = pgTable("course_program_sessions", {
   dayNumber: integer("day_number").notNull(), // 1-based day within the week
   sessionOrder: integer("session_order").default(1).notNull(),
   topic: varchar("topic", { length: 255 }).notNull(),
-  type: varchar("type", { enum: ["lesson", "exercise", "revision", "evaluation"] }).notNull(),
+  type: varchar("type", { enum: ["lesson", "exercise", "quiz", "recap", "revision", "evaluation"] }).notNull(),
+  engagementMode: varchar("engagement_mode", { enum: ["discovery", "quick_win", "challenge", "exam_drill"] })
+    .default("discovery")
+    .notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   durationMinutes: integer("duration_minutes").notNull(),

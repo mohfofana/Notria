@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS "course_program_sessions" (
 	"session_order" integer DEFAULT 1 NOT NULL,
 	"topic" varchar(255) NOT NULL,
 	"type" varchar NOT NULL,
+	"engagement_mode" varchar DEFAULT 'discovery' NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"description" text,
 	"duration_minutes" integer NOT NULL,
@@ -51,3 +52,6 @@ CREATE TABLE IF NOT EXISTS "course_program_sessions" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
+--> statement-breakpoint
+ALTER TABLE "course_program_sessions"
+ADD COLUMN IF NOT EXISTS "engagement_mode" varchar DEFAULT 'discovery' NOT NULL;

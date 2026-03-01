@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { desc, eq } from "drizzle-orm";
 import { db, schema } from "../db/index.js";
 import { AIService } from "./ai.service.js";
+import { CourseProgramService } from "./course-program.service.js";
 
 type Difficulty = "facile" | "moyen" | "difficile";
 
@@ -349,6 +350,27 @@ function computeDomainLevel(
 }
 
 export const AssessmentService = {
+  async getExamOverview(userId: number) {
+    const student = await db.query.students.findFirst({
+      where: eq(schema.students.userId, userId),
+    });
+    if (!student) throw new Error("Student not found");
+
+    return {
+      examType: student.examType,
+      grade: student.grade,
+      subject: "Mathematiques",
+      totalQuestions: REQUIRED_TOTAL_QUESTIONS,
+      domains: DOMAIN_CONFIG.map((d) => ({
+        key: d.key,
+        topic: d.topic,
+        questionCount: d.count,
+      })),
+      estimatedMinutes: 15,
+      assessmentCompleted: student.assessmentCompleted,
+    };
+  },
+
   async startAssessment(userId: number): Promise<AssessmentProgress> {
     const student = await db.query.students.findFirst({
       where: eq(schema.students.userId, userId),
@@ -494,6 +516,13 @@ export const AssessmentService = {
           updatedAt: new Date(),
         })
         .where(eq(schema.students.id, student.id));
+
+      // Program generation is handled by Prof Ada after assessment completion.
+      try {
+        await CourseProgramService.generateProgram(userId);
+      } catch (programError) {
+        console.error("Auto program generation failed after assessment:", programError);
+      }
     }
 
     return { subjectLevels, overallAverage, personalizedPlan };
