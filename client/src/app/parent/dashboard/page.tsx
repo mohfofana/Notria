@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, BookOpen, CheckCircle, Clock, TrendingUp } from "lucide-react";
+import { Bell, BookOpen, CheckCircle, Clock, RefreshCw, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,18 @@ interface ParentDashboardStudent {
     createdAt: string;
     read: boolean;
   }>;
+  weeklyTimeline: Array<{
+    id: number;
+    day: string;
+    subject: string;
+    minutes: number;
+    score: number | null;
+  }>;
+  weaknessActions: Array<{
+    topic: string;
+    misses: number;
+    action: string;
+  }>;
 }
 
 interface ParentDashboardResponse {
@@ -44,10 +56,11 @@ interface ParentDashboardResponse {
 }
 
 export default function ParentDashboardPage() {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, parent, linkedStudents, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [dashboard, setDashboard] = useState<ParentDashboardStudent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const unreadCount = useMemo(
@@ -66,24 +79,25 @@ export default function ParentDashboardPage() {
     }
   }, [isLoading, isAuthenticated, user, router]);
 
+  async function loadDashboard(showSpinner = false) {
+    if (showSpinner) setLoading(true);
+    else setRefreshing(true);
+    setError(null);
+    try {
+      const response = await api.get<ParentDashboardResponse>("/parent/dashboard");
+      setDashboard(response.data.data || []);
+    } catch {
+      setError("Impossible de charger le dashboard parent.");
+      if (showSpinner) setDashboard([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }
+
   useEffect(() => {
     if (isLoading || !isAuthenticated || user?.role !== "parent") return;
-
-    async function loadDashboard() {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await api.get<ParentDashboardResponse>("/parent/dashboard");
-        setDashboard(response.data.data || []);
-      } catch {
-        setError("Impossible de charger le dashboard parent.");
-        setDashboard([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadDashboard();
+    loadDashboard(true);
   }, [isLoading, isAuthenticated, user]);
 
   if (isLoading || loading) {
@@ -105,8 +119,20 @@ export default function ParentDashboardPage() {
           <p className="text-base text-muted-foreground mt-1">
             Suivi simple de {dashboard.length > 1 ? "vos enfants" : "votre enfant"}
           </p>
+          {parent?.inviteCode && (
+            <p className="text-sm mt-2">
+              Votre code de liaison: <span className="font-semibold tracking-wider">{parent.inviteCode}</span>
+            </p>
+          )}
         </div>
-        <Badge variant="outline" className="text-sm">{unreadCount} notification(s) non lue(s)</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="text-sm">{linkedStudents.length} enfant(s) lie(s)</Badge>
+          <Badge variant="outline" className="text-sm">{unreadCount} notification(s) non lue(s)</Badge>
+          <Button variant="outline" size="sm" onClick={() => loadDashboard(false)} disabled={refreshing}>
+            <RefreshCw className={`h-4 w-4 mr-1 ${refreshing ? "animate-spin" : ""}`} />
+            Actualiser
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -229,21 +255,50 @@ export default function ParentDashboardPage() {
                     className="w-full mt-1"
                     onClick={async () => {
                       await api.post("/parent/notifications/read", { notificationId: "all" });
-                      setDashboard((prev) =>
-                        prev.map((entry) =>
-                          entry.student.id === studentData.student.id
-                            ? {
-                                ...entry,
-                                notifications: entry.notifications.map((n) => ({ ...n, read: true })),
-                              }
-                            : entry
-                        )
-                      );
+                      await loadDashboard(false);
                     }}
                   >
                     <CheckCircle className="h-4 w-4 mr-1" />
                     Marquer comme lu
                   </Button>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="soft-card rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-lg">Timeline hebdo</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {studentData.weeklyTimeline.length > 0 ? (
+                  studentData.weeklyTimeline.map((item) => (
+                    <div key={item.id} className="rounded-lg border p-2 text-sm">
+                      <p className="font-medium">{item.day} • {item.subject}</p>
+                      <p className="text-muted-foreground">{item.minutes} min • score {item.score ?? "-"}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">Pas encore de sessions cette semaine.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="soft-card rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-lg">Faiblesses et actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {studentData.weaknessActions.length > 0 ? (
+                  studentData.weaknessActions.map((item) => (
+                    <div key={`${item.topic}-${item.action}`} className="rounded-lg border p-2 text-sm">
+                      <p className="font-medium">{item.topic} ({item.misses} erreurs)</p>
+                      <p className="text-muted-foreground">{item.action}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">Aucune faiblesse critique detectee.</p>
                 )}
               </CardContent>
             </Card>

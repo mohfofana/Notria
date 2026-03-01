@@ -1,255 +1,239 @@
 # Notria
 
-Notria est un prof particulier IA pour les eleves en Cote d'Ivoire qui preparent le BEPC/BAC, avec un focus current sur les mathematiques 3eme (BEPC).  
-L'assistant IA s'appelle **Prof Ada**.
+Notria est une plateforme d'accompagnement scolaire pour eleves de 3eme (BEPC), avec un apprentissage guide et interactif.
 
-## Objectif produit
+Le produit combine:
+- parcours pedagogique guide
+- chat pedagogique contextuel
+- suivi parent
+- pilotage admin
 
-Prof Ada ne doit pas etre un chatbot generique.  
-Le produit vise un parcours pedagogique structure:
+Mise a jour (Mars 2026):
+- Matieres actives: Mathématiques, Français, SVT, Physique-Chimie
+- Chat IA relie au RAG avec citations sources et score de fiabilite lisible
+- Session guidee renforcee (format court, interaction eleve, visuels tableau)
+- Gamification eleve amelioree (ligues, missions, progression hebdo)
 
-1. Inscription
-2. Test de niveau adaptatif
-3. Plan personnalise
-4. Boucle quotidienne (cours -> exercices -> validation)
-5. Fonctions hors session (photo math, question express)
-6. BEPC blanc periodique
-7. Dashboard parent
+## Sommaire
 
-## Vision technique
+- [Architecture](#architecture)
+- [Stack technique](#stack-technique)
+- [Fonctionnalites](#fonctionnalites)
+- [Prerequis](#prerequis)
+- [Configuration](#configuration)
+- [Installation et demarrage](#installation-et-demarrage)
+- [Base de donnees et migrations](#base-de-donnees-et-migrations)
+- [RAG (ingestion + recherche)](#rag-ingestion--recherche)
+- [Scripts utiles](#scripts-utiles)
+- [Troubleshooting](#troubleshooting)
 
-Le coeur de la specialisation est le **RAG**:
+## Architecture
 
-- on ne re-entraine pas un modele from scratch
-- on indexe le contenu BEPC CI (cours, annales, livres, exercices)
-- a chaque question, on recupere les meilleurs chunks
-- on envoie ce contexte au LLM pour une reponse adaptee
-
-## Monorepo
+Monorepo pnpm:
 
 ```text
 Notria/
-  client/                 # Next.js app
-  server/                 # Express + TypeScript API
-  packages/
-    shared/               # types + validation + constants partages
+  client/                # Frontend Next.js
+  server/                # API Express + logique metier
+  packages/shared/       # types, constantes, schemas Zod partages
 ```
 
-## Stack
+## Stack technique
 
-- Frontend: Next.js 15, Tailwind, shadcn/ui
-- Backend: Express.js + TypeScript
-- DB: PostgreSQL + Drizzle ORM
-- Vector search: pgvector
-- Embeddings: OpenAI `text-embedding-3-small`
-- Monorepo: pnpm workspaces
+- Frontend: Next.js 15, React 18, Tailwind, shadcn/ui
+- Backend: Express 4, TypeScript, Drizzle ORM
+- DB relationnelle: PostgreSQL
+- Recherche vectorielle: pgvector
+- IA: OpenAI (chat + embeddings)
+- Observabilite: logs HTTP avec request id, Sentry optionnel
 
-## Structure backend (active)
+## Fonctionnalites
 
-```text
-server/src/
-  controllers/
-  services/
-  routes/
-  db/
-    schema.ts
-    index.ts
-  middleware/
-  lib/
-  scripts/
-    ingest.ts            # JSON -> chunks -> embeddings -> DB
-```
+### Authentification et roles
 
-## RAG implemente
+- Roles: `student`, `parent`, `admin`
+- JWT access token + refresh token (cookie httpOnly)
+- Endpoints:
+  - `POST /api/auth/register`
+  - `POST /api/auth/login`
+  - `POST /api/auth/refresh`
+  - `POST /api/auth/logout`
+  - `GET /api/auth/me`
 
-### Schema DB
+### Liaison parent <-> eleve
 
-Table `content_chunks` ajoutee dans `server/src/db/schema.ts`:
+Liaison possible a l'inscription ou a la connexion avec `linkCode` (optionnel):
+- parent saisit le code eleve
+- eleve saisit le code parent
 
-- `source_type` (`cours|exercice|annale|livre`)
-- `subject`, `grade`, `chapter`, `title`
-- `content`
-- `chunk_index`, `total_chunks`
-- `embedding` (`vector(1536)`)
-- `metadata` (`jsonb`)
-- index HNSW cosine + index de filtres
+Chaque profil parent/eleve dispose d'un code de liaison unique.
 
-### Endpoint
+### Parcours eleve
 
-`POST /api/rag/search`
+- onboarding
+- evaluation de niveau
+- programme de cours
+- session du jour
+- devoirs
+- chat pedagogique
+- seance guidee
+- gamification (classement, missions, avatar, progression)
 
-Body:
+### Parcours parent
 
-```json
-{
-  "query": "theoreme de pythagore",
-  "limit": 5,
-  "filters": {
-    "chapter": "pythagore",
-    "grade": "3eme",
-    "sourceType": "cours"
-  }
-}
-```
+- dashboard de suivi
+- notifications
 
-Retour:
+### Parcours admin
 
-```json
-{
-  "results": [
-    {
-      "id": 1,
-      "content": "...",
-      "chapter": "pythagore",
-      "sourceType": "cours",
-      "title": "...",
-      "similarity": 0.70,
-      "metadata": {}
-    }
-  ]
-}
-```
-
-Regle actuelle: seuil de similarite `> 0.7`.
-
-### Script ingestion
-
-`server/src/scripts/ingest.ts`
-
-- lit `server/data/raw/**/*.json`
-- chunking avec overlap
-- embeddings OpenAI
-- insertion idempotente dans `content_chunks`
-- gestion des erreurs/fichiers invalides (skip)
-
-## Pipeline data (scraper)
-
-Scripts Python:
-
-```text
-server/scripts/scraper/
-  scrape_urls.py
-  download_pdfs.py
-  extract_text.py
-  structure_content.py
-  requirements.txt
-  urls.json
-  download_report.json
-  failed_urls.json
-```
-
-Flux:
-
-1. `scrape_urls.py` -> collecte des liens
-2. `download_pdfs.py` -> telechargement dans `server/data/pdfs/`
-3. `extract_text.py` -> extraction texte vers `server/data/extracted/`
-4. `structure_content.py` -> JSON normalises vers `server/data/raw/`
-
-Sources actuellement integrees:
-
-- fomesoutra.com
-- banquedesepreuves.com
-- epreuvesetcorriges.com
-- sujetcorrige.com
-
-Filtrage active: maths + niveau BEPC/3eme + types `annale|exercice|livre`.
-
-## Donnees
-
-- `server/data/pdfs/`: source brute (ignoree par git)
-- `server/data/extracted/`: intermediaire extraction (ignoree par git)
-- `server/data/raw/`: dataset structure (versionne)
+- overview produit
+- gestion utilisateurs
+- export CSV
+- suivi activite et metriques IA
 
 ## Prerequis
 
 - Node.js 20+
 - pnpm 10+
-- Python 3.10+
-- PostgreSQL avec extension pgvector
+- PostgreSQL 15+ (avec extension `vector`)
 - cle OpenAI valide
 
-## Variables d'environnement
+## Configuration
 
-Le projet charge `.env` a plusieurs niveaux pour faciliter le dev local.  
-Variables minimales:
+Le backend charge `.env.local` puis `.env` (dossier `server`, puis racine).
+
+### Variables serveur (`server/.env.local`)
 
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/notria
-OPENAI_API_KEY=sk-...
-JWT_SECRET=...
-JWT_REFRESH_SECRET=...
-SERVER_PORT=4001
+DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<database>
+OPENAI_API_KEY=<your_openai_api_key>
+OPENAI_MODEL=gpt-4o-mini
+
+JWT_SECRET=<strong_random_secret>
+JWT_REFRESH_SECRET=<strong_random_secret>
+
+SERVER_PORT=3001
 CLIENT_URL=http://localhost:4000
-NEXT_PUBLIC_API_URL=http://localhost:4001
+NODE_ENV=development
+
+# Optionnel
+SENTRY_DSN=
 ```
 
-## Installation
+### Variables client (`client/.env.local`)
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+## Installation et demarrage
+
+Depuis la racine du repo:
 
 ```bash
 pnpm install
-python -m pip install -r server/scripts/scraper/requirements.txt
-```
-
-## Commandes utiles
-
-### Dev
-
-```bash
+pnpm db:push
 pnpm dev
-pnpm dev:server
-pnpm dev:client
 ```
 
-### DB
+Applications:
+- Frontend: `http://localhost:4000`
+- API: `http://localhost:3001`
+- Healthcheck: `http://localhost:3001/health`
+
+## Base de donnees et migrations
+
+Commandes disponibles:
 
 ```bash
 pnpm db:generate
+pnpm db:migrate
 pnpm db:push
 pnpm db:studio
 ```
 
-### Scraping / dataset
+Notes:
+- `content_chunks.embedding` utilise le type `vector(1536)`
+- l'extension `vector` doit etre installee sur l'instance PostgreSQL cible
 
-```bash
-python server/scripts/scraper/scrape_urls.py
-python server/scripts/scraper/download_pdfs.py
-python server/scripts/scraper/extract_text.py
-python server/scripts/scraper/structure_content.py
-```
+## RAG (ingestion + recherche)
 
-### Ingestion RAG
+Dataset source:
+- `server/data/raw/` (JSON structures)
+
+Ingestion:
 
 ```bash
 pnpm --filter @notria/server ingest:rag
 ```
 
-### Test endpoint RAG
+API recherche:
+- `POST /api/rag/search`
+- `GET /api/rag/coverage`
+
+Filtres supportes:
+- `grade`
+- `sourceType`
+- `chapter`
+- `subject`
+
+Exemple:
 
 ```bash
-curl -X POST http://localhost:4001/api/rag/search \
+curl -X POST http://localhost:3001/api/rag/search \
   -H "Content-Type: application/json" \
-  -d "{\"query\":\"theoreme de pythagore triangle rectangle\",\"limit\":5}"
+  -d '{"query":"Pythagore triangle rectangle","limit":3}'
 ```
 
-## Workflow Git recommande
+## Scripts utiles
 
-- branche `main`: pas de push direct
-- branches: `feat/...`, `fix/...`, `chore/...`, `refactor/...`
-- commits format:
-  - `feat(scope): description`
-  - `fix(scope): description`
-- PR obligatoire avant merge
-- pas de secrets dans git
+```bash
+pnpm dev
+pnpm dev:client
+pnpm dev:server
 
-## Etat actuel du sprint RAG
+pnpm build
+pnpm lint
 
-- schema pgvector: en place
-- endpoint `/api/rag/search`: en place
-- scraper multi-sources: en place
-- ingestion operationnelle: en place (avec skip fichiers invalides)
-- dataset raw BEPC maths: en place et versionne
+pnpm db:generate
+pnpm db:migrate
+pnpm db:push
+pnpm db:studio
 
-## Notes
+pnpm --filter @notria/server ingest:rag
+```
 
-- Certains fichiers PDF/JSON peuvent etre invalides (scan vide, caracteres null, format incomplet).
-- Le pipeline est concu pour continuer en mode resilient (skip + log), pas pour s'arreter completement.
+## Troubleshooting
+
+### `ERR_CONNECTION_REFUSED` cote frontend
+
+Verifier:
+- `NEXT_PUBLIC_API_URL` pointe vers le bon port API
+- serveur backend demarre
+
+### `Database unavailable` / `ECONNREFUSED`
+
+Verifier:
+- `DATABASE_URL`
+- etat de l'instance PostgreSQL
+- acces reseau / port
+
+### `type "vector" does not exist` ou `extension "vector" is not available`
+
+L'extension pgvector n'est pas installee sur le serveur PostgreSQL cible.
+
+### `/api/rag/search` renvoie `results: []`
+
+Verifier:
+1. table `content_chunks` non vide
+2. ingestion executee
+3. `OPENAI_API_KEY` valide
+4. filtre `subject` coherent avec les donnees ingerees
+
+### Erreur 401 provider IA
+
+Verifier la validite de la cle API et redemarrer le serveur apres mise a jour des variables.
+
+---
+
+Pour la production, utiliser un fichier de configuration dedie a l'environnement (secrets manager recommande) et ne jamais committer de secrets.

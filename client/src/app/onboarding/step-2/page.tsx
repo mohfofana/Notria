@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,17 +12,15 @@ export default function OnboardingStep2() {
   const { student, refreshMe } = useAuth();
   const router = useRouter();
 
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>(student?.prioritySubjects ?? []);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get available subjects based on student profile
-  const subjects = student
-    ? getSubjectsForStudent(
-        "BEPC",
-        undefined
-      )
-    : [];
+  const subjects = useMemo(() => {
+    if (!student) return [];
+    return getSubjectsForStudent("BEPC", undefined);
+  }, [student]);
 
   function toggleSubject(subject: string) {
     setSelected((prev) =>
@@ -64,8 +62,7 @@ export default function OnboardingStep2() {
       <div>
         <h1 className="text-2xl font-bold">Tes matières</h1>
         <p className="text-muted-foreground mt-1">
-          Prof Ada se concentrera sur ces matières en priorité.
-          D'autres matières seront bientôt disponibles !
+          Choisis tes matières prioritaires. Prof Ada adaptera tes séances et exercices selon ce choix.
         </p>
       </div>
 

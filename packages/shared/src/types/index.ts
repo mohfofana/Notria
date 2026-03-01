@@ -163,6 +163,7 @@ export interface RagSearchFilters {
   chapter?: string;
   grade?: string;
   sourceType?: RagSourceType;
+  subject?: string;
 }
 
 export interface RagSearchRequest {

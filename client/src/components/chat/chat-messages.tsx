@@ -79,7 +79,7 @@ function MessageBubble({
   const isUser = role === "user";
   const allowBoard = !isUser && !isStreaming;
   const boardSequence = allowBoard ? extractBoardSequence(content) : null;
-  const renderedContent = isUser
+  const cleanedContent = isUser
     ? content
     : stripBoardSequence(content)
         .replace(/(?:^|\n)\s*\[?\s*ETAPE\s*:[^\n\]]*\]?\s*/gi, "\n")
@@ -87,6 +87,9 @@ function MessageBubble({
         .replace(/(?:^|\n)\s*(INTRO|EXPLAIN|CHECK|PRACTICE|RECAP)\s*$/gim, "")
         .replace(/(?:^|\n)\s*Choix\s*:\s*.+$/gim, "")
         .trim();
+  const { body, references, confidence } = isUser
+    ? { body: cleanedContent, references: [] as string[], confidence: null as string | null }
+    : splitReferences(cleanedContent);
   const activeBoard = boardSequence;
   const showTextBlock = isUser ? true : !activeBoard;
 
@@ -111,14 +114,31 @@ function MessageBubble({
         }`}
       >
         {isUser ? (
-          <p className="whitespace-pre-wrap">{renderedContent}</p>
+          <p className="whitespace-pre-wrap">{body}</p>
         ) : (
           <>
-            {showTextBlock && renderedContent ? (
+            {showTextBlock && body ? (
               <div className="prose prose-sm max-w-none prose-headings:text-base prose-headings:font-semibold prose-headings:mt-3 prose-headings:mb-1 prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5 prose-strong:text-foreground prose-code:bg-background/50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-pre:bg-background/50 prose-pre:rounded-lg">
-                <ReactMarkdown>{renderedContent}</ReactMarkdown>
+                <ReactMarkdown>{body}</ReactMarkdown>
               </div>
             ) : null}
+            {!isUser && references.length > 0 && (
+              <div className="mt-3 rounded-lg border border-border/70 bg-background/60 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                  References
+                </p>
+                <ul className="space-y-1 text-xs text-muted-foreground">
+                  {references.map((ref) => (
+                    <li key={ref}>• {ref}</li>
+                  ))}
+                </ul>
+                {confidence && (
+                  <p className="mt-2 text-[11px] text-muted-foreground">
+                    Fiabilite estimee: <span className="font-medium">{confidence}</span>
+                  </p>
+                )}
+              </div>
+            )}
             {activeBoard ? <ChalkBoardSequence sequence={activeBoard} /> : null}
           </>
         )}
@@ -128,6 +148,38 @@ function MessageBubble({
       </div>
     </div>
   );
+}
+
+function splitReferences(content: string): { body: string; references: string[]; confidence: string | null } {
+  const refHeaderRegex = /\nReferences utilisees:\n/i;
+  const match = content.match(refHeaderRegex);
+  if (!match || match.index === undefined) {
+    const legacyMatch = content.match(/\nSources:\s*(.+)(?:\n|$)/i);
+    const legacyConfidence = content.match(/\nConfiance RAG:\s*([0-9.]+)/i);
+    if (!legacyMatch || legacyMatch.index === undefined) {
+      return { body: content, references: [], confidence: null };
+    }
+    const body = content.slice(0, legacyMatch.index).trim();
+    const references = legacyMatch[1]
+      .split("|")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    const confidence = legacyConfidence ? legacyConfidence[1] : null;
+    return { body, references, confidence };
+  }
+
+  const body = content.slice(0, match.index).trim();
+  const footer = content.slice(match.index + match[0].length).trim();
+  const lines = footer.split("\n").map((line) => line.trim()).filter(Boolean);
+  const references = lines
+    .filter((line) => line.startsWith("- "))
+    .map((line) => line.replace(/^-+\s*/, "").trim());
+  const confidenceLine = lines.find((line) => /^Fiabilite estimee:/i.test(line));
+  const confidence = confidenceLine
+    ? confidenceLine.replace(/^Fiabilite estimee:\s*/i, "").trim()
+    : null;
+
+  return { body, references, confidence };
 }
 
 function stripBoardSequence(content: string): string {

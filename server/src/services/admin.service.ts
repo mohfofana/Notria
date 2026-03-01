@@ -1,6 +1,7 @@
-import { and, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, ilike, inArray, or, sql } from "drizzle-orm";
 
 import { db, schema } from "../db/index.js";
+import { AIMetricsService } from "../observability/ai-metrics.service.js";
 
 type UserRole = "student" | "parent" | "admin";
 
@@ -19,6 +20,10 @@ export const AdminService = {
     const [messagesCount] = await db.select({ value: sql<number>`count(*)` }).from(schema.messages);
     const [sessions7dCount] = await db
       .select({ value: sql<number>`count(*)` })
+      .from(schema.studySessions)
+      .where(gte(schema.studySessions.createdAt, sevenDaysAgo));
+    const [activeStudents7d] = await db
+      .select({ value: sql<number>`count(distinct ${schema.studySessions.studentId})` })
       .from(schema.studySessions)
       .where(gte(schema.studySessions.createdAt, sevenDaysAgo));
 
@@ -42,6 +47,8 @@ export const AdminService = {
       activeConversations: Number(conversationsCount?.value ?? 0),
       messages: Number(messagesCount?.value ?? 0),
       sessionsLast7Days: Number(sessions7dCount?.value ?? 0),
+      activeStudentsLast7Days: Number(activeStudents7d?.value ?? 0),
+      aiMetrics: AIMetricsService.snapshot(),
       roleBreakdown,
     };
   },
@@ -127,9 +134,44 @@ export const AdminService = {
       limit: normalizedLimit,
     });
 
+    const studentIds = Array.from(
+      new Set([
+        ...recentSessions.map((item) => item.studentId),
+        ...recentConversations.map((item) => item.studentId),
+      ]),
+    );
+
+    const students = studentIds.length
+      ? await db.query.students.findMany({
+          where: inArray(schema.students.id, studentIds),
+        })
+      : [];
+    const users = students.length
+      ? await db.query.users.findMany({
+          where: inArray(
+            schema.users.id,
+            students.map((student) => student.userId),
+          ),
+        })
+      : [];
+    const userMap = new Map(users.map((user) => [user.id, user]));
+    const studentNameById = new Map(
+      students.map((student) => {
+        const user = userMap.get(student.userId);
+        const fullName = user ? `${user.firstName} ${user.lastName}`.trim() : `Eleve #${student.id}`;
+        return [student.id, fullName];
+      }),
+    );
+
     return {
-      recentSessions,
-      recentConversations,
+      recentSessions: recentSessions.map((session) => ({
+        ...session,
+        studentName: studentNameById.get(session.studentId) ?? `Eleve #${session.studentId}`,
+      })),
+      recentConversations: recentConversations.map((conversation) => ({
+        ...conversation,
+        studentName: studentNameById.get(conversation.studentId) ?? `Eleve #${conversation.studentId}`,
+      })),
     };
   },
 };

@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 
 import { AdminService } from "../services/admin.service.js";
+import { AIMetricsService } from "../observability/ai-metrics.service.js";
 
 export const AdminController = {
   async overview(_req: Request, res: Response) {
@@ -55,6 +56,55 @@ export const AdminController = {
     } catch (error: any) {
       console.error("Admin activity error:", error);
       return res.status(500).json({ success: false, error: "Failed to load activity" });
+    }
+  },
+
+  async aiMetrics(_req: Request, res: Response) {
+    try {
+      const snapshot = AIMetricsService.snapshot();
+      const alerts = snapshot.prompts
+        .filter((prompt) => prompt.calls >= 5 && prompt.fallbackRate >= 0.3)
+        .map((prompt) => ({
+          type: "high_fallback_rate",
+          prompt: `${prompt.promptId}@${prompt.version}`,
+          fallbackRate: prompt.fallbackRate,
+          calls: prompt.calls,
+        }));
+
+      return res.json({ success: true, data: { snapshot, alerts } });
+    } catch (error: any) {
+      console.error("Admin ai metrics error:", error);
+      return res.status(500).json({ success: false, error: "Failed to load AI metrics" });
+    }
+  },
+
+  async exportUsersCsv(req: Request, res: Response) {
+    try {
+      const role = req.query.role as "student" | "parent" | "admin" | undefined;
+      const search = typeof req.query.search === "string" ? req.query.search : undefined;
+      const data = await AdminService.listUsers({ role, search, limit: 5000 });
+
+      const rows = [
+        ["id", "firstName", "lastName", "phone", "role", "isActive", "createdAt"].join(","),
+        ...data.map((user) =>
+          [
+            user.id,
+            JSON.stringify(user.firstName),
+            JSON.stringify(user.lastName),
+            JSON.stringify(user.phone),
+            user.role,
+            user.isActive ? "true" : "false",
+            new Date(user.createdAt).toISOString(),
+          ].join(","),
+        ),
+      ];
+
+      res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader("Content-Disposition", `attachment; filename=\"notria-users-${Date.now()}.csv\"`);
+      return res.status(200).send(rows.join("\n"));
+    } catch (error: any) {
+      console.error("Admin export users csv error:", error);
+      return res.status(500).json({ success: false, error: "Failed to export users" });
     }
   },
 };

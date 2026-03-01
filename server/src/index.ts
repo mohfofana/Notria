@@ -16,20 +16,36 @@ import ragRouter from "./routes/rag.routes.js";
 import guidedSessionRouter from "./routes/guided-session.routes.js";
 import adminRouter from "./routes/admin.routes.js";
 import courseProgramRouter from "./routes/course-program.routes.js";
+import { captureServerError, requestLogger, withRequestId } from "./observability/http-observability.js";
 
 const app = express();
 const BASE_PORT = Number(process.env.PORT || process.env.SERVER_PORT || 3001);
 const MAX_PORT_ATTEMPTS = 10;
-const defaultOrigins = ["http://localhost:4000", "http://localhost:3000"];
+const defaultOrigins = [
+  "http://localhost:4000",
+  "http://127.0.0.1:4000",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+];
 const configuredOrigins = process.env.CLIENT_URL
   ? process.env.CLIENT_URL.split(",").map((value) => value.trim()).filter(Boolean)
   : [];
 const allowedOrigins = Array.from(new Set([...configuredOrigins, ...defaultOrigins]));
+const isDev = (process.env.NODE_ENV || "development") !== "production";
+const devLanOriginPattern = /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:(3000|4000)$/;
 
 // Middleware
 app.use(helmet());
+app.use(withRequestId);
+app.use(requestLogger);
 app.use(cors({
-  origin: allowedOrigins,
+  origin(origin, callback) {
+    // Non-browser requests (curl/server-to-server) may not send Origin
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (isDev && devLanOriginPattern.test(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true,
 }));
 app.use(express.json());
@@ -60,6 +76,13 @@ app.get("/health", (req, res) => {
 // Routes will be added here
 app.get("/", (req, res) => {
   res.json({ message: "Notria API Server" });
+});
+
+app.use(async (error: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  await captureServerError(error, req);
+  if (!res.headersSent) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 function startServer(port: number, attemptsLeft: number): void {

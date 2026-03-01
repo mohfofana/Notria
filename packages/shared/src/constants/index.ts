@@ -21,8 +21,13 @@ export const BEPC_SUBJECTS = [
   "Histoire-Géographie",
 ] as const;
 
-/** Matières réellement disponibles (contenu + RAG prêts). Étendre au fur et à mesure. */
-export const AVAILABLE_BEPC_SUBJECTS: readonly string[] = ["Mathématiques"];
+/** Matières BEPC activées dans le produit. */
+export const AVAILABLE_BEPC_SUBJECTS: readonly string[] = [
+  "Mathématiques",
+  "Français",
+  "SVT",
+  "Physique-Chimie",
+];
 
 export const MATH_TOPICS_BAC_CD = [
   "Suites numériques",

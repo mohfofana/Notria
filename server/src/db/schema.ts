@@ -44,6 +44,7 @@ export const users = pgTable("users", {
 export const students = pgTable("students", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
+  inviteCode: varchar("invite_code", { length: 8 }).unique(),
   country: varchar("country", { length: 100 }).notNull(),
   examType: varchar("exam_type", { enum: ["BEPC", "BAC"] }).notNull(),
   grade: varchar("grade", { enum: ["3eme", "terminale"] }).notNull(),
@@ -65,6 +66,7 @@ export const students = pgTable("students", {
 export const parents = pgTable("parents", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
+  inviteCode: varchar("invite_code", { length: 8 }).unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -79,6 +81,30 @@ export const parentStudents = pgTable("parent_students", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// Parent notifications read model
+export const parentNotifications = pgTable(
+  "parent_notifications",
+  {
+    id: serial("id").primaryKey(),
+    parentId: integer("parent_id").references(() => parents.id).notNull(),
+    studentId: integer("student_id").references(() => students.id).notNull(),
+    notificationId: varchar("notification_id", { length: 120 }).notNull(),
+    type: varchar("type", { length: 50 }).notNull(),
+    message: text("message").notNull(),
+    readAt: timestamp("read_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    parentStudentIdx: index("parent_notifications_parent_student_idx").on(table.parentId, table.studentId),
+    notificationUnique: uniqueIndex("parent_notifications_unique").on(
+      table.parentId,
+      table.studentId,
+      table.notificationId
+    ),
+  })
+);
 
 // Conversations
 export const conversations = pgTable("conversations", {

@@ -18,6 +18,7 @@ export default function InscriptionPage() {
     lastName: "",
     phone: "",
     password: "",
+    linkCode: "",
     role: "student" as "student" | "parent",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -43,6 +44,10 @@ export default function InscriptionPage() {
     return `+225 ${form.phone}`;
   }
 
+  function normalizeLinkCode(value: string) {
+    return value.replace(/\s/g, "").toUpperCase().slice(0, 8);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -62,6 +67,10 @@ export default function InscriptionPage() {
       setError("Le mot de passe doit contenir au moins 6 caractères");
       return;
     }
+    if (form.linkCode && normalizeLinkCode(form.linkCode).length !== 8) {
+      setError("Le code de liaison doit contenir 8 caractères");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -71,6 +80,7 @@ export default function InscriptionPage() {
         phone: fullPhone,
         password: form.password,
         role: form.role,
+        linkCode: form.linkCode ? normalizeLinkCode(form.linkCode) : undefined,
       });
       router.push(form.role === "student" ? "/onboarding/step-1" : "/dashboard");
     } catch (err: any) {
@@ -182,6 +192,19 @@ export default function InscriptionPage() {
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="linkCode" className="text-base">
+            Code de liaison {form.role === "parent" ? "de l'élève" : "du parent"} (optionnel)
+          </Label>
+          <Input
+            id="linkCode"
+            placeholder="AB12CD34"
+            value={form.linkCode}
+            onChange={(e) => setForm((p) => ({ ...p, linkCode: normalizeLinkCode(e.target.value) }))}
+            disabled={isSubmitting}
+          />
         </div>
 
         {error && (

@@ -19,10 +19,6 @@ export const StudentController = {
     const userId = req.user!.userId;
     const { examType, grade, series, school } = parsed.data;
 
-    if (examType === "BAC" && !series) {
-      return res.status(400).json({ error: "La série est requise pour le BAC" });
-    }
-
     const student = await StudentService.onboardingStep1(userId, { examType, grade, series, school });
     return res.json({ student });
   },

@@ -83,4 +83,40 @@ export const SessionController = {
       });
     }
   },
+
+  async getCompetencyProgress(req: Request, res: Response) {
+    try {
+      const userId = req.user!.userId;
+      const competencies = await SessionService.getCompetencyProgress(userId);
+
+      res.json({
+        success: true,
+        data: competencies,
+      });
+    } catch (error: any) {
+      console.error("Get competency progress error:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Failed to get competency progress",
+      });
+    }
+  },
+
+  async getGamification(req: Request, res: Response) {
+    try {
+      const userId = req.user!.userId;
+      const gamification = await SessionService.getGamificationSnapshot(userId);
+
+      res.json({
+        success: true,
+        data: gamification,
+      });
+    } catch (error: any) {
+      console.error("Get gamification snapshot error:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Failed to get gamification snapshot",
+      });
+    }
+  },
 };

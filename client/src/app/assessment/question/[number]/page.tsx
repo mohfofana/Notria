@@ -10,6 +10,7 @@ import { api } from "@/lib/api";
 
 interface Question {
   id: string;
+  subject?: string;
   topic: string;
   difficulty: "facile" | "moyen" | "difficile";
   question: string;
@@ -180,7 +181,7 @@ export default function AssessmentQuestion() {
             Question {questionNumber} sur {totalQuestions}
           </span>
           <span>
-            {question.topic} - {formatDifficulty(question.difficulty)}
+            {[question.subject, question.topic, formatDifficulty(question.difficulty)].filter(Boolean).join(" - ")}
           </span>
         </div>
         <Progress value={progress} className="w-full" />

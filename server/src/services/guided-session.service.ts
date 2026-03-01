@@ -1,4 +1,6 @@
 import OpenAI from "openai";
+import { z } from "zod";
+import { PromptRegistry, runJsonPrompt } from "../observability/prompt-registry.js";
 
 type GuidedSessionState =
   | "INTRO"
@@ -21,6 +23,9 @@ interface GuidedStepVisual {
   type: GuidedVisualType;
   title?: string;
   content: string;
+  figure?: "triangle" | "vector" | "repere" | "fraction" | "equation" | "method";
+  labels?: Record<string, string>;
+  steps?: string[];
 }
 
 interface GuidedStepInteraction {
@@ -101,6 +106,10 @@ interface GuidedScript {
   practiceLine2: string;
   practicePrompt: string;
   recapLine1: string;
+  explainVisual?: GuidedStepVisual;
+  checkVisual?: GuidedStepVisual;
+  practiceVisual?: GuidedStepVisual;
+  recapVisual?: GuidedStepVisual;
 }
 
 interface GuidedSessionInstance {
@@ -157,20 +166,191 @@ function fallbackScript(input: GuidedSessionStartInput): GuidedScript {
   const conceptHint = input.content?.keyConcepts?.[0] || "";
   const exerciseHint = input.content?.exercises?.[0] || `Donne un exemple simple sur ${topic}.`;
 
+  const inferredVisualType = inferVisualType(topic, conceptHint || objective);
+
   return {
     topic,
     title,
-    introLine1: `Eh ! Aujourd'hui on attaque ${topic} ensemble.`,
-    introLine2: `C'est important pour ton BEPC. On va gerer ca tranquille, etape par etape.`,
+    introLine1: `Aujourd'hui, on travaille ${topic} ensemble.`,
+    introLine2: "Objectif: avancer pas a pas avec une methode claire.",
     contextLine1: input.description?.trim() || `${objective}.`,
-    contextLine2: conceptHint || `Retiens bien ce truc la, on va verifier juste apres si tu as capte.`,
-    checkLine1: "Bon, voyons si tu as capte le truc.",
-    checkLine2: "Dis-moi avec tes propres mots, meme si c'est pas parfait c'est pas grave.",
+    contextLine2: conceptHint || "Retiens cette idee cle, on la verifie juste apres.",
+    checkLine1: "Verifions ta comprehension.",
+    checkLine2: "Explique avec tes mots, meme si ce n'est pas parfait.",
     checkPrompt: `Comment tu expliquerais ${topic} a un camarade en classe ?`,
-    practiceLine1: "Allez, maintenant on pratique pour de vrai !",
-    practiceLine2: "Montre-moi comment tu fais, etape par etape.",
+    practiceLine1: "Passons a la pratique.",
+    practiceLine2: "Montre ton raisonnement etape par etape.",
     practicePrompt: exerciseHint,
-    recapLine1: `Tu as gere ! Tu as bien avance sur ${topic}.`,
+    recapLine1: `Bon travail. Tu as progresse sur ${topic}.`,
+    explainVisual: {
+      type: inferredVisualType,
+      title: `Tableau: ${topic}`,
+      content: [objective, conceptHint || `Idee cle: ${topic}`].filter(Boolean).join("\n"),
+      figure: inferredVisualType === "diagram" ? "triangle" : "method",
+      steps: ["Definition", "Exemple rapide", "Question de verification"],
+    },
+    checkVisual: {
+      type: "formula",
+      title: "Question de comprehension",
+      content: `A retenir\n${topic}\nPuis reponds avec tes mots`,
+      figure: "method",
+      steps: ["Lis", "Explique avec tes mots", "Donne un exemple"],
+    },
+    practiceVisual: {
+      type: "exercise_card",
+      title: title || `Exercice - ${topic}`,
+      content: exerciseHint,
+      figure: "equation",
+      steps: ["Identifier les donnees", "Appliquer la methode", "Verifier le resultat"],
+    },
+    recapVisual: {
+      type: "formula",
+      title: "Methode en 3 etapes",
+      content: ["1) Lire l'enonce", "2) Choisir la methode", "3) Verifier le resultat"].join("\n"),
+      figure: "method",
+      steps: ["Lire", "Calculer", "Verifier"],
+    },
+  };
+}
+
+function inferVisualType(topic: string, context: string): GuidedVisualType {
+  const text = `${topic} ${context}`.toLowerCase();
+  if (
+    text.includes("triangle") ||
+    text.includes("pythagore") ||
+    text.includes("geometr") ||
+    text.includes("schema") ||
+    text.includes("repere")
+  ) {
+    return "diagram";
+  }
+  if (
+    text.includes("exercice") ||
+    text.includes("probleme") ||
+    text.includes("application")
+  ) {
+    return "exercise_card";
+  }
+  return "formula";
+}
+
+function sanitizeVisual(
+  value: unknown,
+  fallback: GuidedStepVisual,
+): GuidedStepVisual {
+  if (!value || typeof value !== "object") return fallback;
+  const candidate = value as Partial<GuidedStepVisual>;
+  const type =
+    candidate.type === "formula" || candidate.type === "diagram" || candidate.type === "exercise_card"
+      ? candidate.type
+      : fallback.type;
+  const title =
+    typeof candidate.title === "string" && candidate.title.trim().length > 0
+      ? candidate.title.trim()
+      : fallback.title;
+  const content =
+    typeof candidate.content === "string" && candidate.content.trim().length > 0
+      ? candidate.content.trim()
+      : fallback.content;
+  const figure =
+    candidate.figure === "triangle" ||
+    candidate.figure === "vector" ||
+    candidate.figure === "repere" ||
+    candidate.figure === "fraction" ||
+    candidate.figure === "equation" ||
+    candidate.figure === "method"
+      ? candidate.figure
+      : fallback.figure;
+  const labels =
+    candidate.labels && typeof candidate.labels === "object"
+      ? candidate.labels as Record<string, string>
+      : fallback.labels;
+  const steps = Array.isArray(candidate.steps)
+    ? candidate.steps.filter((item): item is string => typeof item === "string" && item.trim().length > 0).slice(0, 6)
+    : fallback.steps;
+
+  return {
+    type,
+    title,
+    content,
+    figure,
+    labels,
+    steps,
+  };
+}
+
+function extractCoreTokens(value: string): string[] {
+  const normalized = normalizeText(value).replace(/[^a-z0-9\s]/g, " ");
+  return Array.from(
+    new Set(
+      normalized
+        .split(/\s+/)
+        .map((token) => token.trim())
+        .filter((token) => token.length >= 4),
+    ),
+  );
+}
+
+function overlapCount(a: string, b: string): number {
+  const aTokens = new Set(extractCoreTokens(a));
+  const bTokens = extractCoreTokens(b);
+  return bTokens.filter((token) => aTokens.has(token)).length;
+}
+
+function isConcreteExercise(value: string): boolean {
+  return /[0-9=+\-*/()]/.test(value) || /\b(calcule|resous|determine|trouve|montre)\b/i.test(value);
+}
+
+function getTopicExerciseTemplate(topic: string): string {
+  const t = normalizeText(topic);
+  if (t.includes("vecteur")) {
+    return "Dans un repere, A(1,2) et B(5,4). Calcule les coordonnees du vecteur AB puis sa norme.";
+  }
+  if (t.includes("pythagore")) {
+    return "Triangle rectangle en B, AB=3 cm et BC=4 cm. Calcule AC en montrant les etapes.";
+  }
+  if (t.includes("equation")) {
+    return "Resous: 2x + 5 = 17. Donne les etapes puis la valeur de x.";
+  }
+  return `Exercice: resous un cas simple sur ${topic}. Montre les etapes et le resultat final.`;
+}
+
+function ensureCoherentScript(base: GuidedScript, fallback: GuidedScript): GuidedScript {
+  const contextAnchor = [base.topic, base.contextLine1, base.contextLine2].join(" ");
+  const coherentPracticePrompt = isConcreteExercise(base.practicePrompt)
+    ? base.practicePrompt
+    : getTopicExerciseTemplate(base.topic);
+
+  const explainVisual = sanitizeVisual(base.explainVisual, fallback.explainVisual!);
+  const checkVisual = sanitizeVisual(base.checkVisual, fallback.checkVisual!);
+  const practiceVisual = sanitizeVisual(base.practiceVisual, fallback.practiceVisual!);
+  const recapVisual = sanitizeVisual(base.recapVisual, fallback.recapVisual!);
+
+  const explainVisualFixed =
+    overlapCount(contextAnchor, explainVisual.content) >= 1
+      ? explainVisual
+      : fallback.explainVisual!;
+
+  const checkVisualFixed =
+    overlapCount([base.topic, base.checkPrompt].join(" "), checkVisual.content) >= 1
+      ? checkVisual
+      : fallback.checkVisual!;
+
+  const practiceVisualContent =
+    overlapCount([base.topic, coherentPracticePrompt].join(" "), practiceVisual.content) >= 1
+      ? practiceVisual.content
+      : coherentPracticePrompt;
+
+  return {
+    ...base,
+    practicePrompt: coherentPracticePrompt,
+    explainVisual: explainVisualFixed,
+    checkVisual: checkVisualFixed,
+    practiceVisual: {
+      ...practiceVisual,
+      content: practiceVisualContent,
+    },
+    recapVisual,
   };
 }
 
@@ -179,7 +359,7 @@ function sanitizeScript(candidate: Partial<GuidedScript>, input: GuidedSessionSt
   const pick = (value: unknown, backup: string) =>
     typeof value === "string" && value.trim().length > 0 ? value.trim() : backup;
 
-  return {
+  const base: GuidedScript = {
     topic: pick(candidate.topic, fallback.topic),
     title: pick(candidate.title, fallback.title),
     introLine1: pick(candidate.introLine1, fallback.introLine1),
@@ -193,7 +373,13 @@ function sanitizeScript(candidate: Partial<GuidedScript>, input: GuidedSessionSt
     practiceLine2: pick(candidate.practiceLine2, fallback.practiceLine2),
     practicePrompt: pick(candidate.practicePrompt, fallback.practicePrompt),
     recapLine1: pick(candidate.recapLine1, fallback.recapLine1),
+    explainVisual: sanitizeVisual(candidate.explainVisual, fallback.explainVisual!),
+    checkVisual: sanitizeVisual(candidate.checkVisual, fallback.checkVisual!),
+    practiceVisual: sanitizeVisual(candidate.practiceVisual, fallback.practiceVisual!),
+    recapVisual: sanitizeVisual(candidate.recapVisual, fallback.recapVisual!),
   };
+
+  return ensureCoherentScript(base, fallback);
 }
 
 async function generateScript(input: GuidedSessionStartInput): Promise<GuidedScript> {
@@ -209,63 +395,48 @@ async function generateScript(input: GuidedSessionStartInput): Promise<GuidedScr
   const exercises = (input.content?.exercises ?? []).slice(0, 2).join(" | ");
   const description = input.description?.trim() || "";
 
+  const scriptSchema = z.object({
+    topic: z.string().min(1),
+    title: z.string().min(1),
+    introLine1: z.string().min(1),
+    introLine2: z.string().min(1),
+    contextLine1: z.string().min(1),
+    contextLine2: z.string().min(1),
+    checkLine1: z.string().min(1),
+    checkLine2: z.string().min(1),
+    checkPrompt: z.string().min(1),
+    practiceLine1: z.string().min(1),
+    practiceLine2: z.string().min(1),
+    practicePrompt: z.string().min(1),
+    recapLine1: z.string().min(1),
+    explainVisual: z.any().optional(),
+    checkVisual: z.any().optional(),
+    practiceVisual: z.any().optional(),
+    recapVisual: z.any().optional(),
+  }).partial();
+
   try {
-    const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
-    const completion = await client.chat.completions.create({
-      model,
+    const userContent = [
+      `Genere un script JSON pour une micro-session sur "${topic}".`,
+      `Titre: ${title || "non fourni"}. Type: ${type || "non fourni"}.`,
+      `Duree: ${durationMinutes ?? "non fournie"} min.`,
+      `Description: ${description || "non fournie"}.`,
+      `Objectifs: ${objectives || "non fournis"}.`,
+      `Concepts cles: ${keyConcepts || "non fournis"}.`,
+      `Exercices de reference: ${exercises || "non fournis"}.`,
+      "JSON strict attendu avec champs script + visuals.",
+    ].join("\n");
+
+    const { data } = await runJsonPrompt({
+      prompt: PromptRegistry.guidedScriptV1,
+      schema: scriptSchema,
+      userContent,
+      retries: 3,
       temperature: 0.5,
-      messages: [
-        {
-          role: "system",
-          content: [
-            "Tu es Prof Ada, un tuteur ivoirien bienveillant pour des eleves de 3eme (14-16 ans) en Cote d'Ivoire.",
-            "Tu parles comme un grand frere / grande soeur ivoirien(ne) qui aide un petit a reviser.",
-            "STYLE OBLIGATOIRE:",
-            "- Francais ivoirien naturel, comme on parle a Abidjan entre jeunes.",
-            "- Tu peux utiliser des expressions courantes: 'on est ensemble', 'c'est clair non ?', 'tu vois le truc ?', 'c'est pas complique han', 'on va gerer ca', 'tu as capte ?', 'tranquille', 'doucement doucement', etc.",
-            "- Tu tutoies toujours. Phrases courtes. Ton chaleureux et encourageant.",
-            "- JAMAIS d'accents dans le texte (pas de e accent, pas de a accent, etc). Ecris sans accents.",
-            "- Les exemples et analogies doivent etre ivoiriens: marche, transport, garba, allocodrome, football, maquis, etc.",
-            "- Tu es strict sur le contenu academique mais cool dans la facon de l'expliquer.",
-            "Reponse JSON stricte, pas de markdown.",
-          ].join("\n"),
-        },
-        {
-          role: "user",
-          content: [
-            `Genere un script JSON pour une micro-session sur "${topic}".`,
-            `Titre: ${title || "non fourni"}. Type: ${type || "non fourni"}.`,
-            `Duree: ${durationMinutes ?? "non fournie"} min.`,
-            `Description: ${description || "non fournie"}.`,
-            `Objectifs: ${objectives || "non fournis"}.`,
-            `Concepts cles: ${keyConcepts || "non fournis"}.`,
-            `Exercices de reference: ${exercises || "non fournis"}.`,
-            "",
-            "STRUCTURE EXACTE du JSON (respecte le role de chaque champ):",
-            "- topic: le sujet en quelques mots",
-            "- title: titre court de la session",
-            "- introLine1: accroche chaleureuse ivoirienne (ex: 'Eh mon ami ! Aujourd'hui on attaque les equations ensemble.')",
-            "- introLine2: phrase qui motive (ex: 'Ca va t'aider pour le BEPC, on va gerer ca tranquille.')",
-            "- contextLine1: EXPLICATION CLAIRE du concept, comme si tu expliquais a ton petit frere. Utilise une analogie du quotidien ivoirien si possible. 1-2 phrases.",
-            "- contextLine2: suite de l'explication, un detail important. 1-2 phrases.",
-            "- checkLine1: intro verification, ton decontracte (ex: 'Bon, voyons si tu as capte le truc.')",
-            "- checkLine2: consigne claire et encourageante (ex: 'Dis-moi avec tes propres mots, meme si c'est pas parfait c'est pas grave.')",
-            "- checkPrompt: UNE VRAIE QUESTION de comprehension (PAS oui/non). Ex: 'C'est quoi la difference entre X et Y ?' ou 'Explique-moi comment on fait pour...'",
-            "- practiceLine1: intro exercice motivante (ex: 'Allez, maintenant on pratique pour de vrai !')",
-            "- practiceLine2: consigne (ex: 'Montre-moi les etapes, comment tu fais.')",
-            "- practicePrompt: UN EXERCICE CONCRET avec des valeurs. Ex: 'Resous: 2x + 3 = 11' ou 'Calcule l'aire d'un triangle de base 6cm et hauteur 4cm.'",
-            "- recapLine1: felicitation chaleureuse (ex: 'Mon gars/Ma go, tu as gere ! Tu as compris que...')",
-          ].join("\n"),
-        },
-      ],
+      maxTokens: 900,
     });
 
-    const content = completion.choices[0]?.message?.content || "";
-    const jsonRaw = extractJsonObject(content);
-    if (!jsonRaw) return fallbackScript(input);
-
-    const parsed = JSON.parse(jsonRaw) as Partial<GuidedScript>;
-    return sanitizeScript(parsed, input);
+    return sanitizeScript(data as Partial<GuidedScript>, input);
   } catch {
     return fallbackScript(input);
   }
@@ -296,11 +467,9 @@ async function generateHelpResponse(
 
   const systemPrompt = [
     "Tu es Prof Ada, un tuteur ivoirien bienveillant pour des eleves de 3eme (14-16 ans) en Cote d'Ivoire.",
-    "Tu parles comme un grand frere / grande soeur ivoirien(ne) a Abidjan.",
-    "Francais ivoirien naturel, phrases courtes (max 2-3 phrases). Pas d'accents (pas de e accent, etc.).",
-    "Expressions ok: 'tu vois ?', 'c'est pas complique han', 'on est ensemble', 'tranquille', 'doucement doucement', 'tu as capte ?', etc.",
-    "Analogies ivoiriennes: marche, garba, football, transport gbaka, etc.",
-    "Tu tutoies toujours. Ton chaleureux, jamais condescendant.",
+    "Tu tutoies toujours. Ton chaleureux et respectueux, jamais familier excessif.",
+    "Francais simple et naturel, phrases courtes (max 2-3 phrases).",
+    "Utilise des exemples de vie quotidienne en Cote d'Ivoire quand c'est utile.",
     `Sujet: ${session.topic}.`,
     stepContext,
   ].join(" ");
@@ -348,15 +517,15 @@ async function generateHelpResponse(
 function fallbackHelpResponse(helpType: string, session: GuidedSessionInstance): string {
   switch (helpType) {
     case "not_understood":
-      return `Tranquille, on reprend doucement. ${session.topic}, c'est comme une recette de garba: tu suis les etapes une par une et ca va aller.`;
+      return `Pas de souci, on reprend calmement. Pour ${session.topic}, avance etape par etape et concentre-toi sur l'idee principale.`;
     case "need_example":
       return `Ok, imagine un exemple simple sur ${session.topic}. Commence par regarder ce que tu connais deja, et on avance a partir de la.`;
     case "need_hint":
-      return `Petit indice: relis bien l'enonce et repere les infos qu'on te donne. Commence par la premiere etape, doucement doucement.`;
+      return "Petit indice: relis bien l'enonce, puis repere les donnees utiles avant de calculer.";
     case "ask_question":
-      return `Bonne question ! Pour ${session.topic}, retiens que chaque etape doit etre faite dans l'ordre. On est ensemble.`;
+      return `Bonne question. Pour ${session.topic}, garde une methode claire: lire, choisir la bonne regle, puis verifier.`;
     default:
-      return "On est ensemble. Dis-moi ce qui te bloque.";
+      return "Dis-moi precisement ce qui te bloque et on corrige ensemble.";
   }
 }
 
@@ -386,8 +555,8 @@ async function evaluateAnswer(
 
   const systemPrompt = [
     "Tu es Prof Ada, un tuteur ivoirien pour des eleves de 3eme en Cote d'Ivoire.",
-    "Tu parles comme un grand frere / grande soeur ivoirien(ne).",
-    "Francais ivoirien naturel, phrases courtes. Pas d'accents.",
+    "Ton: encourageant, precis, pedagogique. Pas de style familier excessif.",
+    "Francais clair, phrases courtes.",
     `Sujet du cours: ${session.topic}.`,
     `Contenu du cours: ${session.script.contextLine1} ${session.script.contextLine2}`,
     questionContext,
@@ -404,30 +573,25 @@ async function evaluateAnswer(
     '- Si correct: "Oui c\'est ca ! Tu as bien vu que [detail specifique]. On continue !"',
     '- Si pas assez: "Tu es sur la bonne piste avec [ce qu\'il a dit]. Mais il manque [detail]. Essaie encore."',
     '- Si faux: "Pas tout a fait. Tu as dit [son erreur], mais en fait [correction]. Reflechis et reessaie."',
-    '- Si n\'importe quoi: "Eh, ca c\'est pas une reponse han ! Relis la question et essaie serieusement."',
+    '- Si hors sujet: "Ce n\'est pas encore dans le sujet. Relis la question et essaie avec la methode du cours."',
   ].join("\n");
 
+  const evalSchema = z.object({
+    correct: z.boolean(),
+    feedback: z.string().min(1),
+  });
+
   try {
-    const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
-    const completion = await client.chat.completions.create({
-      model,
+    const { data } = await runJsonPrompt({
+      prompt: PromptRegistry.guidedEvalV1,
+      schema: evalSchema,
+      userContent: `${systemPrompt}\n\n${userPrompt}`,
+      retries: 2,
       temperature: 0.3,
-      max_tokens: 200,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
+      maxTokens: 260,
     });
 
-    const content = completion.choices[0]?.message?.content?.trim() || "";
-    const jsonRaw = extractJsonObject(content);
-    if (!jsonRaw) return fallbackEvaluation(session, answer, stepType);
-
-    const parsed = JSON.parse(jsonRaw) as { correct?: boolean; feedback?: string };
-    if (typeof parsed.correct !== "boolean" || typeof parsed.feedback !== "string") {
-      return fallbackEvaluation(session, answer, stepType);
-    }
-    return { correct: parsed.correct, feedback: parsed.feedback };
+    return { correct: data.correct, feedback: data.feedback };
   } catch {
     return fallbackEvaluation(session, answer, stepType);
   }
@@ -445,12 +609,12 @@ function fallbackEvaluation(
   const correct = strong && (keywordMatches >= 1 || (stepType === "practice" && math));
 
   if (isConfusedAnswer(answer)) {
-    return { correct: false, feedback: "C'est pas grave han. Essaie de repondre meme si t'es pas sur, on est la pour apprendre." };
+    return { correct: false, feedback: "Ce n'est pas grave. Essaie une premiere reponse avec tes mots, puis on corrige ensemble." };
   }
   if (correct) {
-    return { correct: true, feedback: `C'est bien, tu as compris le truc sur ${session.topic}. On avance !` };
+    return { correct: true, feedback: `Bonne reponse. Tu as bien compris l'idee sur ${session.topic}. On continue.` };
   }
-  return { correct: false, feedback: "C'est pas encore ca. Developpe un peu plus ta reponse, mets au moins une notion du cours." };
+  return { correct: false, feedback: "Ce n'est pas encore suffisant. Ajoute au moins une notion du cours dans ta reponse." };
 }
 
 function buildChoices(choices: Array<{ id: string; label: string }>): GuidedChoiceOption[] {
@@ -577,6 +741,7 @@ function buildStep(session: GuidedSessionInstance, feedback?: string): GuidedSte
         state: "EXPLAIN",
         coachLines: [script.contextLine1, script.contextLine2],
         prompt: "Lis bien, puis utilise les boutons en bas.",
+        visual: script.explainVisual,
         interaction: {
           type: "choice",
           ctaLabel: "Continuer",
@@ -589,6 +754,7 @@ function buildStep(session: GuidedSessionInstance, feedback?: string): GuidedSte
         state: "CHECK",
         coachLines: [script.checkLine1, script.checkLine2],
         prompt: script.checkPrompt,
+        visual: script.checkVisual,
         interaction: {
           type: "short_text",
           ctaLabel: "Valider",
@@ -605,6 +771,7 @@ function buildStep(session: GuidedSessionInstance, feedback?: string): GuidedSte
           `A retenir: ${script.contextLine1}`,
         ],
         prompt: "En une phrase: c'est quoi la methode pour ce type d'exercice ?",
+        visual: script.recapVisual,
         interaction: {
           type: "short_text",
           ctaLabel: "Valider le recap",
@@ -618,11 +785,11 @@ function buildStep(session: GuidedSessionInstance, feedback?: string): GuidedSte
         state: "PRACTICE",
         coachLines: [script.practiceLine1, script.practiceLine2],
         prompt: "A toi de jouer !",
-        visual: {
+        visual: sanitizeVisual(script.practiceVisual, {
           type: "exercise_card",
           title: script.title,
           content: script.practicePrompt,
-        },
+        }),
         interaction: {
           type: "short_text",
           ctaLabel: "Valider ma reponse",
@@ -779,9 +946,9 @@ export const GuidedSessionService = {
       case "explain-context":
         if (payload.choiceId === "understood_continue") {
           session.currentStepId = "concept-check";
-          feedback = "C'est bon, tu as capte ! On va verifier ca vite fait.";
+          feedback = "Parfait. On passe a une petite verification.";
         } else if (isConfusedAnswer(payload.response)) {
-          feedback = "Tranquille, c'est normal. Dis-moi ce qui bloque: la definition, la methode ou tu veux un exemple ?";
+          feedback = "C'est normal. Dis-moi ce qui bloque: la definition, la methode, ou un exemple.";
         } else if (isStrongTextAnswer(payload.response, 12) && keywordMatches >= 1) {
           session.currentStepId = "concept-check";
         } else {

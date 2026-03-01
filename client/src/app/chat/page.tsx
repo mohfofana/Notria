@@ -33,7 +33,10 @@ function extractQuickReplies(content: string): string[] {
   const bulletMatches = content.matchAll(/(?:^|\n)\s*[-*]\s+(.{3,120})$/gim);
   for (const match of bulletMatches) {
     const candidate = match[1]?.trim();
-    if (candidate) choices.push(candidate);
+    if (!candidate) continue;
+    if (/^\[S\d+\]/i.test(candidate)) continue;
+    if (/^source\b/i.test(candidate)) continue;
+    choices.push(candidate);
   }
 
   return uniq(choices).slice(0, 6);
@@ -238,8 +241,11 @@ export default function ChatPage() {
     });
   }
 
-  async function handleCreate(topic?: string) {
-    const { data } = await api.post("/chat", { subject: "Mathématiques", topic });
+  async function handleCreate(payload: { subject: string; topic?: string }) {
+    const { data } = await api.post("/chat", {
+      subject: payload.subject,
+      topic: payload.topic,
+    });
     setConversations((prev) => [data.conversation, ...prev]);
     setActiveId(data.conversation.id);
     setShowNewDialog(false);
@@ -348,7 +354,7 @@ export default function ChatPage() {
                 <div className="flex items-center gap-2 min-w-0">
                   <BookOpen className="h-4 w-4 text-primary shrink-0" />
                   <span className="font-medium truncate">
-                    Cours: {activeConv?.subject || "Mathématiques"}
+                    Cours: {activeConv?.subject || "Séance"}
                     {activeConv?.topic ? ` • ${activeConv.topic}` : ""}
                   </span>
                   <span className="text-muted-foreground">({messages.filter((m) => m.role !== "system").length} messages)</span>

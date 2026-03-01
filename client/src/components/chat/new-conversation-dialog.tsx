@@ -1,37 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { X, BookOpen, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getTopicsForSubject } from "@notria/shared";
+import { getSubjectsForStudent, getTopicsForSubject } from "@notria/shared";
 import { useAuth } from "@/contexts/auth-context";
 import { Input } from "@/components/ui/input";
 
 interface NewConversationDialogProps {
   open: boolean;
   onClose: () => void;
-  onCreate: (topic?: string) => Promise<void>;
+  onCreate: (payload: { subject: string; topic?: string }) => Promise<void>;
 }
 
 export function NewConversationDialog({ open, onClose, onCreate }: NewConversationDialogProps) {
   const { student } = useAuth();
+  const examType = student?.examType === "BAC" ? "BAC" : "BEPC";
+  const subjects = useMemo(() => {
+    if (!student) return [];
+    const preferred = Array.isArray(student.prioritySubjects) ? student.prioritySubjects : [];
+    if (preferred.length > 0) return preferred;
+    return getSubjectsForStudent(examType, undefined);
+  }, [student, examType]);
+
+  const [subject, setSubject] = useState<string>("");
   const [topic, setTopic] = useState<string | null>(null);
   const [customTopic, setCustomTopic] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
+  useEffect(() => {
+    if (subjects.length > 0 && !subject) {
+      setSubject(subjects[0] || "Mathématiques");
+    }
+  }, [subjects, subject]);
+
   if (!open || !student) return null;
 
-  const examType = student.examType === "BAC" ? "BAC" : "BEPC";
-  const subject = "Mathématiques";
   const topics = getTopicsForSubject(subject, examType);
 
   async function handleCreate() {
+    if (!subject) return;
     setIsCreating(true);
     try {
       const finalTopic = customTopic.trim() || topic || undefined;
-      await onCreate(finalTopic);
+      await onCreate({ subject, topic: finalTopic });
       setTopic(null);
       setCustomTopic("");
+      setSubject(subjects[0] || "");
     } finally {
       setIsCreating(false);
     }
@@ -40,6 +55,7 @@ export function NewConversationDialog({ open, onClose, onCreate }: NewConversati
   function handleClose() {
     setTopic(null);
     setCustomTopic("");
+    setSubject(subjects[0] || "");
     onClose();
   }
 
@@ -60,8 +76,25 @@ export function NewConversationDialog({ open, onClose, onCreate }: NewConversati
         <div className="p-4 space-y-4">
           <div>
             <p className="text-sm font-medium mb-2">Matiere</p>
-            <div className="rounded-lg border-2 border-primary bg-primary/5 px-3 py-2 text-sm font-medium text-primary">
-              Mathematiques
+            <div className="flex flex-wrap gap-2">
+              {subjects.map((entry) => (
+                <button
+                  key={entry}
+                  type="button"
+                  onClick={() => {
+                    setSubject(entry);
+                    setTopic(null);
+                  }}
+                  className={`rounded-lg border-2 px-3 py-2 text-sm font-medium transition-colors ${
+                    subject === entry
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                  disabled={isCreating}
+                >
+                  {entry}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -70,7 +103,7 @@ export function NewConversationDialog({ open, onClose, onCreate }: NewConversati
               Sujet libre <span className="text-muted-foreground font-normal">(optionnel)</span>
             </p>
             <Input
-              placeholder="Ex: Pythagore, Fractions, Calcul numerique..."
+              placeholder={`Ex: ${subject === "Français" ? "Conjugaison, Dictée, Résumé" : subject === "SVT" ? "Cellule, Nutrition, Reproduction" : subject === "Physique-Chimie" ? "Électricité, Optique, Solutions" : "Pythagore, Fractions, Calcul numérique"}`}
               value={customTopic}
               onChange={(e) => setCustomTopic(e.target.value)}
               disabled={isCreating}
@@ -104,7 +137,7 @@ export function NewConversationDialog({ open, onClose, onCreate }: NewConversati
         <div className="p-4 border-t">
           <Button
             onClick={handleCreate}
-            disabled={isCreating}
+            disabled={isCreating || !subject}
             className="w-full"
           >
             {isCreating ? (

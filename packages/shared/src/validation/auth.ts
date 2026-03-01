@@ -6,11 +6,13 @@ export const registerSchema = z.object({
   phone: z.string().regex(/^\+225\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}$/),
   password: z.string().min(6),
   role: z.enum(["student", "parent"]),
+  linkCode: z.string().trim().toUpperCase().length(8).optional(),
 });
 
 export const loginSchema = z.object({
   phone: z.string().regex(/^\+225\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}$/),
   password: z.string().min(6),
+  linkCode: z.string().trim().toUpperCase().length(8).optional(),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

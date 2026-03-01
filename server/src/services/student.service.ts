@@ -3,6 +3,27 @@ import { eq } from "drizzle-orm";
 import { db, schema } from "../db/index.js";
 import { StudyPlanService } from "./studyplan.service.js";
 
+const INVITE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+function randomInviteCode(length: number) {
+  let code = "";
+  for (let i = 0; i < length; i += 1) {
+    const index = Math.floor(Math.random() * INVITE_CHARS.length);
+    code += INVITE_CHARS[index];
+  }
+  return code;
+}
+
+async function generateUniqueStudentInviteCode() {
+  while (true) {
+    const code = randomInviteCode(8);
+    const existing = await db.query.students.findFirst({
+      where: eq(schema.students.inviteCode, code),
+    });
+    if (!existing) return code;
+  }
+}
+
 export const StudentService = {
   async getByUserId(userId: number) {
     return db.query.students.findFirst({ where: eq(schema.students.userId, userId) });
@@ -15,6 +36,15 @@ export const StudentService = {
     school?: string;
   }) {
     let student = await db.query.students.findFirst({ where: eq(schema.students.userId, userId) });
+    if (student && !student.inviteCode) {
+      const inviteCode = await generateUniqueStudentInviteCode();
+      const [patchedStudent] = await db
+        .update(schema.students)
+        .set({ inviteCode, updatedAt: new Date() })
+        .where(eq(schema.students.id, student.id))
+        .returning();
+      student = patchedStudent;
+    }
 
     if (student) {
       const [updated] = await db
@@ -31,10 +61,12 @@ export const StudentService = {
 
       student = updated;
     } else {
+      const inviteCode = await generateUniqueStudentInviteCode();
       const [created] = await db
         .insert(schema.students)
         .values({
           userId,
+          inviteCode,
           country: "Côte d'Ivoire",
           examType: input.examType,
           grade: input.grade,

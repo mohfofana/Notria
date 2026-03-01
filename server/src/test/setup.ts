@@ -1,5 +1,8 @@
 import { config } from 'dotenv';
 
+declare const beforeAll: (fn: () => Promise<void> | void) => void;
+declare const afterAll: (fn: () => Promise<void> | void) => void;
+
 // Load test environment variables
 config({ path: '../.env.test' });
 

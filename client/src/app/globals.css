@@ -201,7 +201,6 @@ h4 {
 }
 
 .chalk-draw {
-  stroke: hsl(var(--primary-foreground));
   stroke-width: 2;
   fill: none;
   stroke-dasharray: 220;

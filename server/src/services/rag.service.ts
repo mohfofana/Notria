@@ -1,7 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import OpenAI from "openai";
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
 import { db, schema } from "../db/index.js";
 
@@ -34,6 +34,7 @@ interface SearchFilters {
   chapter?: string;
   grade?: string;
   sourceType?: SourceType;
+  subject?: string;
 }
 
 interface SearchResult {
@@ -397,6 +398,9 @@ export const RagService = {
     if (filters?.sourceType) {
       whereConditions.push(sql`source_type = ${filters.sourceType}`);
     }
+    if (filters?.subject) {
+      whereConditions.push(sql`LOWER(subject) = LOWER(${filters.subject.trim()})`);
+    }
 
     const whereClause =
       whereConditions.length > 0
@@ -456,5 +460,92 @@ export const RagService = {
     }
 
     return normalizedRows.slice(0, normalizedLimit);
+  },
+
+  async getMathCoverage() {
+    const rawDir = path.resolve(process.cwd(), "data", "raw");
+    const files = await listJsonFiles(rawDir).catch(() => []);
+    const enabledSubjects = ["math", "fran", "svt", "physique", "chimie"];
+    const enabledExactSubjects = ["Mathématiques", "Français", "SVT", "Physique-Chimie"];
+    const bepcDocs: Array<{ chapter: string | null; title: string; subject: string }> = [];
+
+    for (const file of files) {
+      try {
+        const text = await readFile(file, "utf8");
+        const parsed = JSON.parse(text) as Partial<RawContentDocument>;
+        const subject = (parsed.subject || "").toLowerCase();
+        const grade = (parsed.grade || "").toLowerCase();
+        if (!enabledSubjects.some((token) => subject.includes(token))) continue;
+        if (!grade.includes("3eme")) continue;
+        bepcDocs.push({
+          chapter: parsed.chapter ?? null,
+          title: parsed.title || path.basename(file),
+          subject: parsed.subject || "Inconnu",
+        });
+      } catch {
+        // Ignore malformed docs
+      }
+    }
+
+    const byChapter = new Map<string, number>();
+    const bySubject = new Map<string, number>();
+    for (const doc of bepcDocs) {
+      const key = doc.chapter?.trim() || "sans_chapitre";
+      byChapter.set(key, (byChapter.get(key) || 0) + 1);
+      bySubject.set(doc.subject, (bySubject.get(doc.subject) || 0) + 1);
+    }
+
+    const chapterCoverage = Array.from(byChapter.entries())
+      .map(([chapter, documents]) => ({
+        chapter,
+        documents,
+      }))
+      .sort((a, b) => b.documents - a.documents);
+
+    const subjectCoverage = Array.from(bySubject.entries())
+      .map(([subject, documents]) => ({
+        subject,
+        documents,
+      }))
+      .sort((a, b) => b.documents - a.documents);
+
+    const dbRows = await db
+      .select({
+        subject: schema.contentChunks.subject,
+        chapter: schema.contentChunks.chapter,
+        count: sql<number>`count(*)`,
+      })
+      .from(schema.contentChunks)
+      .where(and(
+        inArray(schema.contentChunks.subject, enabledExactSubjects),
+        eq(schema.contentChunks.grade, "3eme"),
+      ))
+      .groupBy(schema.contentChunks.subject, schema.contentChunks.chapter);
+
+    const indexedByChapter = dbRows.map((row) => ({
+      subject: row.subject,
+      chapter: row.chapter || "sans_chapitre",
+      chunks: Number(row.count),
+    }));
+
+    const indexedBySubject = Array.from(
+      dbRows.reduce((acc, row) => {
+        const key = row.subject;
+        const next = (acc.get(key) || 0) + Number(row.count);
+        acc.set(key, next);
+        return acc;
+      }, new Map<string, number>())
+    )
+      .map(([subject, chunks]) => ({ subject, chunks }))
+      .sort((a, b) => b.chunks - a.chunks);
+
+    return {
+      rawDocuments: bepcDocs.length,
+      indexedChunks: indexedByChapter.reduce((sum, row) => sum + row.chunks, 0),
+      subjectCoverage,
+      chapterCoverage,
+      indexedBySubject,
+      indexedByChapter,
+    };
   },
 };

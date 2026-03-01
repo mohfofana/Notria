@@ -86,6 +86,29 @@ function normalizeText(input: string): string {
     .trim();
 }
 
+function sanitizeUnicodeString(input: string): string {
+  return input
+    .replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])/g, "")
+    .replace(/(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, "");
+}
+
+function sanitizeJsonValue<T>(value: T): T {
+  if (typeof value === "string") {
+    return sanitizeUnicodeString(value) as T;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeJsonValue(item)) as T;
+  }
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>).map(([k, v]) => [
+      k,
+      sanitizeJsonValue(v),
+    ]);
+    return Object.fromEntries(entries) as T;
+  }
+  return value;
+}
+
 function mapDomainToTopic(domain: string): string {
   if (DOMAIN_TO_TOPIC[domain]) return DOMAIN_TO_TOPIC[domain];
   const normalized = normalizeText(domain);
@@ -663,6 +686,18 @@ Format strict JSON:
     }
   },
 
+  inferSubjectFromTopic(topic: string): string | undefined {
+    const normalized = topic
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+    if (normalized.includes("francais")) return "Français";
+    if (normalized.includes("svt")) return "SVT";
+    if (normalized.includes("physique") || normalized.includes("chimie")) return "Physique-Chimie";
+    if (normalized.includes("math")) return "Mathématiques";
+    return undefined;
+  },
+
   async fetchRagContent(
     topic: string,
     type: ProgramSessionType,
@@ -670,13 +705,16 @@ Format strict JSON:
     const keyConcepts: string[] = [];
     const exercises: string[] = [];
     const ragSources: string[] = [];
+    const inferredSubject = this.inferSubjectFromTopic(topic);
+    const subjectFilter = inferredSubject ? { subject: inferredSubject } : {};
+    const subjectHint = inferredSubject ? `${inferredSubject} ` : "";
 
     try {
       if (type === "lesson" || type === "revision" || type === "recap") {
         const coursResults = await RagService.search(
-          `cours ${topic} BEPC 3eme mathematiques`,
+          `cours ${topic} BEPC 3eme ${subjectHint}programme ivoirien`,
           3,
-          { sourceType: "cours", grade: "3eme" },
+          { sourceType: "cours", grade: "3eme", ...subjectFilter },
         );
         for (const result of coursResults) {
           keyConcepts.push(result.content.substring(0, 500));
@@ -686,9 +724,9 @@ Format strict JSON:
 
       if (type === "exercise" || type === "revision" || type === "evaluation" || type === "quiz") {
         const exerciseResults = await RagService.search(
-          `exercice ${topic} BEPC 3eme`,
+          `exercice ${topic} BEPC 3eme ${subjectHint}`,
           3,
-          { sourceType: "exercice", grade: "3eme" },
+          { sourceType: "exercice", grade: "3eme", ...subjectFilter },
         );
         for (const result of exerciseResults) {
           exercises.push(result.content.substring(0, 500));
@@ -698,9 +736,9 @@ Format strict JSON:
 
       if (type === "evaluation") {
         const annaleResults = await RagService.search(
-          `annale BEPC mathematiques ${topic}`,
+          `annale BEPC ${subjectHint}${topic}`,
           2,
-          { sourceType: "annale", grade: "3eme" },
+          { sourceType: "annale", grade: "3eme", ...subjectFilter },
         );
         for (const result of annaleResults) {
           exercises.push(result.content.substring(0, 500));
@@ -758,16 +796,18 @@ Format strict JSON:
       .values({
         studentId: student.id,
         assessmentId: assessment.id,
-        title: `Programme personnalise - ${overallLevel === "debutant" ? "Renforcement des bases" : overallLevel === "avance" ? "Perfectionnement" : "Progression"}`,
+        title: sanitizeUnicodeString(
+          `Programme personnalise - ${overallLevel === "debutant" ? "Renforcement des bases" : overallLevel === "avance" ? "Perfectionnement" : "Progression"}`
+        ),
         totalWeeks: 4,
         startDate,
         endDate,
         weeklySessionCount,
         sessionDurationMinutes: sessionDuration,
         overallLevel,
-        weaknesses,
-        strengths,
-        recommendations: aiRecommendations,
+        weaknesses: sanitizeJsonValue(weaknesses),
+        strengths: sanitizeJsonValue(strengths),
+        recommendations: sanitizeJsonValue(aiRecommendations),
       })
       .returning();
 
@@ -779,9 +819,9 @@ Format strict JSON:
         .values({
           programId: program.id,
           weekNumber: weekPlan.weekNumber,
-          theme: weekPlan.theme,
-          objectives: weekPlan.objectives,
-          focusTopics: weekPlan.focusTopics,
+          theme: sanitizeUnicodeString(weekPlan.theme),
+          objectives: sanitizeJsonValue(weekPlan.objectives),
+          focusTopics: sanitizeJsonValue(weekPlan.focusTopics),
           status: weekPlan.weekNumber === 1 ? ("in_progress" as WeekStatus) : ("upcoming" as WeekStatus),
         })
         .returning();
@@ -794,15 +834,15 @@ Format strict JSON:
             weekId: week.id,
             dayNumber: sessionPlan.dayNumber,
             sessionOrder: sessionPlan.sessionOrder,
-            topic: sessionPlan.topic,
+            topic: sanitizeUnicodeString(sessionPlan.topic),
             type: sessionPlan.type,
             engagementMode: sessionPlan.engagementMode,
-            title: sessionPlan.title,
-            description: sessionPlan.description,
+            title: sanitizeUnicodeString(sessionPlan.title),
+            description: sanitizeUnicodeString(sessionPlan.description),
             durationMinutes: sessionPlan.durationMinutes,
             difficulty: sessionPlan.difficulty,
-            content: sessionPlan.content,
-            objectives: sessionPlan.objectives,
+            content: sanitizeJsonValue(sessionPlan.content),
+            objectives: sanitizeJsonValue(sessionPlan.objectives),
           })
           .returning();
 

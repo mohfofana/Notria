@@ -11,7 +11,7 @@ const steps = [
 export default function NotriaVisionPage() {
   return (
     <main className="min-h-screen">
-      <MvpTopbar />
+      <MvpTopbar />           
       <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
         <div className="mx-auto w-full max-w-4xl">
           <article className="rounded-3xl border border-border bg-white/90 p-7 sm:p-9">

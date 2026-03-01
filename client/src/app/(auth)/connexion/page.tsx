@@ -15,6 +15,7 @@ export default function ConnexionPage() {
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [linkCode, setLinkCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,6 +36,10 @@ export default function ConnexionPage() {
     return `+225 ${phone}`;
   }
 
+  function normalizeLinkCode(value: string) {
+    return value.replace(/\s/g, "").toUpperCase().slice(0, 8);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -48,15 +53,21 @@ export default function ConnexionPage() {
       setError("Le mot de passe doit contenir au moins 6 caractères");
       return;
     }
+    if (linkCode && normalizeLinkCode(linkCode).length !== 8) {
+      setError("Le code de liaison doit contenir 8 caractères");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      await login(getFullPhone(), password);
+      await login(getFullPhone(), password, linkCode ? normalizeLinkCode(linkCode) : undefined);
       router.push("/dashboard");
     } catch (err: any) {
       const msg = err?.response?.data?.error;
       if (msg === "Invalid credentials") {
         setError("Numéro ou mot de passe incorrect");
+      } else if (!err?.response) {
+        setError("Impossible de joindre le serveur. Vérifie que l'API tourne sur le port 3001.");
       } else {
         setError(msg || "Une erreur est survenue. Réessaie.");
       }
@@ -113,6 +124,17 @@ export default function ConnexionPage() {
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="linkCode" className="text-base">Code de liaison (optionnel)</Label>
+          <Input
+            id="linkCode"
+            placeholder="AB12CD34"
+            value={linkCode}
+            onChange={(e) => setLinkCode(normalizeLinkCode(e.target.value))}
+            disabled={isSubmitting}
+          />
         </div>
 
         {error && (

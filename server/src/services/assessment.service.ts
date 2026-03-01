@@ -1,5 +1,6 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import path from "node:path";
 import { desc, eq } from "drizzle-orm";
 import { db, schema } from "../db/index.js";
 import { AIService } from "./ai.service.js";
@@ -16,10 +17,11 @@ interface QuestionBankItem {
   correctAnswer: number;
   explanation: string;
   tags: string[];
+  subject?: string;
 }
 
 interface PlannedQuestion extends QuestionBankItem {
-  subject: "Mathematiques";
+  subject: string;
   domainKey: string;
   domainAttempt: number;
   userAnswer?: number;
@@ -49,9 +51,7 @@ interface AssessmentProgress {
   studentProfile: StudentProfile;
 }
 
-const QUESTION_BANK_PATH = fileURLToPath(
-  new URL("../../data/assessment/bepc-maths-3eme.json", import.meta.url),
-);
+const ASSESSMENT_DATA_DIR = fileURLToPath(new URL("../../data/assessment", import.meta.url));
 
 const DOMAIN_CONFIG = [
   { key: "calc_num", topic: "Calcul numerique", idPrefix: "calc-num", count: 1 },
@@ -194,47 +194,84 @@ function normalizeText(input: string): string {
     .trim();
 }
 
-function loadQuestionBank(): QuestionBankItem[] {
-  const raw = readFileSync(QUESTION_BANK_PATH, "utf8");
+function normalizeSubjectName(value: string): string {
+  const normalized = normalizeText(value);
+  if (normalized.includes("math")) return "Mathématiques";
+  if (normalized.includes("franc")) return "Français";
+  if (normalized.includes("svt")) return "SVT";
+  if (normalized.includes("phys") || normalized.includes("chim")) return "Physique-Chimie";
+  return value.trim();
+}
+
+function inferSubjectFromFilename(fileName: string): string {
+  return normalizeSubjectName(fileName);
+}
+
+function loadQuestionBankFile(filePath: string, fallbackSubject: string): QuestionBankItem[] {
+  const raw = readFileSync(filePath, "utf8");
   const sanitized = raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
   const parsed = JSON.parse(sanitized) as unknown;
   if (!Array.isArray(parsed)) {
-    throw new Error("Invalid assessment question bank format");
+    throw new Error(`Invalid assessment question bank format in ${path.basename(filePath)}`);
   }
 
-  const questions = (parsed as QuestionBankItem[]).map((question) => ({
+  return (parsed as QuestionBankItem[]).map((question) => ({
     ...question,
+    subject: normalizeSubjectName(question.subject || fallbackSubject),
     topic: normalizeQuestionText(question.topic),
     question: normalizeQuestionText(question.question),
     options: question.options.map((option) => normalizeQuestionText(option)),
     explanation: normalizeQuestionText(question.explanation),
     tags: question.tags.map((tag) => normalizeQuestionText(tag)),
   }));
+}
 
+function loadQuestionBank(): QuestionBankItem[] {
+  const files = readdirSync(ASSESSMENT_DATA_DIR)
+    .filter((entry) => entry.toLowerCase().endsWith(".json"))
+    .map((entry) => path.join(ASSESSMENT_DATA_DIR, entry));
+
+  const allQuestions: QuestionBankItem[] = [];
   const uniqueIds = new Set<string>();
-  for (const question of questions) {
-    if (
-      !question.id ||
-      !question.topic ||
-      !question.question ||
-      !Array.isArray(question.options) ||
-      question.options.length !== 4 ||
-      typeof question.correctAnswer !== "number"
-    ) {
-      throw new Error(`Invalid question in bank: ${JSON.stringify(question).slice(0, 120)}`);
+
+  for (const filePath of files) {
+    const inferredSubject = inferSubjectFromFilename(path.basename(filePath));
+    const questions = loadQuestionBankFile(filePath, inferredSubject);
+    for (const question of questions) {
+      if (
+        !question.id ||
+        !question.topic ||
+        !question.question ||
+        !Array.isArray(question.options) ||
+        question.options.length !== 4 ||
+        typeof question.correctAnswer !== "number"
+      ) {
+        throw new Error(`Invalid question in bank: ${JSON.stringify(question).slice(0, 120)}`);
+      }
+      if (uniqueIds.has(question.id)) {
+        throw new Error(`Duplicate question id in bank: ${question.id}`);
+      }
+      uniqueIds.add(question.id);
+      allQuestions.push(question);
     }
-    if (uniqueIds.has(question.id)) {
-      throw new Error(`Duplicate question id in bank: ${question.id}`);
-    }
-    uniqueIds.add(question.id);
   }
 
-  return questions;
+  return allQuestions;
 }
 
 const QUESTION_BANK = loadQuestionBank();
+const AVAILABLE_SUBJECTS = Array.from(new Set(QUESTION_BANK.map((question) => normalizeSubjectName(question.subject || "Mathématiques"))));
+
+function resolvePrioritySubjects(prioritySubjects: unknown): string[] {
+  if (!Array.isArray(prioritySubjects)) return [];
+  return prioritySubjects
+    .map((subject) => (typeof subject === "string" ? normalizeSubjectName(subject) : ""))
+    .filter(Boolean);
+}
 
 function findDomainByQuestion(question: QuestionBankItem) {
+  const subject = normalizeSubjectName(question.subject || "Mathématiques");
+  if (subject !== "Mathématiques") return undefined;
   const normalizedTopic = normalizeText(question.topic);
   return DOMAIN_CONFIG.find((domain) => {
     if (question.id.startsWith(domain.idPrefix)) {
@@ -246,6 +283,8 @@ function findDomainByQuestion(question: QuestionBankItem) {
 
 function getQuestionsForDomain(domainKey: string, difficulty: Difficulty) {
   return QUESTION_BANK.filter((question) => {
+    const subject = normalizeSubjectName(question.subject || "Mathématiques");
+    if (subject !== "Mathématiques") return false;
     const domain = findDomainByQuestion(question);
     return domain?.key === domainKey && question.difficulty === difficulty;
   });
@@ -307,7 +346,7 @@ function createQuestionPlan(): PlannedQuestion[] {
     plan.push({
       ...firstQuestion,
       topic: resolveTopic(domain.key, firstQuestion.topic),
-      subject: "Mathematiques",
+      subject: "Mathématiques",
       domainKey: domain.key,
       domainAttempt: 1,
     });
@@ -319,7 +358,7 @@ function createQuestionPlan(): PlannedQuestion[] {
     plan.push({
       ...secondQuestion,
       topic: resolveTopic(domain.key, secondQuestion.topic),
-      subject: "Mathematiques",
+      subject: "Mathématiques",
       domainKey: domain.key,
       domainAttempt: 2,
     });
@@ -330,6 +369,111 @@ function createQuestionPlan(): PlannedQuestion[] {
   }
 
   return plan;
+}
+
+function pickQuestionForSubject(
+  subject: string,
+  difficulty: Difficulty,
+  usedIds: Set<string>,
+): QuestionBankItem {
+  const preferred = QUESTION_BANK.filter((question) => {
+    const qSubject = normalizeSubjectName(question.subject || "Mathématiques");
+    return qSubject === subject && question.difficulty === difficulty && !usedIds.has(question.id);
+  });
+  if (preferred.length > 0) {
+    return preferred[Math.floor(Math.random() * preferred.length)];
+  }
+
+  const fallback = QUESTION_BANK.filter((question) => {
+    const qSubject = normalizeSubjectName(question.subject || "Mathématiques");
+    return qSubject === subject && !usedIds.has(question.id);
+  });
+  if (fallback.length > 0) {
+    return fallback[Math.floor(Math.random() * fallback.length)];
+  }
+
+  throw new Error(`No available question for subject "${subject}"`);
+}
+
+function slugifyKey(value: string): string {
+  return normalizeText(value).replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+function createMultiSubjectQuestionPlan(selectedSubjects: string[], totalQuestions = REQUIRED_TOTAL_QUESTIONS): PlannedQuestion[] {
+  const usedIds = new Set<string>();
+  const plan: PlannedQuestion[] = [];
+  const difficulties: Difficulty[] = ["facile", "moyen", "difficile", "moyen", "facile"];
+  const subjects = selectedSubjects.length > 0 ? selectedSubjects : ["Mathématiques"];
+
+  const baseCount = Math.floor(totalQuestions / subjects.length);
+  let remainder = totalQuestions % subjects.length;
+  const perSubjectCount = subjects.map((subject) => {
+    const count = baseCount + (remainder > 0 ? 1 : 0);
+    if (remainder > 0) remainder -= 1;
+    return { subject, count };
+  });
+
+  for (const bucket of perSubjectCount) {
+    const domainAttemptByKey = new Map<string, number>();
+    for (let i = 0; i < bucket.count; i += 1) {
+      const difficulty = difficulties[i % difficulties.length];
+      const question = shuffleOptions(pickQuestionForSubject(bucket.subject, difficulty, usedIds));
+      usedIds.add(question.id);
+      const domainKey = `${slugifyKey(bucket.subject)}_${slugifyKey(question.topic)}`;
+      const attempt = (domainAttemptByKey.get(domainKey) || 0) + 1;
+      domainAttemptByKey.set(domainKey, attempt);
+
+      plan.push({
+        ...question,
+        subject: bucket.subject,
+        domainKey,
+        domainAttempt: attempt,
+      });
+    }
+  }
+
+  return plan.sort(() => Math.random() - 0.5);
+}
+
+function createQuestionPlanForSubjects(prioritySubjects: string[]): PlannedQuestion[] {
+  const filtered = prioritySubjects.filter((subject) => AVAILABLE_SUBJECTS.includes(subject));
+  const selected = filtered.length > 0 ? filtered : (AVAILABLE_SUBJECTS.includes("Mathématiques") ? ["Mathématiques"] : AVAILABLE_SUBJECTS.slice(0, 1));
+
+  if (selected.length === 1 && selected[0] === "Mathématiques") {
+    return createQuestionPlan();
+  }
+
+  try {
+    return createMultiSubjectQuestionPlan(selected, REQUIRED_TOTAL_QUESTIONS);
+  } catch {
+    return createQuestionPlan();
+  }
+}
+
+function buildDomainProgress(questions: PlannedQuestion[]): Record<string, DomainProgress> {
+  const grouped = new Map<string, { topic: string; totalPlanned: number }>();
+  for (const question of questions) {
+    const existing = grouped.get(question.domainKey);
+    if (existing) {
+      existing.totalPlanned += 1;
+      continue;
+    }
+    grouped.set(question.domainKey, {
+      topic: question.topic,
+      totalPlanned: 1,
+    });
+  }
+
+  const progress: Record<string, DomainProgress> = {};
+  for (const [domainKey, value] of grouped.entries()) {
+    progress[domainKey] = {
+      topic: value.topic,
+      asked: 0,
+      correct: 0,
+      totalPlanned: value.totalPlanned,
+    };
+  }
+  return progress;
 }
 
 function computeDomainLevel(
@@ -356,16 +500,32 @@ export const AssessmentService = {
     });
     if (!student) throw new Error("Student not found");
 
+    const prioritySubjects = resolvePrioritySubjects(student.prioritySubjects);
+    const activeSubjects = prioritySubjects.length > 0 ? prioritySubjects : ["Mathématiques"];
+    const availableForAssessment = activeSubjects.filter((subject) => AVAILABLE_SUBJECTS.includes(subject));
+    const missingBanks = activeSubjects.filter((subject) => !AVAILABLE_SUBJECTS.includes(subject));
+
+    const domains = availableForAssessment.length === 1 && availableForAssessment[0] === "Mathématiques"
+      ? DOMAIN_CONFIG.map((d) => ({
+          key: d.key,
+          topic: d.topic,
+          questionCount: d.count,
+        }))
+      : availableForAssessment.map((subject) => ({
+          key: slugifyKey(subject),
+          topic: subject,
+          questionCount: Math.max(1, Math.round(REQUIRED_TOTAL_QUESTIONS / Math.max(1, availableForAssessment.length))),
+        }));
+
     return {
       examType: student.examType,
       grade: student.grade,
-      subject: "Mathematiques",
+      subject: availableForAssessment.join(", "),
       totalQuestions: REQUIRED_TOTAL_QUESTIONS,
-      domains: DOMAIN_CONFIG.map((d) => ({
-        key: d.key,
-        topic: d.topic,
-        questionCount: d.count,
-      })),
+      activeSubjects,
+      availableForAssessment,
+      missingBanks,
+      domains,
       estimatedMinutes: 15,
       assessmentCompleted: student.assessmentCompleted,
     };
@@ -380,26 +540,21 @@ export const AssessmentService = {
       throw new Error("Student not found");
     }
 
-    const domainProgress: Record<string, DomainProgress> = {};
-    for (const domain of DOMAIN_CONFIG) {
-      domainProgress[domain.key] = {
-        topic: domain.topic,
-        asked: 0,
-        correct: 0,
-        totalPlanned: domain.count,
-      };
-    }
+    const prioritySubjects = resolvePrioritySubjects(student.prioritySubjects);
+    const questions = createQuestionPlanForSubjects(prioritySubjects);
+    const domainProgress = buildDomainProgress(questions);
+    const totalQuestions = questions.length;
 
     return {
       currentQuestionIndex: 0,
-      totalQuestions: REQUIRED_TOTAL_QUESTIONS,
-      questions: createQuestionPlan(),
+      totalQuestions,
+      questions,
       domainProgress,
       studentProfile: {
         examType: student.examType as "BEPC" | "BAC",
         grade: student.grade as "3eme" | "terminale",
         series: student.series as "A1" | "A2" | "C" | "D" | undefined,
-        prioritySubjects: ["Mathematiques"],
+        prioritySubjects: prioritySubjects.length > 0 ? prioritySubjects : ["Mathématiques"],
         targetScore: student.targetScore || undefined,
       },
     };
@@ -433,7 +588,9 @@ export const AssessmentService = {
       domainState.correct += 1;
     }
 
-    if (currentQuestion.domainAttempt === 1 && domainState.totalPlanned === 2) {
+    const isMathDomain = currentQuestion.subject === "Mathématiques"
+      && DOMAIN_CONFIG.some((domain) => domain.key === currentQuestion.domainKey);
+    if (isMathDomain && currentQuestion.domainAttempt === 1 && domainState.totalPlanned === 2) {
       const secondQuestionIndex = progress.questions.findIndex(
         (question) => question.domainKey === currentQuestion.domainKey && question.domainAttempt === 2,
       );
@@ -448,7 +605,7 @@ export const AssessmentService = {
         progress.questions[secondQuestionIndex] = {
           ...replacement,
           topic: resolveTopic(currentQuestion.domainKey, replacement.topic),
-          subject: "Mathematiques",
+          subject: "Mathématiques",
           domainKey: currentQuestion.domainKey,
           domainAttempt: 2,
         };
@@ -491,7 +648,7 @@ export const AssessmentService = {
     if (student) {
       await db.insert(schema.levelAssessments).values({
         studentId: student.id,
-        subject: "Mathematiques",
+        subject: finalProgress.studentProfile.prioritySubjects.join(", "),
         questionsJson: finalProgress.questions.map((question) => ({
           id: question.id,
           topic: question.topic,
@@ -551,7 +708,7 @@ export const AssessmentService = {
 
     const topicStats: Record<string, { correct: number; total: number }> = {};
     for (const question of questions) {
-      const topic = question.topic ?? "Mathematiques";
+      const topic = question.topic ?? "General";
       if (!topicStats[topic]) {
         topicStats[topic] = { correct: 0, total: 0 };
       }

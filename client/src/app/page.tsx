@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   Sparkles,
   Target,
+  Trophy,
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import { Button } from "@/components/ui/button";
 const stats = [
   { value: "4 500+", label: "eleves de 3e actifs" },
   { value: "12k+", label: "seances chaque semaine" },
-  { value: "87%", label: "objectifs valides" },
+  { value: "4", label: "matieres actives" },
   { value: "4.8/5", label: "satisfaction familles" },
 ];
 
@@ -23,16 +24,21 @@ const promises = [
   "Des explications courtes et simples",
   "Des exercices guides, pas du blabla",
   "Un suivi clair pour l'eleve et le parent",
+  "Une gamification motivante et saine",
 ];
 
 const faq = [
   {
     q: "Notria est pour qui ?",
-    a: "Pour les eleves de 3e qui veulent progresser en maths et preparer le BEPC.",
+    a: "Pour les eleves de 3e qui veulent progresser et preparer le BEPC.",
   },
   {
     q: "Combien de temps par jour ?",
     a: "10 a 20 minutes suffisent pour garder un bon rythme.",
+  },
+  {
+    q: "Quelles matieres sont disponibles ?",
+    a: "Mathématiques, Français, SVT, Physique-Chimie.",
   },
   {
     q: "Le parent peut suivre ?",
@@ -139,13 +145,13 @@ export default function Home() {
             </p>
 
             <h1 className="mt-6 text-5xl font-semibold leading-[1.02] sm:text-6xl lg:text-7xl">
-              Reviser les maths
+              Reviser sans stress,
               <br />
-              sans stress.
+              progresser en equipe.
             </h1>
 
             <p className="mt-6 max-w-xl text-xl text-muted-foreground sm:text-2xl">
-              Tu avances pas a pas, tu pratiques tout de suite, et tu comprends vraiment avant le BEPC.
+              Maths, Français, SVT, Physique-Chimie. Tu avances pas a pas, tu pratiques vite, et tu montes dans le classement Notria.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -180,17 +186,17 @@ export default function Home() {
                     </span>
                     <p className="text-xl font-semibold">Seance du jour</p>
                   </div>
-                  <span className="rounded-full border border-border/70 bg-white px-3 py-1 text-xs">Maths 3e</span>
+                  <span className="rounded-full border border-border/70 bg-white px-3 py-1 text-xs">BEPC 3e • Multi-matières</span>
                 </div>
 
                 <div className="space-y-3 text-base">
                   <div className="rounded-xl border border-border/80 bg-white/85 p-4">
-                    Salut. On fait une seance courte de calcul numerique. Tu preferes rappel ou exercice ?
+                    Salut. On lance ton defi du jour en Physique-Chimie. Tu veux un rappel ou un exercice guide ?
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <span className="soft-chip rounded-full px-3 py-1 text-xs">Rappel rapide</span>
                     <span className="soft-chip rounded-full px-3 py-1 text-xs">Exercice guide</span>
-                    <span className="soft-chip rounded-full px-3 py-1 text-xs">Je suis bloque</span>
+                    <span className="soft-chip rounded-full px-3 py-1 text-xs">Defi +30 pts</span>
                   </div>
                 </div>
               </div>
@@ -213,13 +219,48 @@ export default function Home() {
       <section id="pourquoi" className="px-4 py-14 sm:px-6">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-4xl font-semibold sm:text-5xl">Ce que Notria change pour un eleve de 3e</h2>
-          <div className="mt-7 grid gap-4 md:grid-cols-3">
+          <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {promises.map((item) => (
               <article key={item} className="soft-card rounded-3xl p-6">
                 <Check className="h-5 w-5 text-primary" />
                 <p className="mt-4 text-lg font-semibold leading-snug">{item}</p>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-14 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="soft-shell rounded-3xl p-6 sm:p-8">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-wide text-primary">Formule ludique Notria</p>
+                <h2 className="mt-2 text-3xl sm:text-4xl font-semibold">Apprendre + jouer + se depasser</h2>
+                <p className="mt-3 text-base text-muted-foreground max-w-2xl">
+                  Chaque action utile rapporte des points: seance, exercice, regularite. L'eleve progresse en ligues, debloque des badges et voit son rang monter avec ses camarades.
+                </p>
+              </div>
+              <span className="soft-chip rounded-full px-3 py-1 text-xs">Points • Ligues • Defis • Avatar</span>
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              <article className="soft-card rounded-2xl p-5">
+                <Trophy className="h-5 w-5 text-primary" />
+                <p className="mt-3 font-semibold">Classement hebdo</p>
+                <p className="mt-1 text-sm text-muted-foreground">Top 10, classement de proximité et défis journaliers.</p>
+              </article>
+              <article className="soft-card rounded-2xl p-5">
+                <Users className="h-5 w-5 text-primary" />
+                <p className="mt-3 font-semibold">Esprit d'equipe</p>
+                <p className="mt-1 text-sm text-muted-foreground">Defis amicaux entre eleves pour garder la motivation.</p>
+              </article>
+              <article className="soft-card rounded-2xl p-5">
+                <Target className="h-5 w-5 text-primary" />
+                <p className="mt-3 font-semibold">Competences reelles</p>
+                <p className="mt-1 text-sm text-muted-foreground">Les points viennent d'actions pedagogiques utiles.</p>
+              </article>
+            </div>
           </div>
         </div>
       </section>

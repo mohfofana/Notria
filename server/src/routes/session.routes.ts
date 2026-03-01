@@ -16,5 +16,7 @@ router.post("/start", SessionController.startSession);
 
 // Get today's homework
 router.get("/homework/today", SessionController.getTodaysHomework);
+router.get("/competencies", SessionController.getCompetencyProgress);
+router.get("/gamification", SessionController.getGamification);
 
 export default router;

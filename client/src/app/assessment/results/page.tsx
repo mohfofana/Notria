@@ -102,7 +102,7 @@ export default function AssessmentResultsPage() {
     <div className="max-w-2xl mx-auto space-y-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold">Tes resultats</h1>
-        <p className="text-muted-foreground mt-2">Voici ton niveau actuel par domaine de mathematiques</p>
+        <p className="text-muted-foreground mt-2">Voici ton niveau actuel par domaine evalue</p>
       </div>
 
       <Card>
