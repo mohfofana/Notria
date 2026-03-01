@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 
 export default function AssessmentLayout({ children }: { children: React.ReactNode }) {
@@ -10,18 +9,13 @@ export default function AssessmentLayout({ children }: { children: React.ReactNo
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/connexion");
-    }
+    if (!isLoading && !isAuthenticated) router.replace("/connexion");
   }, [isLoading, isAuthenticated, router]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center gap-3">
-          <GraduationCap className="h-10 w-10 text-primary" />
-          <p className="text-muted-foreground text-sm">Chargement...</p>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-muted border-t-primary" />
       </div>
     );
   }
@@ -30,14 +24,16 @@ export default function AssessmentLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="max-w-3xl mx-auto flex items-center gap-2 px-6 py-4">
-          <GraduationCap className="h-7 w-7 text-primary" />
-          <span className="text-lg font-bold">Notria</span>
-          <span className="text-sm text-muted-foreground ml-2">— Test de niveau</span>
+      <header className="border-b border-border/50">
+        <div className="mx-auto flex max-w-3xl items-center gap-2.5 px-6 py-4">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground font-display text-sm font-bold">
+            N
+          </span>
+          <span className="font-display text-base font-bold">Notria</span>
+          <span className="text-xs text-muted-foreground">— Test de niveau</span>
         </div>
       </header>
-      <main className="max-w-3xl mx-auto px-6 py-8">
+      <main className="mx-auto max-w-3xl px-6 py-8">
         {children}
       </main>
     </div>

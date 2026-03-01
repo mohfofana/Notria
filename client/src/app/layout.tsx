@@ -1,24 +1,24 @@
 import type { Metadata } from "next";
-import { Manrope, Baloo_2 } from "next/font/google";
+import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const manrope = Manrope({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-body",
   weight: ["400", "500", "600", "700"],
 });
 
-const baloo = Baloo_2({
+const sora = Sora({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["500", "600", "700"],
+  weight: ["500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "Notria - IA educative BEPC",
+  title: "Notria - Ton IA pour reussir le BEPC",
   description:
-    "Plateforme de tutorat IA contextualisee pour les eleves ivoiriens preparant le BEPC.",
+    "Plateforme de tutorat IA pour les eleves ivoiriens. Revise ton BEPC sans stress avec Prof Ada.",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={`${manrope.variable} ${baloo.variable}`}>
+      <body className={`${plusJakarta.variable} ${sora.variable}`}>
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -4,42 +4,23 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Play, Target, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/auth-context";
 import { api } from "@/lib/api";
 
-interface DomainLevel {
-  level: string;
-  percentage: number;
-}
-
-interface AssessmentResultsData {
-  subjectLevels: Record<string, DomainLevel>;
-  overallAverage: number;
-}
-
-function getLevelColor(level: string) {
-  const normalized = level.toLowerCase();
-  if (normalized.includes("debutant") || normalized.includes("dÃ©butant")) return "text-red-600";
-  if (normalized.includes("intermediaire") || normalized.includes("intermÃ©diaire")) return "text-yellow-600";
-  if (normalized.includes("avance") || normalized.includes("avancÃ©")) return "text-green-600";
-  return "text-gray-600";
-}
+interface DomainLevel { level: string; percentage: number; }
+interface AssessmentResultsData { subjectLevels: Record<string, DomainLevel>; overallAverage: number; }
 
 function getLevelLabel(level: string) {
-  const normalized = level.toLowerCase();
-  if (normalized.includes("debutant") || normalized.includes("dÃ©butant")) return "Debutant";
-  if (normalized.includes("intermediaire") || normalized.includes("intermÃ©diaire")) return "Intermediaire";
-  if (normalized.includes("avance") || normalized.includes("avancÃ©")) return "Avance";
+  const n = level.toLowerCase();
+  if (n.includes("debutant") || n.includes("dÃ©butant")) return "Debutant";
+  if (n.includes("intermediaire") || n.includes("intermÃ©diaire")) return "Intermediaire";
+  if (n.includes("avance") || n.includes("avancÃ©")) return "Avance";
   return level;
 }
 
-function getLevelBarColor(percentage: number) {
-  if (percentage >= 80) return "bg-green-500";
-  if (percentage >= 60) return "bg-yellow-500";
-  return "bg-red-500";
-}
+function barColor(pct: number) { return pct >= 80 ? "bg-accent" : pct >= 60 ? "bg-warning" : "bg-destructive"; }
+function textColor(pct: number) { return pct >= 80 ? "text-accent" : pct >= 60 ? "text-warning-foreground" : "text-destructive"; }
 
 export default function AssessmentResultsPage() {
   const router = useRouter();
@@ -48,33 +29,21 @@ export default function AssessmentResultsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadResults();
+    (async () => {
+      try { const { data } = await api.get("/assessment/results"); if (data.success) setResults(data.data); }
+      catch {}
+      finally { setLoading(false); }
+    })();
   }, []);
 
-  const loadResults = async () => {
-    try {
-      const { data } = await api.get("/assessment/results");
-      if (data.success) {
-        setResults(data.data);
-      }
-    } catch (error) {
-      console.error("Failed to load results:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleContinue = async () => {
-    await refreshMe();
-    router.push("/programme");
-  };
+  async function handleContinue() { await refreshMe(); router.push("/programme"); }
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Calcul de tes resultats...</p>
+      <div className="flex items-center justify-center py-20">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Calcul de tes resultats...</p>
         </div>
       </div>
     );
@@ -82,13 +51,9 @@ export default function AssessmentResultsPage() {
 
   if (!results) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-destructive mb-4">Impossible de charger les resultats</p>
-            <Button onClick={() => router.push("/assessment/start")}>Refaire le test</Button>
-          </CardContent>
-        </Card>
+      <div className="text-center py-12">
+        <p className="text-destructive mb-4">Impossible de charger les resultats</p>
+        <Button onClick={() => router.push("/assessment/start")}>Refaire le test</Button>
       </div>
     );
   }
@@ -99,92 +64,57 @@ export default function AssessmentResultsPage() {
   const domains = Object.entries(results.subjectLevels).sort(([a], [b]) => a.localeCompare(b));
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="max-w-lg mx-auto space-y-5 animate-fade-in">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">Tes resultats</h1>
-        <p className="text-muted-foreground mt-2">Voici ton niveau actuel par domaine de mathematiques</p>
+        <h1 className="font-display text-2xl font-bold">Tes resultats</h1>
+        <p className="text-sm text-muted-foreground mt-1">Ton niveau par domaine de maths</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
-            Niveau global detecte
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center space-y-4">
-            <div className="text-4xl font-bold text-primary">{scoreOn20}/20</div>
-            <Progress value={results.overallAverage} className="w-full h-3" />
-            <p className="text-muted-foreground">Score global : {results.overallAverage}%</p>
-            {gap > 0 && (
-              <p className="text-muted-foreground">
-                Objectif : {targetScore}/20 (ecart a combler : +{gap.toFixed(1)} points)
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl border border-border bg-card p-5 text-center">
+        <div className="font-display text-5xl font-bold text-primary">{scoreOn20}<span className="text-lg text-muted-foreground">/20</span></div>
+        <Progress value={results.overallAverage} className="h-2 mt-3" />
+        <p className="text-xs text-muted-foreground mt-2">
+          Score global: {results.overallAverage}%
+          {gap > 0 && ` — Il te manque ${gap.toFixed(1)} pts pour ${targetScore}/20`}
+        </p>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Resultats par domaine</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          {domains.map(([domain, data]) => (
-            <div key={domain} className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="font-medium">{domain}</span>
-                <span className={`text-sm font-semibold ${getLevelColor(data.level)}`}>
-                  {getLevelLabel(data.level)} ({data.percentage}%)
-                </span>
-              </div>
-              <div className="relative h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className={`absolute top-0 left-0 h-full rounded-full transition-all ${getLevelBarColor(data.percentage)}`}
-                  style={{ width: `${data.percentage}%` }}
-                />
-              </div>
+      <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+        <p className="font-display text-sm font-semibold mb-1">Par domaine</p>
+        {domains.map(([domain, data]) => (
+          <div key={domain}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium truncate">{domain}</span>
+              <span className={`text-[10px] font-semibold ${textColor(data.percentage)}`}>
+                {getLevelLabel(data.level)} ({data.percentage}%)
+              </span>
             </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            <span className="font-semibold">Ce que ca veut dire</span>
+            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+              <div className={`h-full rounded-full transition-all ${barColor(data.percentage)}`} style={{ width: `${data.percentage}%` }} />
+            </div>
           </div>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            {domains
-              .filter(([, domain]) => domain.percentage < 60)
-              .map(([domain]) => (
-                <li key={domain}>
-                  <span className="text-red-600 font-medium">{domain}</span> : on reprend les bases.
-                </li>
-              ))}
-            {domains
-              .filter(([, domain]) => domain.percentage >= 60 && domain.percentage < 80)
-              .map(([domain]) => (
-                <li key={domain}>
-                  <span className="text-yellow-600 font-medium">{domain}</span> : bonne base, on approfondit.
-                </li>
-              ))}
-            {domains
-              .filter(([, domain]) => domain.percentage >= 80)
-              .map(([domain]) => (
-                <li key={domain}>
-                  <span className="text-green-600 font-medium">{domain}</span> : tres bon niveau.
-                </li>
-              ))}
-          </ul>
-        </CardContent>
-      </Card>
+        ))}
+      </div>
 
-      <Button onClick={handleContinue} size="lg" className="w-full">
-        <Play className="mr-2 h-4 w-4" />
-        Voir mon programme
+      <div className="rounded-2xl border border-border bg-card p-5">
+        <p className="text-xs font-semibold flex items-center gap-1.5 mb-2">
+          <TrendingUp className="h-3.5 w-3.5 text-primary" /> Ce que ca veut dire
+        </p>
+        <ul className="space-y-1.5 text-xs text-muted-foreground">
+          {domains.filter(([, d]) => d.percentage < 60).map(([name]) => (
+            <li key={name}><span className="text-destructive font-medium">{name}</span> : on reprend les bases</li>
+          ))}
+          {domains.filter(([, d]) => d.percentage >= 60 && d.percentage < 80).map(([name]) => (
+            <li key={name}><span className="text-warning-foreground font-medium">{name}</span> : bonne base, on approfondit</li>
+          ))}
+          {domains.filter(([, d]) => d.percentage >= 80).map(([name]) => (
+            <li key={name}><span className="text-accent font-medium">{name}</span> : tres bon niveau</li>
+          ))}
+        </ul>
+      </div>
+
+      <Button onClick={handleContinue} size="xl" className="w-full">
+        <Play className="h-4 w-4" /> Voir mon programme
       </Button>
     </div>
   );

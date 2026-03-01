@@ -2,39 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { CheckCircle, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, Loader2, XCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { api } from "@/lib/api";
 
-interface Question {
-  id: string;
-  topic: string;
-  difficulty: "facile" | "moyen" | "difficile";
-  question: string;
-  options: string[];
-}
-
+interface Question { id: string; topic: string; difficulty: "facile" | "moyen" | "difficile"; question: string; options: string[]; }
 interface AssessmentResponse {
   success: boolean;
-  data: {
-    completed: boolean;
-    currentQuestionIndex: number;
-    totalQuestions: number;
-    question?: Question;
-    previousAnswer?: {
-      isCorrect: boolean;
-      explanation?: string;
-    };
-  };
+  data: { completed: boolean; currentQuestionIndex: number; totalQuestions: number; question?: Question; previousAnswer?: { isCorrect: boolean; explanation?: string }; };
   error?: string;
 }
 
-function formatDifficulty(difficulty: string): string {
-  if (!difficulty) return "";
-  return `${difficulty.charAt(0).toUpperCase()}${difficulty.slice(1)}`;
-}
+const diffColor: Record<string, string> = { facile: "text-accent", moyen: "text-warning-foreground", difficile: "text-destructive" };
 
 export default function AssessmentQuestion() {
   const router = useRouter();
@@ -51,198 +31,110 @@ export default function AssessmentQuestion() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadQuestion();
-  }, [questionNumber]);
+  useEffect(() => { loadQuestion(); }, [questionNumber]);
 
-  const loadQuestion = async () => {
+  async function loadQuestion() {
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true); setError(null);
+      const { data: res } = await api.get<AssessmentResponse>("/assessment/question");
+      if (!res.success) throw new Error(res.error);
+      if (res.data.completed) { router.push("/assessment/results"); return; }
+      setTotalQuestions(res.data.totalQuestions || 15);
+      setQuestion(res.data.question || null);
+      setSelectedAnswer(null); setCanGoNext(false);
+      if (res.data.previousAnswer) { setFeedback(res.data.previousAnswer); setShowFeedback(true); }
+      else { setFeedback(null); setShowFeedback(false); }
+    } catch (e: any) { setError(e.message || "Erreur de chargement"); }
+    finally { setLoading(false); }
+  }
 
-      const response = await api.get<AssessmentResponse>("/assessment/question");
-      if (!response.data.success) {
-        throw new Error(response.data.error || "Failed to load question");
-      }
-
-      const { data } = response.data;
-      if (data.completed) {
-        router.push("/assessment/results");
-        return;
-      }
-
-      setTotalQuestions(data.totalQuestions || 15);
-      setQuestion(data.question || null);
-      setSelectedAnswer(null);
-      setCanGoNext(false);
-
-      if (data.previousAnswer) {
-        setFeedback(data.previousAnswer);
-        setShowFeedback(true);
-      } else {
-        setFeedback(null);
-        setShowFeedback(false);
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to load question");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmitAnswer = async () => {
-    if (canGoNext) {
-      router.push(`/assessment/question/${questionNumber + 1}`);
-      return;
-    }
-
-    if (selectedAnswer === null || !question) {
-      return;
-    }
-
+  async function handleSubmit() {
+    if (canGoNext) { router.push(`/assessment/question/${questionNumber + 1}`); return; }
+    if (selectedAnswer === null || !question) return;
     setIsSubmitting(true);
     try {
-      const response = await api.post<AssessmentResponse>("/assessment/answer", {
-        questionId: question.id,
-        answer: selectedAnswer,
-      });
-
-      if (!response.data.success) {
-        throw new Error(response.data.error || "Failed to submit answer");
-      }
-
-      const { data } = response.data;
-      if (data.completed) {
-        router.push("/assessment/results");
-        return;
-      }
-
-      setTotalQuestions(data.totalQuestions || totalQuestions);
-
-      if (data.previousAnswer) {
-        setFeedback(data.previousAnswer);
-        setShowFeedback(true);
-      } else {
-        setFeedback(null);
-        setShowFeedback(false);
-      }
-
+      const { data: res } = await api.post<AssessmentResponse>("/assessment/answer", { questionId: question.id, answer: selectedAnswer });
+      if (!res.success) throw new Error(res.error);
+      if (res.data.completed) { router.push("/assessment/results"); return; }
+      setTotalQuestions(res.data.totalQuestions || totalQuestions);
+      if (res.data.previousAnswer) { setFeedback(res.data.previousAnswer); setShowFeedback(true); }
+      else { setFeedback(null); setShowFeedback(false); }
       setCanGoNext(true);
-    } catch (err: any) {
-      setError(err.message || "Failed to submit answer");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    } catch (e: any) { setError(e.message || "Erreur"); }
+    finally { setIsSubmitting(false); }
+  }
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex items-center justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
       </div>
     );
   }
 
-  if (error) {
+  if (error || !question) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-destructive text-center">{error}</p>
-            <Button onClick={() => router.push("/assessment/start")} className="mt-4 w-full">
-              Recommencer
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="max-w-lg mx-auto text-center py-12">
+        <p className="text-destructive mb-4">{error || "Aucune question"}</p>
+        <Button onClick={() => router.push("/assessment/start")}>Recommencer</Button>
       </div>
     );
   }
 
-  if (!question) {
-    return (
-      <div className="max-w-2xl mx-auto p-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center">Aucune question disponible</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const progress = (questionNumber / totalQuestions) * 100;
+  const pct = (questionNumber / totalQuestions) * 100;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm text-muted-foreground">
-          <span>
-            Question {questionNumber} sur {totalQuestions}
-          </span>
-          <span>
-            {question.topic} - {formatDifficulty(question.difficulty)}
-          </span>
+    <div className="max-w-lg mx-auto space-y-5 animate-fade-in">
+      <div>
+        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+          <span>Question {questionNumber}/{totalQuestions}</span>
+          <span className={diffColor[question.difficulty] || ""}>{question.topic}</span>
         </div>
-        <Progress value={progress} className="w-full" />
+        <Progress value={pct} className="h-1.5" />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">{question.question}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {question.options.map((option, index) => (
-            <button
-              key={index}
-              onClick={() => setSelectedAnswer(index)}
-              disabled={isSubmitting || canGoNext}
-              className={`w-full p-4 text-left rounded-lg border-2 transition-colors ${
-                selectedAnswer === index
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/40"
-              }`}
-            >
-              <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span>
-              {option}
-            </button>
-          ))}
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl border border-border bg-card p-5">
+        <p className="font-display text-base font-semibold leading-relaxed">{question.question}</p>
+      </div>
+
+      <div className="space-y-2">
+        {question.options.map((opt, i) => (
+          <button
+            key={i}
+            onClick={() => setSelectedAnswer(i)}
+            disabled={isSubmitting || canGoNext}
+            className={`w-full rounded-xl border-2 p-4 text-left text-sm transition-all active:scale-[0.98] ${
+              selectedAnswer === i
+                ? "border-primary bg-primary/5 font-medium"
+                : "border-border bg-card hover:border-primary/30"
+            } disabled:opacity-60`}
+          >
+            <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-lg bg-muted text-xs font-bold">
+              {String.fromCharCode(65 + i)}
+            </span>
+            {opt}
+          </button>
+        ))}
+      </div>
 
       {showFeedback && feedback && (
-        <Card className={`border-2 ${feedback.isCorrect ? "border-green-500" : "border-red-500"}`}>
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-2">
-              {feedback.isCorrect ? (
-                <CheckCircle className="h-5 w-5 text-green-500" />
-              ) : (
-                <XCircle className="h-5 w-5 text-red-500" />
-              )}
-              <span className="font-medium">{feedback.isCorrect ? "Bonne reponse !" : "Reponse incorrecte"}</span>
-            </div>
-            {feedback.explanation && (
-              <p className="text-sm text-muted-foreground mt-2">{feedback.explanation}</p>
-            )}
-          </CardContent>
-        </Card>
+        <div className={`rounded-2xl border-2 p-4 animate-scale-in ${
+          feedback.isCorrect ? "border-accent/30 bg-accent/5" : "border-destructive/30 bg-destructive/5"
+        }`}>
+          <div className="flex items-center gap-2 mb-1">
+            {feedback.isCorrect ? <CheckCircle className="h-5 w-5 text-accent" /> : <XCircle className="h-5 w-5 text-destructive" />}
+            <span className="font-semibold text-sm">{feedback.isCorrect ? "Bonne reponse !" : "Pas tout a fait..."}</span>
+          </div>
+          {feedback.explanation && <p className="text-xs text-muted-foreground mt-1">{feedback.explanation}</p>}
+        </div>
       )}
 
-      <Button
-        onClick={handleSubmitAnswer}
-        disabled={(!canGoNext && selectedAnswer === null) || isSubmitting}
-        size="lg"
-        className="w-full"
-      >
+      <Button onClick={handleSubmit} disabled={(!canGoNext && selectedAnswer === null) || isSubmitting} size="lg" className="w-full">
         {isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Validation...
-          </>
+          <><Loader2 className="h-4 w-4 animate-spin" /> Validation...</>
         ) : canGoNext ? (
-          "Question suivante"
-        ) : (
-          "Valider la reponse"
-        )}
+          <><ArrowRight className="h-4 w-4" /> Question suivante</>
+        ) : "Valider"}
       </Button>
     </div>
   );

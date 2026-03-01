@@ -1,5 +1,5 @@
 import { Camera, CheckCircle2, ImageIcon } from "lucide-react";
-import { MvpTopbar } from "@/components/mvp/mvp-topbar";
+
 import { Button } from "@/components/ui/button";
 
 const steps = [
@@ -10,9 +10,7 @@ const steps = [
 
 export default function NotriaVisionPage() {
   return (
-    <main className="min-h-screen">
-      <MvpTopbar />
-      <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+    <div className="animate-fade-in">
         <div className="mx-auto w-full max-w-4xl">
           <article className="rounded-3xl border border-border bg-white/90 p-7 sm:p-9">
             <p className="text-xs font-semibold uppercase tracking-wide text-primary">Notria Vision</p>
@@ -42,7 +40,6 @@ export default function NotriaVisionPage() {
             </div>
           </article>
         </div>
-      </section>
-    </main>
+    </div>
   );
 }

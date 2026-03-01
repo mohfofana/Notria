@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BookOpenCheck, Clock3, FileCheck2, PenSquare } from "lucide-react";
 
-import { MvpTopbar } from "@/components/mvp/mvp-topbar";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/auth-context";
@@ -84,19 +84,14 @@ export default function ExamensPage() {
 
   if (isLoading || loading) {
     return (
-      <main className="min-h-screen">
-        <MvpTopbar />
-        <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-          <p className="text-sm text-muted-foreground">Chargement des examens...</p>
-        </section>
-      </main>
+      <div className="animate-fade-in">
+        <p className="text-sm text-muted-foreground">Chargement des examens...</p>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen">
-      <MvpTopbar />
-      <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+    <div className="space-y-6 animate-fade-in">
         <div className="mb-7 rounded-3xl border border-border bg-white/90 p-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">F013 · F014</p>
           <h1 className="mt-2 text-3xl font-semibold">
@@ -183,7 +178,6 @@ export default function ExamensPage() {
             </div>
           </article>
         </div>
-      </section>
-    </main>
+    </div>
   );
 }

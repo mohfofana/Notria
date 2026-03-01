@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, GraduationCap, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,10 +14,7 @@ export default function InscriptionPage() {
   const router = useRouter();
 
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    password: "",
+    firstName: "", lastName: "", phone: "", password: "",
     role: "student" as "student" | "parent",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -25,118 +22,89 @@ export default function InscriptionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function formatPhone(raw: string) {
-    // Keep only digits
     const digits = raw.replace(/\D/g, "");
-    // Remove leading 225 if the user typed it (we add the prefix ourselves)
     const local = digits.startsWith("225") ? digits.slice(3) : digits;
-    // Format as XX XX XX XX XX (10 digits for Ivory Coast)
     const trimmed = local.slice(0, 10);
     const parts = trimmed.match(/.{1,2}/g);
     return parts ? parts.join(" ") : "";
   }
 
-  function handlePhoneChange(value: string) {
-    setForm((prev) => ({ ...prev, phone: formatPhone(value) }));
-  }
-
-  function getFullPhone() {
-    return `+225 ${form.phone}`;
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-
-    const fullPhone = getFullPhone();
-    // Basic validation
     const phoneDigits = form.phone.replace(/\s/g, "");
-    if (phoneDigits.length !== 10) {
-      setError("Numéro de téléphone invalide (10 chiffres requis)");
-      return;
-    }
-    if (!form.firstName.trim() || !form.lastName.trim()) {
-      setError("Nom et prénom sont obligatoires");
-      return;
-    }
-    if (form.password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
+    if (phoneDigits.length !== 10) { setError("Numero invalide (10 chiffres)"); return; }
+    if (!form.firstName.trim() || !form.lastName.trim()) { setError("Nom et prenom obligatoires"); return; }
+    if (form.password.length < 6) { setError("Mot de passe: 6 caracteres minimum"); return; }
 
     setIsSubmitting(true);
     try {
       await register({
         firstName: form.firstName.trim(),
         lastName: form.lastName.trim(),
-        phone: fullPhone,
+        phone: `+225 ${form.phone}`,
         password: form.password,
         role: form.role,
       });
       router.push(form.role === "student" ? "/onboarding/step-1" : "/dashboard");
     } catch (err: any) {
       const msg = err?.response?.data?.error;
-      if (msg === "Phone already in use") {
-        setError("Ce numéro de téléphone est déjà utilisé");
-      } else {
-        setError(msg || "Une erreur est survenue. Réessaie.");
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+      setError(msg === "Phone already in use" ? "Ce numero est deja utilise" : msg || "Une erreur est survenue.");
+    } finally { setIsSubmitting(false); }
   }
 
   return (
     <>
-      <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Cree ton compte</h1>
-        <p className="text-base text-muted-foreground">
-          Commence tes revisions de maths en quelques minutes
+      <div className="space-y-2 text-center animate-fade-in">
+        <h1 className="font-display text-2xl font-bold">Cree ton compte</h1>
+        <p className="text-sm text-muted-foreground">
+          Commence tes revisions en quelques minutes
         </p>
       </div>
 
       {/* Role selector */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 animate-slide-up delay-1">
         <button
           type="button"
           onClick={() => setForm((p) => ({ ...p, role: "student" }))}
-          className={`rounded-lg border-2 p-3 text-center text-sm font-medium transition-colors ${
+          className={`flex flex-col items-center gap-2 rounded-2xl border-2 p-4 transition-all ${
             form.role === "student"
               ? "border-primary bg-primary/5 text-primary"
-              : "border-border text-muted-foreground hover:border-primary/40"
+              : "border-border text-muted-foreground hover:border-primary/30"
           }`}
         >
-          Je suis eleve
+          <GraduationCap className="h-6 w-6" />
+          <span className="text-sm font-semibold">Je suis eleve</span>
         </button>
         <button
           type="button"
           onClick={() => setForm((p) => ({ ...p, role: "parent" }))}
-          className={`rounded-lg border-2 p-3 text-center text-sm font-medium transition-colors ${
+          className={`flex flex-col items-center gap-2 rounded-2xl border-2 p-4 transition-all ${
             form.role === "parent"
               ? "border-primary bg-primary/5 text-primary"
-              : "border-border text-muted-foreground hover:border-primary/40"
+              : "border-border text-muted-foreground hover:border-primary/30"
           }`}
         >
-          Je suis parent
+          <Users className="h-6 w-6" />
+          <span className="text-sm font-semibold">Je suis parent</span>
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 animate-slide-up delay-2">
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
-            <Label htmlFor="firstName" className="text-base">Prenom</Label>
+            <Label htmlFor="firstName">Prenom</Label>
             <Input
-              id="firstName"
-              placeholder="Fatou"
+              id="firstName" placeholder="Fatou"
               value={form.firstName}
               onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))}
               disabled={isSubmitting}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="lastName" className="text-base">Nom</Label>
+            <Label htmlFor="lastName">Nom</Label>
             <Input
-              id="lastName"
-              placeholder="Koné"
+              id="lastName" placeholder="Kone"
               value={form.lastName}
               onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))}
               disabled={isSubmitting}
@@ -145,30 +113,28 @@ export default function InscriptionPage() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="phone" className="text-base">Numero de telephone</Label>
+          <Label htmlFor="phone">Numero de telephone</Label>
           <div className="flex">
-            <span className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
+            <span className="inline-flex items-center rounded-l-xl border-2 border-r-0 border-input bg-muted px-3 text-sm font-medium text-muted-foreground">
               +225
             </span>
             <Input
-              id="phone"
-              type="tel"
-              placeholder="07 08 09 10 11"
+              id="phone" type="tel" placeholder="07 08 09 10 11"
               className="rounded-l-none"
               value={form.phone}
-              onChange={(e) => handlePhoneChange(e.target.value)}
+              onChange={(e) => setForm((p) => ({ ...p, phone: formatPhone(e.target.value) }))}
               disabled={isSubmitting}
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-base">Mot de passe</Label>
+          <Label htmlFor="password">Mot de passe</Label>
           <div className="relative">
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
-              placeholder="6 caractères minimum"
+              placeholder="6 caracteres minimum"
               value={form.password}
               onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
               disabled={isSubmitting}
@@ -185,24 +151,21 @@ export default function InscriptionPage() {
         </div>
 
         {error && (
-          <p className="text-base text-destructive font-medium">{error}</p>
+          <div className="rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+            {error}
+          </div>
         )}
 
         <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
           {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Inscription...
-            </>
-          ) : (
-            "Créer mon compte"
-          )}
+            <><Loader2 className="h-4 w-4 animate-spin" /> Inscription...</>
+          ) : "Creer mon compte"}
         </Button>
       </form>
 
-      <p className="text-center text-base text-muted-foreground">
+      <p className="text-center text-sm text-muted-foreground animate-fade-in delay-3">
         Tu as deja un compte ?{" "}
-        <Link href="/connexion" className="text-primary font-medium hover:underline">
+        <Link href="/connexion" className="text-primary font-semibold hover:underline">
           Connecte-toi
         </Link>
       </p>

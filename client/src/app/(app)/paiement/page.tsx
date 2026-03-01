@@ -1,5 +1,5 @@
 import { Check, CreditCard, ShieldCheck, Ticket } from "lucide-react";
-import { MvpTopbar } from "@/components/mvp/mvp-topbar";
+
 import { Button } from "@/components/ui/button";
 
 const plans = [
@@ -22,9 +22,7 @@ const plans = [
 
 export default function PaiementPage() {
   return (
-    <main className="min-h-screen">
-      <MvpTopbar />
-      <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+    <div className="space-y-6 animate-fade-in">
         <div className="mb-7 rounded-3xl border border-border bg-white/90 p-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">F026</p>
           <h1 className="mt-2 text-3xl font-semibold">Abonnements & paiements</h1>
@@ -75,7 +73,6 @@ export default function PaiementPage() {
             </p>
           </article>
         </div>
-      </section>
-    </main>
+    </div>
   );
 }

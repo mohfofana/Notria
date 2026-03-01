@@ -110,7 +110,7 @@ export default function ParentDashboardPage() {
       </div>
 
       {error && (
-        <Card className="soft-card rounded-2xl">
+        <Card className="rounded-2xl">
           <CardContent className="pt-6">
             <p className="text-sm text-red-600">{error}</p>
           </CardContent>
@@ -118,7 +118,7 @@ export default function ParentDashboardPage() {
       )}
 
       {dashboard.length === 0 && !error && (
-        <Card className="soft-card rounded-2xl">
+        <Card className="rounded-2xl">
           <CardContent className="pt-6 text-center">
             <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
             <h2 className="text-xl font-semibold">Aucun enfant lie</h2>
@@ -131,7 +131,7 @@ export default function ParentDashboardPage() {
 
       {dashboard.map((studentData) => (
         <div key={studentData.student.id} className="space-y-5">
-          <Card className="soft-shell rounded-2xl">
+          <Card className="rounded-2xl border-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center justify-between gap-3">
                 <div>
@@ -148,7 +148,7 @@ export default function ParentDashboardPage() {
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="soft-card rounded-2xl">
+            <Card className="rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-primary" />
@@ -173,7 +173,7 @@ export default function ParentDashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="soft-card rounded-2xl">
+            <Card className="rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Clock className="h-4 w-4 text-primary" />
@@ -198,7 +198,7 @@ export default function ParentDashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="soft-card rounded-2xl">
+            <Card className="rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Bell className="h-4 w-4 text-primary" />

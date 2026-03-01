@@ -126,7 +126,7 @@ export default function AdminPage() {
       </div>
 
       {error && (
-        <Card className="soft-card rounded-2xl">
+        <Card className="rounded-2xl">
           <CardContent className="pt-6">
             <p className="text-sm text-red-600">{error}</p>
           </CardContent>
@@ -135,27 +135,27 @@ export default function AdminPage() {
 
       {overview && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card className="soft-card rounded-2xl">
+          <Card className="rounded-2xl">
             <CardHeader><CardTitle className="text-lg">Utilisateurs</CardTitle></CardHeader>
             <CardContent className="text-2xl font-semibold">{overview.users}</CardContent>
           </Card>
-          <Card className="soft-card rounded-2xl">
+          <Card className="rounded-2xl">
             <CardHeader><CardTitle className="text-lg">Eleves / Parents</CardTitle></CardHeader>
             <CardContent className="text-2xl font-semibold">{overview.students} / {overview.parents}</CardContent>
           </Card>
-          <Card className="soft-card rounded-2xl">
+          <Card className="rounded-2xl">
             <CardHeader><CardTitle className="text-lg">Conversations actives</CardTitle></CardHeader>
             <CardContent className="text-2xl font-semibold">{overview.activeConversations}</CardContent>
           </Card>
-          <Card className="soft-card rounded-2xl">
+          <Card className="rounded-2xl">
             <CardHeader><CardTitle className="text-lg">Messages</CardTitle></CardHeader>
             <CardContent className="text-2xl font-semibold">{overview.messages}</CardContent>
           </Card>
-          <Card className="soft-card rounded-2xl">
+          <Card className="rounded-2xl">
             <CardHeader><CardTitle className="text-lg">Sessions (7 jours)</CardTitle></CardHeader>
             <CardContent className="text-2xl font-semibold">{overview.sessionsLast7Days}</CardContent>
           </Card>
-          <Card className="soft-card rounded-2xl">
+          <Card className="rounded-2xl">
             <CardHeader><CardTitle className="text-lg">Roles</CardTitle></CardHeader>
             <CardContent className="text-base text-muted-foreground">
               {Object.entries(overview.roleBreakdown).map(([role, count]) => (
@@ -167,7 +167,7 @@ export default function AdminPage() {
       )}
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="soft-shell rounded-2xl">
+        <Card className="rounded-2xl border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-4 w-4 text-primary" />
@@ -194,7 +194,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
-        <Card className="soft-shell rounded-2xl">
+        <Card className="rounded-2xl border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" />

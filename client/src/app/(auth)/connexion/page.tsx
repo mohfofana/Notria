@@ -27,58 +27,37 @@ export default function ConnexionPage() {
     return parts ? parts.join(" ") : "";
   }
 
-  function handlePhoneChange(value: string) {
-    setPhone(formatPhone(value));
-  }
-
-  function getFullPhone() {
-    return `+225 ${phone}`;
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-
     const phoneDigits = phone.replace(/\s/g, "");
-    if (phoneDigits.length !== 10) {
-      setError("Numéro de téléphone invalide (10 chiffres requis)");
-      return;
-    }
-    if (password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
+    if (phoneDigits.length !== 10) { setError("Numero invalide (10 chiffres)"); return; }
+    if (password.length < 6) { setError("Mot de passe: 6 caracteres minimum"); return; }
 
     setIsSubmitting(true);
     try {
-      await login(getFullPhone(), password);
+      await login(`+225 ${phone}`, password);
       router.push("/dashboard");
     } catch (err: any) {
       const msg = err?.response?.data?.error;
-      if (msg === "Invalid credentials") {
-        setError("Numéro ou mot de passe incorrect");
-      } else {
-        setError(msg || "Une erreur est survenue. Réessaie.");
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+      setError(msg === "Invalid credentials" ? "Numero ou mot de passe incorrect" : msg || "Une erreur est survenue.");
+    } finally { setIsSubmitting(false); }
   }
 
   return (
     <>
-      <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Content de te revoir</h1>
-        <p className="text-base text-muted-foreground">
+      <div className="space-y-2 text-center animate-fade-in">
+        <h1 className="font-display text-2xl font-bold">Content de te revoir !</h1>
+        <p className="text-sm text-muted-foreground">
           Connecte-toi pour reprendre tes revisions
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 animate-slide-up delay-1">
         <div className="space-y-2">
-          <Label htmlFor="phone" className="text-base">Numero de telephone</Label>
+          <Label htmlFor="phone">Numero de telephone</Label>
           <div className="flex">
-            <span className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
+            <span className="inline-flex items-center rounded-l-xl border-2 border-r-0 border-input bg-muted px-3 text-sm font-medium text-muted-foreground">
               +225
             </span>
             <Input
@@ -87,14 +66,14 @@ export default function ConnexionPage() {
               placeholder="07 08 09 10 11"
               className="rounded-l-none"
               value={phone}
-              onChange={(e) => handlePhoneChange(e.target.value)}
+              onChange={(e) => setPhone(formatPhone(e.target.value))}
               disabled={isSubmitting}
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-base">Mot de passe</Label>
+          <Label htmlFor="password">Mot de passe</Label>
           <div className="relative">
             <Input
               id="password"
@@ -116,24 +95,21 @@ export default function ConnexionPage() {
         </div>
 
         {error && (
-          <p className="text-base text-destructive font-medium">{error}</p>
+          <div className="rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+            {error}
+          </div>
         )}
 
         <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
           {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Connexion...
-            </>
-          ) : (
-            "Se connecter"
-          )}
+            <><Loader2 className="h-4 w-4 animate-spin" /> Connexion...</>
+          ) : "Se connecter"}
         </Button>
       </form>
 
-      <p className="text-center text-base text-muted-foreground">
+      <p className="text-center text-sm text-muted-foreground animate-fade-in delay-2">
         Pas encore de compte ?{" "}
-        <Link href="/inscription" className="text-primary font-medium hover:underline">
+        <Link href="/inscription" className="text-primary font-semibold hover:underline">
           Inscris-toi
         </Link>
       </p>
