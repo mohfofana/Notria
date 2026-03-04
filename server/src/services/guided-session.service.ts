@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { z } from "zod";
 import { PromptRegistry, runJsonPrompt } from "../observability/prompt-registry.js";
+import { PedagogicalContentService } from "./pedagogical-content.service.js";
 
 type GuidedSessionState =
   | "INTRO"
@@ -73,6 +74,8 @@ interface GuidedSessionStartInput {
   title?: string;
   description?: string;
   type?: string;
+  subject?: string;
+  examType?: "BEPC" | "BAC";
   durationMinutes?: number;
   objectives?: string[];
   content?: SessionContent;
@@ -99,6 +102,7 @@ interface GuidedScript {
   introLine2: string;
   contextLine1: string;
   contextLine2: string;
+  contextLine3: string;
   checkLine1: string;
   checkLine2: string;
   checkPrompt: string;
@@ -115,12 +119,26 @@ interface GuidedScript {
 interface GuidedSessionInstance {
   id: string;
   topic: string;
+  subject: string;
+  examType: "BEPC" | "BAC";
+  officialContext: string;
   courseProgramSessionId?: number;
   script: GuidedScript;
   topicKeywords: string[];
   currentStepId: SessionStepId;
   correctAnswers: number;
   totalChecks: number;
+}
+
+interface OfficialContextMeta {
+  subject: string;
+  examType: "BEPC" | "BAC";
+  officialContext: string;
+}
+
+interface GeneratedScriptResult {
+  script: GuidedScript;
+  officialMeta: OfficialContextMeta;
 }
 
 const sessions = new Map<string, GuidedSessionInstance>();
@@ -159,58 +177,205 @@ function normalizeInput(input?: GuidedSessionStartInput | string): GuidedSession
   return input;
 }
 
+function inferSubjectFromText(value: string): string {
+  const text = normalizeText(value);
+  if (
+    text.includes("francais") ||
+    text.includes("grammaire") ||
+    text.includes("conjugaison") ||
+    text.includes("orthographe")
+  ) return "Français";
+  if (
+    text.includes("anglais") ||
+    text.includes("english") ||
+    text.includes("grammar") ||
+    text.includes("reading")
+  ) return "Anglais";
+  if (
+    text.includes("svt") ||
+    text.includes("cellule") ||
+    text.includes("ecosysteme") ||
+    text.includes("reproduction")
+  ) return "SVT";
+  if (
+    text.includes("physique") ||
+    text.includes("chimie") ||
+    text.includes("electricite") ||
+    text.includes("optique") ||
+    text.includes("mecanique")
+  ) return "Physique-Chimie";
+  return "Mathématiques";
+}
+
+function truncateContext(value: string, maxChars = 2600): string {
+  const text = value.trim();
+  if (text.length <= maxChars) return text;
+  return `${text.slice(0, maxChars)}\n...[contexte officiel tronque]`;
+}
+
+async function resolveOfficialContext(params: {
+  subjectHint?: string;
+  examTypeHint?: "BEPC" | "BAC";
+  textParts: string[];
+}): Promise<OfficialContextMeta> {
+  const examType: "BEPC" | "BAC" = params.examTypeHint === "BAC" ? "BAC" : "BEPC";
+  const mergedText = params.textParts.filter(Boolean).join(" ");
+  const subject = params.subjectHint?.trim() || inferSubjectFromText(mergedText);
+  const officialContext = await PedagogicalContentService.getCurriculumContext(subject, examType);
+  return { subject, examType, officialContext };
+}
+
 function fallbackScript(input: GuidedSessionStartInput): GuidedScript {
   const topic = input.topic?.trim() || "seance du jour";
   const title = input.title?.trim() || `Micro-session: ${topic}`;
   const objective = input.objectives?.[0] || `Comprendre les points cles de ${topic}`;
   const conceptHint = input.content?.keyConcepts?.[0] || "";
-  const exerciseHint = input.content?.exercises?.[0] || `Donne un exemple simple sur ${topic}.`;
+  const exerciseHint = input.content?.exercises?.[0] || "";
+  const description = input.description?.trim() || "";
 
   const inferredVisualType = inferVisualType(topic, conceptHint || objective);
+
+  // Build a concrete exercise if none provided
+  const concreteExercise = exerciseHint && isConcreteExercise(exerciseHint)
+    ? exerciseHint
+    : getTopicExerciseTemplate(topic);
+
+  // Build a concrete check question (not "explain in your own words")
+  const concreteCheckPrompt = getTopicCheckQuestion(topic, conceptHint);
 
   return {
     topic,
     title,
-    introLine1: `Aujourd'hui, on travaille ${topic} ensemble.`,
-    introLine2: "Objectif: avancer pas a pas avec une methode claire.",
-    contextLine1: input.description?.trim() || `${objective}.`,
-    contextLine2: conceptHint || "Retiens cette idee cle, on la verifie juste apres.",
-    checkLine1: "Verifions ta comprehension.",
-    checkLine2: "Explique avec tes mots, meme si ce n'est pas parfait.",
-    checkPrompt: `Comment tu expliquerais ${topic} a un camarade en classe ?`,
-    practiceLine1: "Passons a la pratique.",
-    practiceLine2: "Montre ton raisonnement etape par etape.",
-    practicePrompt: exerciseHint,
-    recapLine1: `Bon travail. Tu as progresse sur ${topic}.`,
+    introLine1: `Salut ! Aujourd'hui on va travailler sur ${topic}.`,
+    introLine2: `Objectif: ${objective}. On y va pas a pas, tu vas voir c'est simple.`,
+    contextLine1: description
+      ? `${description} C'est une notion importante pour le BEPC.`
+      : `${objective}. C'est une notion cle du programme de 3eme.`,
+    contextLine2: conceptHint
+      ? `Voici comment ca marche: ${conceptHint}. Regarde l'exemple au tableau pour mieux comprendre.`
+      : `On va voir la methode avec un exemple concret. Regarde bien les etapes au tableau.`,
+    contextLine3: conceptHint
+      ? `A retenir: ${conceptHint}.`
+      : `A retenir: pour ${topic}, suis toujours les etapes dans l'ordre.`,
+    checkLine1: "Maintenant, on verifie que tu as compris avec une petite question.",
+    checkLine2: "Utilise ce qu'on vient de voir dans le cours.",
+    checkPrompt: concreteCheckPrompt,
+    practiceLine1: "A ton tour ! Voici un exercice a resoudre.",
+    practiceLine2: "Rappelle-toi de la methode: lis l'enonce, applique la formule, verifie ton resultat.",
+    practicePrompt: concreteExercise,
+    recapLine1: `Bien joue ! Tu as travaille sur ${topic}. Continue comme ca.`,
     explainVisual: {
       type: inferredVisualType,
-      title: `Tableau: ${topic}`,
-      content: [objective, conceptHint || `Idee cle: ${topic}`].filter(Boolean).join("\n"),
+      title: topic,
+      content: [
+        objective,
+        conceptHint || `Methode: etape par etape`,
+      ].filter(Boolean).join("\n"),
       figure: inferredVisualType === "diagram" ? "triangle" : "method",
-      steps: ["Definition", "Exemple rapide", "Question de verification"],
+      steps: ["Comprendre la definition", "Voir l'exemple", "Retenir la formule"],
     },
     checkVisual: {
       type: "formula",
-      title: "Question de comprehension",
-      content: `A retenir\n${topic}\nPuis reponds avec tes mots`,
+      title: "Verification",
+      content: concreteCheckPrompt,
       figure: "method",
-      steps: ["Lis", "Explique avec tes mots", "Donne un exemple"],
+      steps: ["Lire la question", "Appliquer le cours", "Donner la reponse"],
     },
     practiceVisual: {
       type: "exercise_card",
-      title: title || `Exercice - ${topic}`,
-      content: exerciseHint,
+      title: `Exercice: ${topic}`,
+      content: concreteExercise,
       figure: "equation",
-      steps: ["Identifier les donnees", "Appliquer la methode", "Verifier le resultat"],
+      steps: ["Lire l'enonce", "Appliquer la methode", "Verifier le resultat"],
     },
     recapVisual: {
       type: "formula",
-      title: "Methode en 3 etapes",
-      content: ["1) Lire l'enonce", "2) Choisir la methode", "3) Verifier le resultat"].join("\n"),
+      title: "Methode a retenir",
+      content: [
+        "1) Lire l'enonce et reperer les donnees",
+        "2) Choisir et appliquer la bonne formule",
+        "3) Calculer et verifier le resultat",
+      ].join("\n"),
       figure: "method",
-      steps: ["Lire", "Calculer", "Verifier"],
+      steps: ["Lire", "Appliquer", "Verifier"],
     },
   };
+}
+
+function getTopicCheckQuestion(topic: string, conceptHint: string): string {
+  const t = normalizeText(topic);
+
+  // --- Mathematiques ---
+  if (t.includes("pythagore")) return "Dans un triangle rectangle, AB=6cm et BC=8cm. Quelle est la formule pour trouver AC?";
+  if (t.includes("thales")) return "Si deux droites paralleles coupent deux secantes, que peut-on dire des rapports des segments?";
+  if (t.includes("vecteur")) return "Si A(1,3) et B(4,7), quelles sont les coordonnees du vecteur AB?";
+  if (t.includes("equation")) return "Pour resoudre 2x+5=13, quelle est la premiere etape?";
+  if (t.includes("fraction")) return "Comment simplifier la fraction 12/18? Donne le resultat.";
+  if (t.includes("trigonometrie") || t.includes("cosinus") || t.includes("sinus"))
+    return "Dans un triangle rectangle, cos(angle) = quoi divise par quoi?";
+  if (t.includes("fonction") || t.includes("lineaire") || t.includes("affine"))
+    return "Si f(x)=3x+2, combien vaut f(4)?";
+  if (t.includes("statistique") || t.includes("moyenne"))
+    return "Comment calcule-t-on la moyenne d'une serie de nombres?";
+  if (t.includes("probabilite")) return "On lance un de a 6 faces. Quelle est la probabilite d'obtenir un 3?";
+  if (t.includes("geometrie") || t.includes("cercle") || t.includes("aire"))
+    return "Quelle est la formule de l'aire d'un cercle de rayon r?";
+
+  // --- Physique-Chimie ---
+  if (t.includes("electricite") || t.includes("circuit") || t.includes("tension"))
+    return "Quelle est la formule de la loi d'Ohm? (relation entre U, R et I)";
+  if (t.includes("mecanique") || t.includes("force") || t.includes("poids"))
+    return "Quelle est la formule du poids? (P = ... x ...)";
+  if (t.includes("optique") || t.includes("lumiere") || t.includes("lentille"))
+    return "Dans quel milieu la lumiere se propage-t-elle en ligne droite?";
+  if (t.includes("chimie") || t.includes("solution") || t.includes("matiere"))
+    return "Quelle est la difference entre un melange homogene et un melange heterogene?";
+  if (t.includes("energie"))
+    return "Cite deux formes d'energie que tu connais.";
+
+  // --- SVT ---
+  if (t.includes("cellule"))
+    return "Quels sont les 3 elements principaux d'une cellule? (membrane, ... , ...)";
+  if (t.includes("reproduction"))
+    return "Quel est le role des gametes dans la reproduction?";
+  if (t.includes("nutrition") || t.includes("digestion") || t.includes("aliment"))
+    return "Quel organe commence la digestion des aliments?";
+  if (t.includes("environnement") || t.includes("ecosysteme") || t.includes("ecologie"))
+    return "Qu'est-ce qu'un ecosysteme? Donne un exemple.";
+  if (t.includes("corps humain") || t.includes("organe") || t.includes("respiration"))
+    return "Quel gaz inspire-t-on et quel gaz expire-t-on lors de la respiration?";
+
+  // --- Francais ---
+  if (t.includes("grammaire") || t.includes("sujet") || t.includes("complement"))
+    return "Dans la phrase 'Le chat mange la souris', quel est le sujet et quel est le COD?";
+  if (t.includes("conjugaison") || t.includes("verbe") || t.includes("temps"))
+    return "Conjugue le verbe 'aller' au passe compose avec 'je'.";
+  if (t.includes("orthographe") || t.includes("dictee"))
+    return "Ecris correctement: 'Les enfants (jouer) dans la cour.' Quel temps utilises-tu?";
+  if (t.includes("expression") || t.includes("redaction") || t.includes("texte"))
+    return "Quelle est la difference entre un texte narratif et un texte argumentatif?";
+  if (t.includes("comprehension") || t.includes("lecture"))
+    return "Quand tu lis un texte, que dois-tu reperer en premier pour le comprendre?";
+  if (t.includes("vocabulaire"))
+    return "Quel est le synonyme du mot 'heureux'?";
+  if (t.includes("resume"))
+    return "Quelles sont les 3 regles principales pour faire un bon resume?";
+
+  // --- Anglais ---
+  if (t.includes("grammar") || t.includes("tense") || t.includes("verb"))
+    return "Complete: 'She ___ (go) to school every day.' (present simple)";
+  if (t.includes("reading") || t.includes("comprehension"))
+    return "When reading a text in English, what should you look for first?";
+  if (t.includes("vocabulary") || t.includes("word"))
+    return "What is the opposite of 'happy'?";
+  if (t.includes("writing") || t.includes("paragraph"))
+    return "What are the 3 parts of a good paragraph? (introduction, ..., ...)";
+  if (t.includes("english") || t.includes("anglais") || t.includes("everyday"))
+    return "How do you introduce yourself in English? Write one sentence.";
+
+  // --- Fallback generique ---
+  if (conceptHint) return `D'apres le cours, ${conceptHint.toLowerCase().replace(/\.$/, "")} — donne un exemple concret.`;
+  return `Quelle est la notion principale a retenir pour ${topic}?`;
 }
 
 function inferVisualType(topic: string, context: string): GuidedVisualType {
@@ -220,14 +385,25 @@ function inferVisualType(topic: string, context: string): GuidedVisualType {
     text.includes("pythagore") ||
     text.includes("geometr") ||
     text.includes("schema") ||
-    text.includes("repere")
+    text.includes("repere") ||
+    text.includes("circuit") ||
+    text.includes("cellule") ||
+    text.includes("organe") ||
+    text.includes("ecosysteme") ||
+    text.includes("optique")
   ) {
     return "diagram";
   }
   if (
     text.includes("exercice") ||
     text.includes("probleme") ||
-    text.includes("application")
+    text.includes("application") ||
+    text.includes("texte") ||
+    text.includes("comprehension") ||
+    text.includes("reading") ||
+    text.includes("writing") ||
+    text.includes("dictee") ||
+    text.includes("redaction")
   ) {
     return "exercise_card";
   }
@@ -298,25 +474,84 @@ function overlapCount(a: string, b: string): number {
 }
 
 function isConcreteExercise(value: string): boolean {
-  return /[0-9=+\-*/()]/.test(value) || /\b(calcule|resous|determine|trouve|montre)\b/i.test(value);
+  return /[0-9=+\-*/()]/.test(value) || /\b(calcule|resous|determine|trouve|montre|conjugue|analyse|complete|corrige|explique|ecris|cite|place|identifie|write|read|put|match|answer)\b/i.test(value);
 }
 
 function getTopicExerciseTemplate(topic: string): string {
   const t = normalizeText(topic);
-  if (t.includes("vecteur")) {
+
+  // --- Mathematiques ---
+  if (t.includes("vecteur"))
     return "Dans un repere, A(1,2) et B(5,4). Calcule les coordonnees du vecteur AB puis sa norme.";
-  }
-  if (t.includes("pythagore")) {
+  if (t.includes("pythagore"))
     return "Triangle rectangle en B, AB=3 cm et BC=4 cm. Calcule AC en montrant les etapes.";
-  }
-  if (t.includes("equation")) {
+  if (t.includes("equation"))
     return "Resous: 2x + 5 = 17. Donne les etapes puis la valeur de x.";
-  }
-  return `Exercice: resous un cas simple sur ${topic}. Montre les etapes et le resultat final.`;
+  if (t.includes("thales"))
+    return "Dans un triangle ABC, M est sur [AB] et N sur [AC] avec (MN)//(BC). AM=3, AB=9, AN=2. Calcule AC.";
+  if (t.includes("trigonometrie") || t.includes("cosinus") || t.includes("sinus"))
+    return "Triangle rectangle en A, angle B=30 degres, BC=10cm. Calcule AB en utilisant cos(B).";
+  if (t.includes("fonction") || t.includes("lineaire") || t.includes("affine"))
+    return "f(x) = 2x - 3. Calcule f(0), f(1) et f(5). Puis trace la droite sur un repere.";
+  if (t.includes("statistique") || t.includes("moyenne"))
+    return "Notes d'un eleve: 12, 14, 8, 16, 10. Calcule la moyenne. Quelle est la note la plus frequente?";
+
+  // --- Physique-Chimie ---
+  if (t.includes("electricite") || t.includes("circuit") || t.includes("tension"))
+    return "Un appareil a une resistance R=20 ohms et est traverse par un courant I=0,5A. Calcule la tension U avec la loi d'Ohm.";
+  if (t.includes("mecanique") || t.includes("force") || t.includes("poids"))
+    return "Un objet a une masse m=5kg. Calcule son poids P sachant que g=10N/kg.";
+  if (t.includes("optique") || t.includes("lumiere"))
+    return "Un rayon lumineux passe de l'air a l'eau. Que se passe-t-il au niveau de la surface? Explique le phenomene.";
+  if (t.includes("chimie") || t.includes("solution") || t.includes("matiere"))
+    return "On dissout 10g de sel dans 200mL d'eau. Calcule la concentration massique de la solution en g/L.";
+  if (t.includes("energie"))
+    return "Une lampe de 60W fonctionne pendant 2 heures. Calcule l'energie consommee en Wh puis en kWh.";
+
+  // --- SVT ---
+  if (t.includes("cellule"))
+    return "Dessine une cellule animale et nomme ses 3 parties principales. Quel est le role du noyau?";
+  if (t.includes("reproduction"))
+    return "Explique la difference entre la fecondation interne et la fecondation externe. Donne un exemple pour chaque.";
+  if (t.includes("nutrition") || t.includes("digestion"))
+    return "Place dans l'ordre les organes du tube digestif: estomac, bouche, intestin grele, oesophage, gros intestin.";
+  if (t.includes("environnement") || t.includes("ecosysteme"))
+    return "Dans une foret, cite un producteur, un consommateur primaire et un consommateur secondaire. Trace la chaine alimentaire.";
+  if (t.includes("corps humain") || t.includes("respiration"))
+    return "Explique le trajet de l'air depuis le nez jusqu'aux poumons. Cite 3 organes traverses.";
+
+  // --- Francais ---
+  if (t.includes("grammaire") || t.includes("complement"))
+    return "Analyse la phrase: 'Le professeur donne un livre a l'eleve.' Identifie le sujet, le verbe, le COD et le COI.";
+  if (t.includes("conjugaison") || t.includes("verbe"))
+    return "Conjugue les verbes 'finir' et 'prendre' au passe compose avec le sujet 'nous'.";
+  if (t.includes("orthographe") || t.includes("dictee"))
+    return "Corrige les erreurs: 'Les enfant joue dans la cours de l'ecoles.' Reecris la phrase correctement.";
+  if (t.includes("expression") || t.includes("redaction"))
+    return "Ecris 3 phrases pour decrire ta journee a l'ecole. Utilise le passe compose.";
+  if (t.includes("comprehension") || t.includes("resume") || t.includes("texte"))
+    return "Lis ce passage et reponds: 'L'eau est essentielle a la vie.' Pourquoi dit-on que l'eau est essentielle? Donne 2 raisons.";
+  if (t.includes("vocabulaire"))
+    return "Trouve un synonyme et un antonyme pour chaque mot: grand, rapide, joyeux.";
+
+  // --- Anglais ---
+  if (t.includes("grammar") || t.includes("tense"))
+    return "Put the verbs in the correct form: 'Yesterday, she ___ (go) to school. Right now, she ___ (study).'";
+  if (t.includes("reading") || t.includes("comprehension"))
+    return "Read: 'Abidjan is the largest city in Ivory Coast.' Answer: What is the largest city? In which country is it?";
+  if (t.includes("vocabulary") || t.includes("word"))
+    return "Match the words with their French translation: happy, school, teacher, book.";
+  if (t.includes("writing") || t.includes("paragraph"))
+    return "Write 3 sentences about your family in English. Use: 'My name is...', 'I have...', 'We live in...'";
+  if (t.includes("english") || t.includes("anglais") || t.includes("everyday"))
+    return "Complete the dialogue: 'Hello, my name is ___. I am ___ years old. I live in ___.'";
+
+  // --- Fallback generique ---
+  return `Exercice sur ${topic}: reponds a la question principale du cours. Montre que tu as compris la notion.`;
 }
 
 function ensureCoherentScript(base: GuidedScript, fallback: GuidedScript): GuidedScript {
-  const contextAnchor = [base.topic, base.contextLine1, base.contextLine2].join(" ");
+  const contextAnchor = [base.topic, base.contextLine1, base.contextLine2, base.contextLine3].join(" ");
   const coherentPracticePrompt = isConcreteExercise(base.practicePrompt)
     ? base.practicePrompt
     : getTopicExerciseTemplate(base.topic);
@@ -366,6 +601,7 @@ function sanitizeScript(candidate: Partial<GuidedScript>, input: GuidedSessionSt
     introLine2: pick(candidate.introLine2, fallback.introLine2),
     contextLine1: pick(candidate.contextLine1, fallback.contextLine1),
     contextLine2: pick(candidate.contextLine2, fallback.contextLine2),
+    contextLine3: pick(candidate.contextLine3, fallback.contextLine3),
     checkLine1: pick(candidate.checkLine1, fallback.checkLine1),
     checkLine2: pick(candidate.checkLine2, fallback.checkLine2),
     checkPrompt: pick(candidate.checkPrompt, fallback.checkPrompt),
@@ -382,18 +618,23 @@ function sanitizeScript(candidate: Partial<GuidedScript>, input: GuidedSessionSt
   return ensureCoherentScript(base, fallback);
 }
 
-async function generateScript(input: GuidedSessionStartInput): Promise<GuidedScript> {
+async function generateScript(input: GuidedSessionStartInput): Promise<GeneratedScriptResult> {
   const client = getOpenAIClient();
-  if (!client) return fallbackScript(input);
-
   const topic = input.topic?.trim() || "seance du jour";
   const title = input.title?.trim() || "";
+  const description = input.description?.trim() || "";
   const type = input.type?.trim() || "";
   const durationMinutes = Number.isFinite(input.durationMinutes) ? input.durationMinutes : undefined;
   const objectives = (input.objectives ?? []).slice(0, 3).join(" | ");
   const keyConcepts = (input.content?.keyConcepts ?? []).slice(0, 3).join(" | ");
   const exercises = (input.content?.exercises ?? []).slice(0, 2).join(" | ");
-  const description = input.description?.trim() || "";
+  const officialMeta = await resolveOfficialContext({
+    subjectHint: input.subject,
+    examTypeHint: input.examType,
+    textParts: [topic, title, description, objectives, keyConcepts, exercises],
+  });
+
+  if (!client) return { script: fallbackScript(input), officialMeta };
 
   const scriptSchema = z.object({
     topic: z.string().min(1),
@@ -402,6 +643,7 @@ async function generateScript(input: GuidedSessionStartInput): Promise<GuidedScr
     introLine2: z.string().min(1),
     contextLine1: z.string().min(1),
     contextLine2: z.string().min(1),
+    contextLine3: z.string().min(1),
     checkLine1: z.string().min(1),
     checkLine2: z.string().min(1),
     checkPrompt: z.string().min(1),
@@ -417,15 +659,38 @@ async function generateScript(input: GuidedSessionStartInput): Promise<GuidedScr
 
   try {
     const userContent = [
-      `Genere un script JSON pour une micro-session sur "${topic}".`,
-      `Titre: ${title || "non fourni"}. Type: ${type || "non fourni"}.`,
-      `Duree: ${durationMinutes ?? "non fournie"} min.`,
-      `Description: ${description || "non fournie"}.`,
-      `Objectifs: ${objectives || "non fournis"}.`,
-      `Concepts cles: ${keyConcepts || "non fournis"}.`,
-      `Exercices de reference: ${exercises || "non fournis"}.`,
-      "JSON strict attendu avec champs script + visuals.",
-    ].join("\n");
+      `MICRO-COURS sur "${topic}" pour un eleve de 3eme en Cote d'Ivoire.`,
+      `Matiere: ${officialMeta.subject}. Examen: ${officialMeta.examType}.`,
+      title ? `Titre: ${title}.` : "",
+      description ? `Description: ${description}.` : "",
+      objectives ? `Objectifs: ${objectives}.` : "",
+      keyConcepts ? `Concepts cles: ${keyConcepts}.` : "",
+      exercises ? `Exercices de reference: ${exercises}.` : "",
+      "",
+      "REFERENTIEL OFFICIEL A RESPECTER (DPFC):",
+      truncateContext(officialMeta.officialContext),
+      "",
+      "GENERE un JSON avec ces champs (chaque champ = une phrase que Prof Ada dit a l'eleve):",
+      "",
+      "introLine1: phrase d'accueil chaleureuse mentionnant le sujet du jour",
+      "introLine2: ce qu'on va apprendre aujourd'hui (objectif clair)",
+      "",
+      "contextLine1: DEFINITION claire du concept. 2-3 phrases simples. Explique QUOI c'est et A QUOI ca sert. Comme si tu parlais a un eleve qui ne connait rien du sujet.",
+      "contextLine2: EXEMPLE CONCRET resolu etape par etape avec des vrais chiffres. Montre la methode sur un cas simple. Ex: 'Prenons un triangle avec AB=3cm et BC=4cm. On cherche AC. Etape 1: on ecrit la formule AC²=AB²+BC². Etape 2: AC²=9+16=25. Etape 3: AC=5cm.'",
+      "contextLine3: LA REGLE A RETENIR en une phrase. La formule ou la methode cle que l'eleve doit memoriser.",
+      "",
+      "checkLine1: phrase de transition vers la verification (ex: 'Voyons si tu as compris.')",
+      "checkLine2: indice ou rappel pour aider l'eleve a repondre",
+      "checkPrompt: UNE QUESTION PRECISE avec une reponse attendue claire. PAS 'explique avec tes mots'. Donne un petit calcul ou une question directe. Ex: 'Si AB=5 et BC=12, combien vaut AC?' ou 'Quelle est la formule du theoreme de Pythagore?'",
+      "",
+      "practiceLine1: introduction a l'exercice pratique",
+      "practiceLine2: rappel de la methode a utiliser",
+      "practicePrompt: UN EXERCICE avec des CHIFFRES CONCRETS. L'eleve doit pouvoir calculer. Ex: 'Resous: 3x + 7 = 22. Donne les etapes et le resultat.'",
+      "",
+      "recapLine1: felicitations et resume de ce qu'on a appris",
+      "",
+      "JSON strict. Pas de markdown. Pas de texte hors JSON.",
+    ].filter(Boolean).join("\n");
 
     const { data } = await runJsonPrompt({
       prompt: PromptRegistry.guidedScriptV1,
@@ -433,12 +698,15 @@ async function generateScript(input: GuidedSessionStartInput): Promise<GuidedScr
       userContent,
       retries: 3,
       temperature: 0.5,
-      maxTokens: 900,
+      maxTokens: 1200,
     });
 
-    return sanitizeScript(data as Partial<GuidedScript>, input);
+    return {
+      script: sanitizeScript(data as Partial<GuidedScript>, input),
+      officialMeta,
+    };
   } catch {
-    return fallbackScript(input);
+    return { script: fallbackScript(input), officialMeta };
   }
 }
 
@@ -453,7 +721,7 @@ async function generateHelpResponse(
   const stepContext = (() => {
     switch (session.currentStepId) {
       case "explain-context":
-        return `Explication en cours: "${session.script.contextLine1}" / "${session.script.contextLine2}"`;
+        return `Explication en cours: "${session.script.contextLine1}" / "${session.script.contextLine2}" / "${session.script.contextLine3}"`;
       case "concept-check":
         return `Verification: "${session.script.checkPrompt}"`;
       case "practice":
@@ -466,33 +734,47 @@ async function generateHelpResponse(
   })();
 
   const systemPrompt = [
-    "Tu es Prof Ada, un tuteur ivoirien bienveillant pour des eleves de 3eme (14-16 ans) en Cote d'Ivoire.",
-    "Tu tutoies toujours. Ton chaleureux et respectueux, jamais familier excessif.",
-    "Francais simple et naturel, phrases courtes (max 2-3 phrases).",
-    "Utilise des exemples de vie quotidienne en Cote d'Ivoire quand c'est utile.",
-    `Sujet: ${session.topic}.`,
+    "Tu es Prof Ada, tutrice bienveillante pour des eleves de 3eme (14-16 ans) en Cote d'Ivoire.",
+    "Tu tutoies toujours. Ton ton est chaleureux et respectueux.",
+    "REGLES STRICTES:",
+    "- Francais TRES simple. Comme si tu parlais a un eleve de 14 ans.",
+    "- Phrases courtes (max 15 mots par phrase).",
+    "- PAS de metaphores compliquees. PAS de comparaisons abstraites.",
+    "- Donne des EXEMPLES CONCRETS avec des chiffres.",
+    "- Si c'est un calcul, montre les etapes: Etape 1, Etape 2, etc.",
+    `Matiere: ${session.subject}. Examen: ${session.examType}.`,
+    "Referentiel officiel DPFC (a respecter):",
+    truncateContext(session.officialContext, 1800),
+    `Sujet du cours: ${session.topic}.`,
+    `Contenu du cours: ${session.script.contextLine1} ${session.script.contextLine2} ${session.script.contextLine3}`,
     stepContext,
-  ].join(" ");
+  ].join("\n");
 
   const userPrompts: Record<string, string> = {
     not_understood: [
-      "L'eleve n'a pas compris. Reformule l'explication plus simplement.",
-      "Utilise une analogie de la vie quotidienne en Cote d'Ivoire (marche, football, cuisine, transport, etc.).",
-      "Sois encourageant. Maximum 3 phrases simples.",
+      "L'eleve n'a pas compris. Re-explique le cours plus simplement.",
+      "1) Donne la DEFINITION en une phrase simple.",
+      "2) Montre UN exemple avec des vrais chiffres, etape par etape.",
+      "3) Termine par la regle a retenir.",
+      "PAS de metaphore. PAS d'analogie. Juste le cours explique simplement.",
+      "Maximum 4 phrases.",
     ].join(" "),
     need_example: [
-      `Donne UN exemple concret et simple sur "${session.topic}".`,
-      "L'exemple doit etre facile a comprendre pour un eleve ivoirien de 3eme.",
-      "Si c'est un calcul, montre les etapes clairement. Maximum 4 phrases.",
+      `Donne UN exemple concret sur "${session.topic}" avec des chiffres.`,
+      "Montre chaque etape du calcul. Ex: 'Etape 1: on ecrit... Etape 2: on calcule...'",
+      "L'eleve de 3eme doit pouvoir suivre sans aide.",
+      "Maximum 4 phrases.",
     ].join(" "),
     need_hint: [
-      `L'eleve est bloque sur: "${session.script.practicePrompt}".`,
-      "Donne UN indice qui guide vers la solution sans la donner.",
-      "Sois encourageant. Maximum 2 phrases.",
+      `L'eleve est bloque sur cet exercice: "${session.script.practicePrompt}".`,
+      "Donne la PREMIERE etape a faire, sans donner la reponse finale.",
+      "Ex: 'Commence par ecrire la formule...' ou 'D'abord, identifie les donnees...'",
+      "Maximum 2 phrases.",
     ].join(" "),
     ask_question: [
       `L'eleve pose cette question: "${questionText || ""}".`,
-      "Reponds clairement et simplement. Maximum 3 phrases.",
+      "Reponds en rapport avec le cours sur ${session.topic}.",
+      "Reponse directe et simple. Maximum 3 phrases.",
     ].join(" "),
   };
 
@@ -557,8 +839,11 @@ async function evaluateAnswer(
     "Tu es Prof Ada, un tuteur ivoirien pour des eleves de 3eme en Cote d'Ivoire.",
     "Ton: encourageant, precis, pedagogique. Pas de style familier excessif.",
     "Francais clair, phrases courtes.",
+    `Matiere: ${session.subject}. Examen: ${session.examType}.`,
+    "Referentiel officiel DPFC (a respecter):",
+    truncateContext(session.officialContext, 1800),
     `Sujet du cours: ${session.topic}.`,
-    `Contenu du cours: ${session.script.contextLine1} ${session.script.contextLine2}`,
+    `Contenu du cours: ${session.script.contextLine1} ${session.script.contextLine2} ${session.script.contextLine3}`,
     questionContext,
   ].join("\n");
 
@@ -739,12 +1024,15 @@ function buildStep(session: GuidedSessionInstance, feedback?: string): GuidedSte
         ...base,
         id: "explain-context",
         state: "EXPLAIN",
-        coachLines: [script.contextLine1, script.contextLine2],
-        prompt: "Lis bien, puis utilise les boutons en bas.",
+        coachLines: [script.contextLine1, script.contextLine2, script.contextLine3],
+        prompt: "Lis bien le cours, regarde l'exemple, puis clique sur Continuer quand tu es pret.",
         visual: script.explainVisual,
         interaction: {
           type: "choice",
-          ctaLabel: "Continuer",
+          ctaLabel: "J'ai compris, on continue",
+          choices: buildChoices([
+            { id: "understood_continue", label: "J'ai compris, on continue" },
+          ]),
         },
       };
     case "concept-check":
@@ -843,12 +1131,15 @@ export const GuidedSessionService = {
   async start(input?: GuidedSessionStartInput | string): Promise<GuidedSessionStartResponse> {
     const normalizedInput = normalizeInput(input);
     const id = `${Date.now()}-${Math.round(Math.random() * 1_000_000)}`;
-    const script = await generateScript(normalizedInput);
+    const { script, officialMeta } = await generateScript(normalizedInput);
     const topicKeywords = buildTopicKeywords(normalizedInput, script);
 
     const session: GuidedSessionInstance = {
       id,
       topic: script.topic,
+      subject: officialMeta.subject,
+      examType: officialMeta.examType,
+      officialContext: officialMeta.officialContext,
       courseProgramSessionId: normalizedInput.courseProgramSessionId,
       script,
       topicKeywords,

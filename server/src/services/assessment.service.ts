@@ -588,27 +588,34 @@ export const AssessmentService = {
       domainState.correct += 1;
     }
 
-    const isMathDomain = currentQuestion.subject === "Mathématiques"
-      && DOMAIN_CONFIG.some((domain) => domain.key === currentQuestion.domainKey);
-    if (isMathDomain && currentQuestion.domainAttempt === 1 && domainState.totalPlanned === 2) {
+    if (currentQuestion.domainAttempt === 1 && domainState.totalPlanned >= 2) {
       const secondQuestionIndex = progress.questions.findIndex(
         (question) => question.domainKey === currentQuestion.domainKey && question.domainAttempt === 2,
       );
 
       if (secondQuestionIndex >= 0) {
         const desiredDifficulty: Difficulty = currentQuestion.isCorrect ? "difficile" : "facile";
-        const nextQuestion = progress.questions[secondQuestionIndex];
         const usedIds = new Set(progress.questions.map((question) => question.id));
-        usedIds.delete(nextQuestion.id);
+        usedIds.delete(progress.questions[secondQuestionIndex].id);
 
-        const replacement = shuffleOptions(pickQuestion(currentQuestion.domainKey, desiredDifficulty, usedIds));
-        progress.questions[secondQuestionIndex] = {
-          ...replacement,
-          topic: resolveTopic(currentQuestion.domainKey, replacement.topic),
-          subject: "Mathématiques",
-          domainKey: currentQuestion.domainKey,
-          domainAttempt: 2,
-        };
+        const isMathDomain = currentQuestion.subject === "Mathématiques"
+          && DOMAIN_CONFIG.some((domain) => domain.key === currentQuestion.domainKey);
+
+        try {
+          const replacement = isMathDomain
+            ? shuffleOptions(pickQuestion(currentQuestion.domainKey, desiredDifficulty, usedIds))
+            : shuffleOptions(pickQuestionForSubject(currentQuestion.subject, desiredDifficulty, usedIds));
+
+          progress.questions[secondQuestionIndex] = {
+            ...replacement,
+            topic: isMathDomain ? resolveTopic(currentQuestion.domainKey, replacement.topic) : replacement.topic,
+            subject: currentQuestion.subject,
+            domainKey: currentQuestion.domainKey,
+            domainAttempt: 2,
+          };
+        } catch {
+          // Keep original question if no replacement available at desired difficulty
+        }
       }
     }
 

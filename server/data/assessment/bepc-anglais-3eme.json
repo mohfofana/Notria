@@ -1,0 +1,187 @@
+[
+  {
+    "id": "ang-01",
+    "subject": "Anglais",
+    "topic": "Grammar",
+    "difficulty": "facile",
+    "question": "Choose the correct form: She ___ to school every day.",
+    "options": ["go", "goes", "going", "gone"],
+    "correctAnswer": 1,
+    "explanation": "Third person singular in present simple takes -s.",
+    "tags": ["grammar", "present_simple"]
+  },
+  {
+    "id": "ang-02",
+    "subject": "Anglais",
+    "topic": "Vocabulary",
+    "difficulty": "facile",
+    "question": "What is the opposite of 'big'?",
+    "options": ["small", "tall", "wide", "strong"],
+    "correctAnswer": 0,
+    "explanation": "The antonym of 'big' is 'small'.",
+    "tags": ["vocabulary", "antonyms"]
+  },
+  {
+    "id": "ang-03",
+    "subject": "Anglais",
+    "topic": "Reading",
+    "difficulty": "facile",
+    "question": "Read: 'Koffi lives in Abidjan.' Where does Koffi live?",
+    "options": ["Yamoussoukro", "Abidjan", "Bouake", "Korhogo"],
+    "correctAnswer": 1,
+    "explanation": "The sentence says Koffi lives in Abidjan.",
+    "tags": ["reading", "comprehension"]
+  },
+  {
+    "id": "ang-04",
+    "subject": "Anglais",
+    "topic": "Grammar",
+    "difficulty": "facile",
+    "question": "Choose the correct pronoun: This is Aminata. ___ is my friend.",
+    "options": ["He", "She", "It", "They"],
+    "correctAnswer": 1,
+    "explanation": "Aminata is female, so we use 'She'.",
+    "tags": ["grammar", "pronouns"]
+  },
+  {
+    "id": "ang-05",
+    "subject": "Anglais",
+    "topic": "Writing",
+    "difficulty": "facile",
+    "question": "Which sentence is correct?",
+    "options": [
+      "I am in class three.",
+      "I is in class three.",
+      "I are in class three.",
+      "I be in class three."
+    ],
+    "correctAnswer": 0,
+    "explanation": "With 'I', we use 'am'.",
+    "tags": ["writing", "basic_sentence"]
+  },
+  {
+    "id": "ang-06",
+    "subject": "Anglais",
+    "topic": "Grammar",
+    "difficulty": "moyen",
+    "question": "Choose the correct past form: Yesterday, they ___ football.",
+    "options": ["play", "plays", "played", "playing"],
+    "correctAnswer": 2,
+    "explanation": "Past simple of 'play' is 'played'.",
+    "tags": ["grammar", "past_simple"]
+  },
+  {
+    "id": "ang-07",
+    "subject": "Anglais",
+    "topic": "Vocabulary",
+    "difficulty": "moyen",
+    "question": "Choose the correct word: A person who teaches is a ___.",
+    "options": ["farmer", "teacher", "driver", "doctor"],
+    "correctAnswer": 1,
+    "explanation": "A person who teaches is a teacher.",
+    "tags": ["vocabulary", "jobs"]
+  },
+  {
+    "id": "ang-08",
+    "subject": "Anglais",
+    "topic": "Reading",
+    "difficulty": "moyen",
+    "question": "Read: 'The market opens at 7 a.m.' What time does it open?",
+    "options": ["6 a.m.", "7 a.m.", "8 a.m.", "9 a.m."],
+    "correctAnswer": 1,
+    "explanation": "The text says 7 a.m.",
+    "tags": ["reading", "time"]
+  },
+  {
+    "id": "ang-09",
+    "subject": "Anglais",
+    "topic": "Grammar",
+    "difficulty": "moyen",
+    "question": "Complete: If it rains, we ___ at home.",
+    "options": ["stays", "stayed", "stay", "staying"],
+    "correctAnswer": 2,
+    "explanation": "First conditional uses present simple in this structure.",
+    "tags": ["grammar", "conditionals"]
+  },
+  {
+    "id": "ang-10",
+    "subject": "Anglais",
+    "topic": "Writing",
+    "difficulty": "moyen",
+    "question": "Which sentence is in the present continuous?",
+    "options": [
+      "She writes a letter.",
+      "She is writing a letter.",
+      "She wrote a letter.",
+      "She has written a letter."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Present continuous is 'is/am/are + verb-ing'.",
+    "tags": ["writing", "tenses"]
+  },
+  {
+    "id": "ang-11",
+    "subject": "Anglais",
+    "topic": "Grammar",
+    "difficulty": "difficile",
+    "question": "Choose the correct sentence.",
+    "options": [
+      "He don't like math.",
+      "He doesn't likes math.",
+      "He doesn't like math.",
+      "He not like math."
+    ],
+    "correctAnswer": 2,
+    "explanation": "With 'doesn't', the main verb stays at base form.",
+    "tags": ["grammar", "negation"]
+  },
+  {
+    "id": "ang-12",
+    "subject": "Anglais",
+    "topic": "Vocabulary",
+    "difficulty": "difficile",
+    "question": "Choose the best synonym of 'quick'.",
+    "options": ["slow", "fast", "weak", "late"],
+    "correctAnswer": 1,
+    "explanation": "'Fast' is a synonym of 'quick'.",
+    "tags": ["vocabulary", "synonyms"]
+  },
+  {
+    "id": "ang-13",
+    "subject": "Anglais",
+    "topic": "Reading",
+    "difficulty": "difficile",
+    "question": "Read: 'Although it was late, they continued studying.' Why did they continue?",
+    "options": ["Because it was early", "Because they were tired", "Despite the late time", "Because school was closed"],
+    "correctAnswer": 2,
+    "explanation": "'Although it was late' means they continued despite that.",
+    "tags": ["reading", "link_words"]
+  },
+  {
+    "id": "ang-14",
+    "subject": "Anglais",
+    "topic": "Writing",
+    "difficulty": "difficile",
+    "question": "Choose the best formal opening for a letter.",
+    "options": ["Hey buddy,", "Dear Sir or Madam,", "Yo friend,", "Hi guys,"],
+    "correctAnswer": 1,
+    "explanation": "'Dear Sir or Madam' is formal.",
+    "tags": ["writing", "letter"]
+  },
+  {
+    "id": "ang-15",
+    "subject": "Anglais",
+    "topic": "Grammar",
+    "difficulty": "difficile",
+    "question": "Choose the correct reported speech: He said, 'I am tired.'",
+    "options": [
+      "He said that he is tired.",
+      "He said that he was tired.",
+      "He says that he was tired.",
+      "He said he tired."
+    ],
+    "correctAnswer": 1,
+    "explanation": "In reported speech, present often shifts to past.",
+    "tags": ["grammar", "reported_speech"]
+  }
+]

@@ -1,0 +1,167 @@
+[
+  {
+    "id": "pc-01",
+    "subject": "Physique-Chimie",
+    "topic": "Electricite",
+    "difficulty": "facile",
+    "question": "La loi d'Ohm s'ecrit...",
+    "options": ["U = R + I", "U = R / I", "U = R x I", "U = I - R"],
+    "correctAnswer": 2,
+    "explanation": "La relation est U = R x I.",
+    "tags": ["electricite", "formules"]
+  },
+  {
+    "id": "pc-02",
+    "subject": "Physique-Chimie",
+    "topic": "Mecanique",
+    "difficulty": "facile",
+    "question": "Le poids d'un corps se calcule par...",
+    "options": ["P = m + g", "P = m x g", "P = m / g", "P = g - m"],
+    "correctAnswer": 1,
+    "explanation": "Le poids est P = m x g.",
+    "tags": ["mecanique", "poids"]
+  },
+  {
+    "id": "pc-03",
+    "subject": "Physique-Chimie",
+    "topic": "Optique",
+    "difficulty": "facile",
+    "question": "Dans un milieu homogene et transparent, la lumiere se propage...",
+    "options": ["en cercle", "en ligne droite", "en spirale", "au hasard"],
+    "correctAnswer": 1,
+    "explanation": "Elle se propage rectilignement.",
+    "tags": ["optique", "lumiere"]
+  },
+  {
+    "id": "pc-04",
+    "subject": "Physique-Chimie",
+    "topic": "Chimie",
+    "difficulty": "facile",
+    "question": "Le pH d'une solution acide est...",
+    "options": ["egal a 7", "superieur a 7", "inferieur a 7", "egal a 14"],
+    "correctAnswer": 2,
+    "explanation": "Une solution acide a un pH < 7.",
+    "tags": ["chimie", "ph"]
+  },
+  {
+    "id": "pc-05",
+    "subject": "Physique-Chimie",
+    "topic": "Electricite",
+    "difficulty": "facile",
+    "question": "L'unite de l'intensite du courant est...",
+    "options": ["volt", "ohm", "ampere", "watt"],
+    "correctAnswer": 2,
+    "explanation": "L'intensite se mesure en ampere (A).",
+    "tags": ["electricite", "unites"]
+  },
+  {
+    "id": "pc-06",
+    "subject": "Physique-Chimie",
+    "topic": "Electricite",
+    "difficulty": "moyen",
+    "question": "Si R = 10 ohms et I = 0,5 A, alors U vaut...",
+    "options": ["5 V", "10 V", "20 V", "0,05 V"],
+    "correctAnswer": 0,
+    "explanation": "U = R x I = 10 x 0,5 = 5 V.",
+    "tags": ["electricite", "calcul"]
+  },
+  {
+    "id": "pc-07",
+    "subject": "Physique-Chimie",
+    "topic": "Mecanique",
+    "difficulty": "moyen",
+    "question": "Un objet de masse 2 kg a g = 10 N/kg. Son poids est...",
+    "options": ["5 N", "10 N", "20 N", "200 N"],
+    "correctAnswer": 2,
+    "explanation": "P = m x g = 2 x 10 = 20 N.",
+    "tags": ["mecanique", "calcul"]
+  },
+  {
+    "id": "pc-08",
+    "subject": "Physique-Chimie",
+    "topic": "Optique",
+    "difficulty": "moyen",
+    "question": "Une lentille convergente est plus epaisse...",
+    "options": ["au centre", "aux bords", "partout pareil", "en haut seulement"],
+    "correctAnswer": 0,
+    "explanation": "La lentille convergente est epaisse au centre.",
+    "tags": ["optique", "lentilles"]
+  },
+  {
+    "id": "pc-09",
+    "subject": "Physique-Chimie",
+    "topic": "Chimie",
+    "difficulty": "moyen",
+    "question": "Une solution de pH 9 est...",
+    "options": ["acide", "basique", "neutre", "toujours toxique"],
+    "correctAnswer": 1,
+    "explanation": "pH > 7 indique une solution basique.",
+    "tags": ["chimie", "ph"]
+  },
+  {
+    "id": "pc-10",
+    "subject": "Physique-Chimie",
+    "topic": "Energie",
+    "difficulty": "moyen",
+    "question": "La puissance electrique s'exprime en...",
+    "options": ["joule", "watt", "ampere", "volt"],
+    "correctAnswer": 1,
+    "explanation": "La puissance se mesure en watt (W).",
+    "tags": ["energie", "unites"]
+  },
+  {
+    "id": "pc-11",
+    "subject": "Physique-Chimie",
+    "topic": "Electricite",
+    "difficulty": "difficile",
+    "question": "Dans un circuit en serie, l'intensite du courant...",
+    "options": ["change a chaque dipole", "est la meme en tout point", "est nulle", "double a chaque lampe"],
+    "correctAnswer": 1,
+    "explanation": "En serie, l'intensite est identique partout.",
+    "tags": ["electricite", "circuits"]
+  },
+  {
+    "id": "pc-12",
+    "subject": "Physique-Chimie",
+    "topic": "Energie",
+    "difficulty": "difficile",
+    "question": "Une lampe de 100 W fonctionne 3 h. Energie en Wh ?",
+    "options": ["30 Wh", "300 Wh", "3000 Wh", "33,3 Wh"],
+    "correctAnswer": 1,
+    "explanation": "E = P x t = 100 x 3 = 300 Wh.",
+    "tags": ["energie", "calcul"]
+  },
+  {
+    "id": "pc-13",
+    "subject": "Physique-Chimie",
+    "topic": "Chimie",
+    "difficulty": "difficile",
+    "question": "Le melange de deux solutions de pH different peut...",
+    "options": ["toujours rester acide", "modifier le pH final", "detruire l'eau", "annuler toute reaction"],
+    "correctAnswer": 1,
+    "explanation": "Le pH final depend des quantites et de la nature des solutions.",
+    "tags": ["chimie", "solutions"]
+  },
+  {
+    "id": "pc-14",
+    "subject": "Physique-Chimie",
+    "topic": "Optique",
+    "difficulty": "difficile",
+    "question": "La refraction est...",
+    "options": ["un reflet parfait", "la deviation de la lumiere en changeant de milieu", "la disparition de la lumiere", "la multiplication des rayons"],
+    "correctAnswer": 1,
+    "explanation": "La direction de la lumiere change a l'interface de deux milieux.",
+    "tags": ["optique", "refraction"]
+  },
+  {
+    "id": "pc-15",
+    "subject": "Physique-Chimie",
+    "topic": "Mecanique",
+    "difficulty": "difficile",
+    "question": "Si la masse double, le poids...",
+    "options": ["reste constant", "est divise par deux", "double", "devient nul"],
+    "correctAnswer": 2,
+    "explanation": "P = m x g, donc si m double, P double.",
+    "tags": ["mecanique", "proportionnalite"]
+  }
+]

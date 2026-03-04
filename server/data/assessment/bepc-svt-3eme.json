@@ -1,0 +1,167 @@
+[
+  {
+    "id": "svt-01",
+    "subject": "SVT",
+    "topic": "Cellule",
+    "difficulty": "facile",
+    "question": "Quel organite contient l'information genetique ?",
+    "options": ["membrane", "noyau", "cytoplasme", "vacuole"],
+    "correctAnswer": 1,
+    "explanation": "Le noyau contient l'ADN.",
+    "tags": ["cellule", "genetique"]
+  },
+  {
+    "id": "svt-02",
+    "subject": "SVT",
+    "topic": "Nutrition",
+    "difficulty": "facile",
+    "question": "Quel organe commence la digestion ?",
+    "options": ["estomac", "intestin grele", "bouche", "foie"],
+    "correctAnswer": 2,
+    "explanation": "La digestion commence dans la bouche.",
+    "tags": ["digestion", "nutrition"]
+  },
+  {
+    "id": "svt-03",
+    "subject": "SVT",
+    "topic": "Respiration",
+    "difficulty": "facile",
+    "question": "Quel gaz est principalement utilise par l'organisme ?",
+    "options": ["azote", "oxygene", "dioxyde de carbone", "vapeur d'eau"],
+    "correctAnswer": 1,
+    "explanation": "L'organisme utilise l'oxygene pour la respiration cellulaire.",
+    "tags": ["respiration", "gaz"]
+  },
+  {
+    "id": "svt-04",
+    "subject": "SVT",
+    "topic": "Reproduction",
+    "difficulty": "facile",
+    "question": "La fecondation est la fusion...",
+    "options": ["de deux os", "de deux gametes", "de deux neurones", "de deux muscles"],
+    "correctAnswer": 1,
+    "explanation": "La fecondation unit les gametes male et femelle.",
+    "tags": ["reproduction", "gametes"]
+  },
+  {
+    "id": "svt-05",
+    "subject": "SVT",
+    "topic": "Ecologie",
+    "difficulty": "facile",
+    "question": "Dans une chaine alimentaire, une plante verte est...",
+    "options": ["consommateur primaire", "producteur", "decomposeur", "predateur"],
+    "correctAnswer": 1,
+    "explanation": "La plante fabrique sa matiere, c'est un producteur.",
+    "tags": ["ecologie", "chaine_alimentaire"]
+  },
+  {
+    "id": "svt-06",
+    "subject": "SVT",
+    "topic": "Circulation sanguine",
+    "difficulty": "moyen",
+    "question": "Quel organe pompe le sang dans tout le corps ?",
+    "options": ["poumon", "foie", "coeur", "rein"],
+    "correctAnswer": 2,
+    "explanation": "Le coeur assure la circulation du sang.",
+    "tags": ["circulation", "coeur"]
+  },
+  {
+    "id": "svt-07",
+    "subject": "SVT",
+    "topic": "Nutrition",
+    "difficulty": "moyen",
+    "question": "L'absorption des nutriments se fait surtout dans...",
+    "options": ["l'estomac", "le gros intestin", "l'intestin grele", "l'oesophage"],
+    "correctAnswer": 2,
+    "explanation": "L'intestin grele possede des villosites pour absorber.",
+    "tags": ["digestion", "absorption"]
+  },
+  {
+    "id": "svt-08",
+    "subject": "SVT",
+    "topic": "Immunite",
+    "difficulty": "moyen",
+    "question": "Le vaccin sert principalement a...",
+    "options": ["soigner une fracture", "prevenir certaines maladies", "remplacer le sang", "augmenter la taille"],
+    "correctAnswer": 1,
+    "explanation": "La vaccination prepare les defenses immunitaires.",
+    "tags": ["immunite", "sante"]
+  },
+  {
+    "id": "svt-09",
+    "subject": "SVT",
+    "topic": "Ecologie",
+    "difficulty": "moyen",
+    "question": "Lequel est un facteur abiotique d'un ecosysteme ?",
+    "options": ["arbre", "insecte", "temperature", "champignon"],
+    "correctAnswer": 2,
+    "explanation": "La temperature est un facteur non vivant (abiotique).",
+    "tags": ["ecologie", "facteurs"]
+  },
+  {
+    "id": "svt-10",
+    "subject": "SVT",
+    "topic": "Reproduction",
+    "difficulty": "moyen",
+    "question": "Le cycle menstruel est controle principalement par...",
+    "options": ["des hormones", "des os", "des nerfs moteurs", "des globules rouges"],
+    "correctAnswer": 0,
+    "explanation": "Il est regule par des hormones ovariennes et hypophysaires.",
+    "tags": ["reproduction", "hormones"]
+  },
+  {
+    "id": "svt-11",
+    "subject": "SVT",
+    "topic": "Genetique",
+    "difficulty": "difficile",
+    "question": "Le support de l'information hereditaire est...",
+    "options": ["les lipides", "l'ADN", "les glucides", "les vitamines"],
+    "correctAnswer": 1,
+    "explanation": "L'ADN porte les genes.",
+    "tags": ["genetique", "adn"]
+  },
+  {
+    "id": "svt-12",
+    "subject": "SVT",
+    "topic": "Cellule",
+    "difficulty": "difficile",
+    "question": "La mitose permet surtout...",
+    "options": ["la production de gametes", "la croissance et le renouvellement cellulaire", "la digestion", "la photosynthese"],
+    "correctAnswer": 1,
+    "explanation": "La mitose produit deux cellules identiques pour croissance/renouvellement.",
+    "tags": ["cellule", "mitose"]
+  },
+  {
+    "id": "svt-13",
+    "subject": "SVT",
+    "topic": "Respiration",
+    "difficulty": "difficile",
+    "question": "Les echanges gazeux se font au niveau des...",
+    "options": ["bronches", "alveoles pulmonaires", "trachee", "cotes"],
+    "correctAnswer": 1,
+    "explanation": "Les alveoles sont la surface d'echange entre air et sang.",
+    "tags": ["respiration", "alveoles"]
+  },
+  {
+    "id": "svt-14",
+    "subject": "SVT",
+    "topic": "Ecologie",
+    "difficulty": "difficile",
+    "question": "La deforestation entraine directement...",
+    "options": ["plus de biodiversite", "une baisse de biodiversite", "aucun effet", "plus de pluie partout"],
+    "correctAnswer": 1,
+    "explanation": "La destruction d'habitats reduit la biodiversite.",
+    "tags": ["ecologie", "environnement"]
+  },
+  {
+    "id": "svt-15",
+    "subject": "SVT",
+    "topic": "Immunite",
+    "difficulty": "difficile",
+    "question": "Les globules blancs ont pour role principal...",
+    "options": ["transporter l'oxygene", "defendre l'organisme", "fabriquer l'urine", "digérer les aliments"],
+    "correctAnswer": 1,
+    "explanation": "Ils participent a la defense immunitaire.",
+    "tags": ["immunite", "sang"]
+  }
+]

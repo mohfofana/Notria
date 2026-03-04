@@ -296,16 +296,23 @@ export const CourseProgramService = {
     tips: string[];
     motivation: string;
   }> {
-    const curriculumContext = await PedagogicalContentService.getCurriculumContext(
-      "Mathematiques",
-      student.examType as "BEPC" | "BAC",
+    const prioritySubjects = (student.prioritySubjects as string[] | null) ?? ["Mathématiques"];
+    const curriculumContexts = await Promise.all(
+      prioritySubjects.map((subject) =>
+        PedagogicalContentService.getCurriculumContext(subject, student.examType as "BEPC" | "BAC"),
+      ),
     );
+    const curriculumContext = curriculumContexts.filter(Boolean).join("\n");
 
     const systemPrompt = `Tu es Prof Ada. Genere des recommandations JSON pour un programme de 4 semaines.
 Profil: ${student.examType}, ${student.grade}, objectif ${student.targetScore ?? 14}/20.
 Faiblesses: ${results.weaknesses.map((w) => `${w.domain} ${w.percentage}%`).join(", ") || "aucune"}.
 Allocations: ${allocations.map((a) => `${a.topic}(${a.priority}:${a.sessionsAllocated})`).join(", ")}.
 Contexte: ${curriculumContext}.
+Regles obligatoires:
+- Respecte le referentiel officiel DPFC indique dans le contexte.
+- Suis l'ordre de progression officiel de chaque matiere avant d'augmenter la difficulte.
+- Ne propose pas de theme hors-programme 3eme BEPC.
 Format strict JSON:
 {
 "summary":"...",

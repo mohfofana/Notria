@@ -228,7 +228,7 @@ export default function AdminPage() {
                 const params = new URLSearchParams();
                 if (search.trim()) params.set("search", search.trim());
                 if (roleFilter !== "all") params.set("role", roleFilter);
-                window.open(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/admin/users/export.csv?${params.toString()}`, "_blank");
+                window.open(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001"}/api/admin/users/export.csv?${params.toString()}`, "_blank");
               }}
             >
               Export CSV utilisateurs

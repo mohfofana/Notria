@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   BookOpen,
@@ -202,7 +202,15 @@ function getTypeLabel(type: ProgramSession["type"]) {
   }
 }
 
-export default function SessionTodayPage() {
+export default function SessionTodayPageWrapper() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center py-20"><p className="text-sm text-muted-foreground">Chargement...</p></div>}>
+      <SessionTodayPage />
+    </Suspense>
+  );
+}
+
+function SessionTodayPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sessionId, setSessionId] = useState<string | null>(null);

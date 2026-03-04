@@ -1,0 +1,187 @@
+[
+  {
+    "id": "fr-01",
+    "subject": "Français",
+    "topic": "Grammaire",
+    "difficulty": "facile",
+    "question": "Dans 'Les eleves arrivent', quel est le verbe ?",
+    "options": ["Les", "eleves", "arrivent", "les eleves"],
+    "correctAnswer": 2,
+    "explanation": "Le verbe est 'arrivent'.",
+    "tags": ["grammaire", "verbe"]
+  },
+  {
+    "id": "fr-02",
+    "subject": "Français",
+    "topic": "Conjugaison",
+    "difficulty": "facile",
+    "question": "Conjugue 'finir' avec 'nous' au present.",
+    "options": ["nous fini", "nous finissons", "nous finisez", "nous finirons"],
+    "correctAnswer": 1,
+    "explanation": "Au present, on dit 'nous finissons'.",
+    "tags": ["conjugaison", "present"]
+  },
+  {
+    "id": "fr-03",
+    "subject": "Français",
+    "topic": "Orthographe",
+    "difficulty": "facile",
+    "question": "Choisis la phrase correcte.",
+    "options": [
+      "Les enfant jouent dans la cour.",
+      "Les enfants joue dans la cour.",
+      "Les enfants jouent dans la cour.",
+      "Les enfants joues dans la cour."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Le sujet pluriel 'les enfants' prend 'jouent'.",
+    "tags": ["orthographe", "accord"]
+  },
+  {
+    "id": "fr-04",
+    "subject": "Français",
+    "topic": "Vocabulaire",
+    "difficulty": "facile",
+    "question": "Quel est le synonyme de 'content' ?",
+    "options": ["triste", "heureux", "fache", "lent"],
+    "correctAnswer": 1,
+    "explanation": "'Heureux' est un synonyme de 'content'.",
+    "tags": ["vocabulaire", "synonyme"]
+  },
+  {
+    "id": "fr-05",
+    "subject": "Français",
+    "topic": "Compréhension de texte",
+    "difficulty": "facile",
+    "question": "Dans un texte narratif, on raconte surtout...",
+    "options": ["une experience scientifique", "une suite d'evenements", "des regles de grammaire", "une carte geographique"],
+    "correctAnswer": 1,
+    "explanation": "Le texte narratif raconte des evenements.",
+    "tags": ["comprehension", "types_de_textes"]
+  },
+  {
+    "id": "fr-06",
+    "subject": "Français",
+    "topic": "Grammaire",
+    "difficulty": "moyen",
+    "question": "Dans 'Le professeur parle a ses eleves', 'a ses eleves' est...",
+    "options": ["un COD", "un COI", "un sujet", "un attribut"],
+    "correctAnswer": 1,
+    "explanation": "On parle 'a' quelqu'un: c'est un COI.",
+    "tags": ["grammaire", "coi"]
+  },
+  {
+    "id": "fr-07",
+    "subject": "Français",
+    "topic": "Conjugaison",
+    "difficulty": "moyen",
+    "question": "Conjugue 'aller' avec 'ils' au passe compose.",
+    "options": ["ils ont alle", "ils sont alles", "ils allerent", "ils allaient"],
+    "correctAnswer": 1,
+    "explanation": "'Aller' se conjugue avec etre au passe compose.",
+    "tags": ["conjugaison", "passe_compose"]
+  },
+  {
+    "id": "fr-08",
+    "subject": "Français",
+    "topic": "Orthographe",
+    "difficulty": "moyen",
+    "question": "Choisis l'accord correct du participe passe.",
+    "options": [
+      "Les lettres qu'elle a ecrit",
+      "Les lettres qu'elle a ecrites",
+      "Les lettres qu'elle a ecrite",
+      "Les lettres qu'elle a ecrire"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Avec COD place avant, on accorde 'ecrites'.",
+    "tags": ["orthographe", "participe_passe"]
+  },
+  {
+    "id": "fr-09",
+    "subject": "Français",
+    "topic": "Vocabulaire",
+    "difficulty": "moyen",
+    "question": "Quel mot appartient au champ lexical de l'ecole ?",
+    "options": ["craie", "volcan", "engrais", "moteur"],
+    "correctAnswer": 0,
+    "explanation": "'Craie' appartient au lexique scolaire.",
+    "tags": ["vocabulaire", "champ_lexical"]
+  },
+  {
+    "id": "fr-10",
+    "subject": "Français",
+    "topic": "Rédaction",
+    "difficulty": "moyen",
+    "question": "Dans une introduction de redaction, on doit surtout...",
+    "options": ["donner la conclusion", "poser le sujet", "lister les fautes", "ecrire tres long"],
+    "correctAnswer": 1,
+    "explanation": "L'introduction presente le sujet.",
+    "tags": ["redaction", "methode"]
+  },
+  {
+    "id": "fr-11",
+    "subject": "Français",
+    "topic": "Grammaire",
+    "difficulty": "difficile",
+    "question": "Dans 'Bien qu'il soit fatigue, il travaille', la proposition introduite par 'bien que' exprime...",
+    "options": ["la cause", "la concession", "le but", "la condition"],
+    "correctAnswer": 1,
+    "explanation": "'Bien que' introduit une concession.",
+    "tags": ["grammaire", "propositions"]
+  },
+  {
+    "id": "fr-12",
+    "subject": "Français",
+    "topic": "Conjugaison",
+    "difficulty": "difficile",
+    "question": "Conjugue 'venir' avec 'que nous' au subjonctif present.",
+    "options": ["que nous venons", "que nous viendrons", "que nous venions", "que nous venonssions"],
+    "correctAnswer": 2,
+    "explanation": "Au subjonctif present: 'que nous venions'.",
+    "tags": ["conjugaison", "subjonctif"]
+  },
+  {
+    "id": "fr-13",
+    "subject": "Français",
+    "topic": "Compréhension de texte",
+    "difficulty": "difficile",
+    "question": "Dans un texte argumentatif, la these est...",
+    "options": ["une description", "l'opinion defendue", "la liste des personnages", "un proverbe final"],
+    "correctAnswer": 1,
+    "explanation": "La these est l'idee que l'auteur defend.",
+    "tags": ["comprehension", "argumentation"]
+  },
+  {
+    "id": "fr-14",
+    "subject": "Français",
+    "topic": "Orthographe",
+    "difficulty": "difficile",
+    "question": "Choisis la phrase correctement ponctuee.",
+    "options": [
+      "Il dit je viens demain.",
+      "Il dit : \"Je viens demain.\"",
+      "Il dit, Je viens demain",
+      "Il dit; je viens demain"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Le discours direct prend deux-points et guillemets.",
+    "tags": ["orthographe", "ponctuation"]
+  },
+  {
+    "id": "fr-15",
+    "subject": "Français",
+    "topic": "Résumé",
+    "difficulty": "difficile",
+    "question": "Un bon resume doit...",
+    "options": [
+      "ajouter des details personnels",
+      "garder les idees essentielles sans copier",
+      "etre plus long que le texte",
+      "supprimer l'idee principale"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Le resume conserve l'essentiel avec reformulation.",
+    "tags": ["resume", "methode"]
+  }
+]

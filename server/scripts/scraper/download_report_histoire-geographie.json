@@ -1,0 +1,64 @@
+{
+  "summary": {
+    "totalUrls": 6,
+    "downloaded": 1,
+    "skippedExisting": 5,
+    "failed": 0,
+    "downloadedBySourceType": {
+      "cours": 0,
+      "exercice": 0,
+      "annale": 1,
+      "livre": 0
+    }
+  },
+  "items": [
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/39718-compilation-complete-sujets-et-corriges-d-histoire-geographie-bepc-session-2025-zones-1-2-et-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/histoire-geographie/annales/t_l_charger_download.pdf",
+      "status": "downloaded",
+      "reason": "downloaded"
+    },
+    {
+      "url": "https://epreuvesetcorriges.com/categories/cote-d-ivoire/examens/bepc/41947-histoire-geographie-examen-blanc-local-bepc-session-fevrier-2026-drena-san-pedro/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/histoire-geographie/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/correction-de-lepreuve-de-histoire-geographie-bepc-2024-zone-1/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/histoire-geographie/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/correction-de-lepreuve-de-histoire-geographie-bepc-2024-zone-3/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/histoire-geographie/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/correction-de-lepreuve-de-histoire-geographie-bepc-2024-zone-2/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/histoire-geographie/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    },
+    {
+      "url": "https://sujetcorrige.com/histoire-geographie-examen-blanc-interne-bepc-2026-avec-corrige-entrainement-scolaire-college-prive-nlm/download",
+      "title": "Télécharger",
+      "sourceType": "annale",
+      "file": "data/pdfs/histoire-geographie/annales/t_l_charger_download.pdf",
+      "status": "skipped_existing",
+      "reason": "already_exists"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import json
 import re
+import argparse
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -28,6 +29,24 @@ CHAPTER_MAP = {
     "sphere": "spheres_boules",
     "boule": "spheres_boules",
     "grandeurs composees": "grandeurs_composees",
+}
+
+SUBJECT_LABELS = {
+    "mathematiques": "Mathématiques",
+    "francais": "Français",
+    "svt": "SVT",
+    "physique-chimie": "Physique-Chimie",
+    "anglais": "Anglais",
+    "histoire-geographie": "Histoire-Géographie",
+}
+
+SUBJECT_KEYWORDS = {
+    "mathematiques": ["math", "mathem", "pythagore", "thales", "trigono", "equation"],
+    "francais": ["francais", "français", "grammaire", "conjugaison", "dictee", "dictée", "redaction", "résumé"],
+    "svt": ["svt", "biologie", "cellule", "nutrition", "reproduction"],
+    "physique-chimie": ["physique", "chimie", "electricite", "électricité", "optique", "mecanique", "mécanique"],
+    "anglais": ["anglais", "english", "grammar", "vocabulary", "reading", "essay"],
+    "histoire-geographie": ["histoire", "geographie", "géographie", "histoire-geo", "histoire geo"],
 }
 
 
@@ -112,6 +131,21 @@ def slugify(value: str) -> str:
     slug = re.sub(r"[^a-zA-Z0-9]+", "_", value).strip("_").lower()
     return slug or "document"
 
+
+def to_subject_slug(value: str) -> str:
+    return re.sub(r"[^a-z0-9-]+", "-", value.lower()).strip("-")
+
+
+def resolve_subject(subject_slug: Optional[str], title: str, relative_path: str, content: str) -> str:
+    if subject_slug and subject_slug in SUBJECT_LABELS:
+        return SUBJECT_LABELS[subject_slug]
+
+    haystack = f"{title} {relative_path} {content[:3000]}".lower()
+    for slug, keywords in SUBJECT_KEYWORDS.items():
+        if any(keyword in haystack for keyword in keywords):
+            return SUBJECT_LABELS[slug]
+    return SUBJECT_LABELS["mathematiques"]
+
 def source_dir_name(source_type: str) -> str:
     mapping = {"cours": "cours", "exercice": "exercices", "annale": "annales", "livre": "livres"}
     return mapping.get(source_type, f"{source_type}s")
@@ -124,10 +158,25 @@ def build_output_name(source_type: str, chapter: Optional[str], title: str, inde
     return f"{base}.json"
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Transform extracted PDF text to raw JSON documents")
+    parser.add_argument(
+        "--subject",
+        default=None,
+        help="Optional subject slug. If set, reads extracted/<subject> and outputs raw/<subject>/...",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
     script_dir = Path(__file__).resolve().parent
     server_root = script_dir.parents[1]
-    extracted_root = server_root / "data" / "extracted"
+    subject_slug = to_subject_slug(args.subject) if args.subject else None
+    if subject_slug:
+        extracted_root = server_root / "data" / "extracted" / subject_slug
+    else:
+        extracted_root = server_root / "data" / "extracted"
     output_root = server_root / "data" / "raw"
 
     if not extracted_root.exists():
@@ -147,7 +196,11 @@ def main() -> None:
         source_type = detect_source_type(relative_path)
         title = Path(pdf_file).stem.replace("_", " ").strip()
         cleaned = normalize_text(strip_repeated_lines(raw_content))
-        chapter = find_chapter(title, cleaned)
+        if not cleaned.strip():
+            print(f"Skip empty content: {relative_path}")
+            continue
+        subject_label = resolve_subject(subject_slug, title, relative_path, cleaned)
+        chapter = find_chapter(title, cleaned) if subject_label == "Mathématiques" else None
         meta_year_zone = parse_year_zone(f"{title} {relative_path} {cleaned[:2000]}")
 
         parts = split_long_content(cleaned, max_tokens=5000 if source_type == "livre" else 9000)
@@ -155,7 +208,7 @@ def main() -> None:
             final_title = title if len(parts) == 1 else f"{title} - part {index + 1}"
             document = {
                 "sourceType": source_type,
-                "subject": "mathematiques",
+                "subject": subject_label,
                 "grade": "3eme",
                 "chapter": chapter if source_type != "annale" else None,
                 "title": final_title,
@@ -169,7 +222,7 @@ def main() -> None:
                 },
             }
 
-            output_dir = output_root / source_dir_name(source_type)
+            output_dir = output_root / (subject_slug or to_subject_slug(subject_label)) / source_dir_name(source_type)
             output_dir.mkdir(parents=True, exist_ok=True)
 
             output_name = build_output_name(source_type, document["chapter"], final_title, index)

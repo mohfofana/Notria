@@ -27,6 +27,7 @@ export const AVAILABLE_BEPC_SUBJECTS: readonly string[] = [
   "Français",
   "SVT",
   "Physique-Chimie",
+  "Anglais",
 ];
 
 export const MATH_TOPICS_BAC_CD = [

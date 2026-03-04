@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "../db/index.js";
+import { OfficialProgrammeService } from "./official-programme.service.js";
 
 // Table temporaire pour stocker le contenu pédagogique ivoirien
 // À remplacer par une vraie table dans le schéma
@@ -166,6 +167,7 @@ Perspectives africaines :
   },
 
   async getCurriculumContext(subject: string, examType: "BEPC" | "BAC"): Promise<string> {
+    const officialContext = OfficialProgrammeService.getContext(subject, examType);
     const contents = this.getIvorianCurriculum();
     const relevantContent = contents.filter(c =>
       c.subject.toLowerCase() === subject.toLowerCase() &&
@@ -173,7 +175,8 @@ Perspectives africaines :
     );
 
     if (relevantContent.length === 0) {
-      return this.getFallbackCurriculumContext(subject, examType);
+      const fallback = this.getFallbackCurriculumContext(subject, examType);
+      return [officialContext, fallback].filter(Boolean).join("\n\n");
     }
 
     const context = `
@@ -194,7 +197,7 @@ Ce contenu est adapté au système éducatif ivoirien et respecte les programmes
 Les questions doivent intégrer des exemples concrets liés au contexte africain et ivoirien.
 `;
 
-    return context;
+    return [officialContext, context].filter(Boolean).join("\n\n");
   },
 
   getFallbackCurriculumContext(subject: string, examType: "BEPC" | "BAC"): string {

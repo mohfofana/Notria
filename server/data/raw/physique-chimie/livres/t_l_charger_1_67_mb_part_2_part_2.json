@@ -1,0 +1,15 @@
+{
+  "sourceType": "livre",
+  "subject": "Physique-Chimie",
+  "grade": "3eme",
+  "chapter": null,
+  "title": "t l charger 1 67 mb - part 2",
+  "content": "T = 14000s = 3h 5mn 16s 48tiers.\n\nExercice 2 :\n\nUn cafier électrique contient 0,5l d’eau. En 5mn la\n\ntempérature de l’eau passe de 20°c à 100°c. Sachant qu’il\n\nfaut 4,2kj pour augmenter d’un (1°c) la température de\n\n1kj d’eau :\n\n1- Calculer la quantité de chaleur reçue par l’eau.\n\n2- Cette quantité de chaleur est égale à l’énergie\n\nélectrique consommée. Calculer la puissance de\n\nl’appareil.\n\nLe cafier est alimenté sous une tension de 220v.\n\nQuelle est l’intensité du courant ? Calculer la\n\nrésistance de l’appareil.\n\nSolution 2 :\n\nDonnées : m = 0,5l ; t = 5mn = 300s ; Ө1 = 100°c ; Ө2 =\n\n20°c ; U = 220v\n\nCalculons la quantité de chaleur.\n\nQ = m.4, 18(Ө1 - Ө2); AN Q = 0, 5 x 4, 2(100 – 20°c) =\n\n168KJ\n\n51\n\nQ = 168KJ\n\nCalculons la puissance\n\nE = Q or E = P x t;\n\nP =\n\n𝐸\n\n𝑡 AN P =\n\n168\n\n300 = 0, 56 = 560w\n\nP = 560w\n\nL’intensité\n\nP = U.I; I =\n\n𝑃\n\n𝑈 ; AN I =\n\n560\n\n220 = 2,54A\n\nI = 2,54A\n\nCalculons la résistance\n\nU = R.I ; R =\n\n𝑈\n\n𝐼 AN R =\n\n220𝑣\n\n2,54𝐴 = 86,6\n\nR = 86,6Ω\n\nDocuments ayant permis d’élaborer ce support de\n\ncours\n\nPhysique Chimie 3e - Livre élève ,P. Bramand, Marie-\n\nJeanne Comte, S. Dessaint, Jean-Pierre Durandeau, P.\n\nFaye, C. Raynal, D. Théboeuf, Collection Durandeau ,\n\nHachette, 2008\n\nPhysique-chimie cycle 4 (5e/4e/3e), Mathieu Ruffenach\n\nBordas, 2016,\n\nPhysique-Chimie J.-L. Azan, Nathan, 2017",
+  "metadata": {
+    "source": "fomesoutra",
+    "pdfFile": "t_l_charger_1_67_mb.pdf",
+    "year": 2018,
+    "zone": null,
+    "hasCorrection": false
+  }
+}

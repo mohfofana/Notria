@@ -1,4 +1,6 @@
 import json
+import argparse
+import re
 from pathlib import Path
 from typing import Dict
 
@@ -21,10 +23,27 @@ def detect_scanned(text: str) -> bool:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Extract text from downloaded PDFs")
+    parser.add_argument(
+        "--subject",
+        default=None,
+        help="Optional subject slug. If set, only process data/pdfs/<subject>.",
+    )
+    args = parser.parse_args()
+
     script_dir = Path(__file__).resolve().parent
     server_root = script_dir.parents[1]
-    pdf_root = server_root / "data" / "pdfs"
-    output_root = server_root / "data" / "extracted"
+    if args.subject:
+        subject_slug = re.sub(r"[^a-z0-9-]+", "-", args.subject.lower()).strip("-")
+        pdf_root = server_root / "data" / "pdfs" / subject_slug
+        output_root = server_root / "data" / "extracted" / subject_slug
+    else:
+        pdf_root = server_root / "data" / "pdfs"
+        output_root = server_root / "data" / "extracted"
+
+    if not pdf_root.exists():
+        raise FileNotFoundError(f"Missing {pdf_root}. Run download_pdfs.py first.")
+
     output_root.mkdir(parents=True, exist_ok=True)
 
     stats: Dict[str, int] = {"processed": 0, "scanned_skipped": 0}

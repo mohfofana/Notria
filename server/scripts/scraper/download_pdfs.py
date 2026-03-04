@@ -1,5 +1,6 @@
 import json
 import re
+import argparse
 from pathlib import Path
 from typing import Dict, List
 from urllib.parse import urlparse
@@ -54,12 +55,21 @@ def download_file(url: str, destination: Path) -> Dict[str, str]:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Download PDFs from scraped URL list")
+    parser.add_argument(
+        "--subject",
+        default="mathematiques",
+        help="Subject slug (used to resolve urls_<subject>.json and output folder)",
+    )
+    args = parser.parse_args()
+
     script_dir = Path(__file__).resolve().parent
     server_root = script_dir.parents[1]
-    urls_path = script_dir / "urls.json"
+    subject_slug = re.sub(r"[^a-z0-9-]+", "-", args.subject.lower()).strip("-") or "mathematiques"
+    urls_path = script_dir / f"urls_{subject_slug}.json"
     pdf_root = server_root / "data" / "pdfs"
-    report_path = script_dir / "download_report.json"
-    failed_path = script_dir / "failed_urls.json"
+    report_path = script_dir / f"download_report_{subject_slug}.json"
+    failed_path = script_dir / f"failed_urls_{subject_slug}.json"
 
     if not urls_path.exists():
         raise FileNotFoundError(f"Missing {urls_path}. Run scrape_urls.py first.")
@@ -79,7 +89,7 @@ def main() -> None:
         if not url:
             continue
 
-        source_dir = pdf_root / source_dir_name(source_type)
+        source_dir = pdf_root / subject_slug / source_dir_name(source_type)
         source_dir.mkdir(parents=True, exist_ok=True)
 
         filename = infer_filename(title, url)

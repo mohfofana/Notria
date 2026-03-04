@@ -1,0 +1,15 @@
+{
+  "sourceType": "cours",
+  "subject": "Physique-Chimie",
+  "grade": "3eme",
+  "chapter": null,
+  "title": "t l charger 99 kb",
+  "content": "Cours de physique troisième\n\nAssociations de conducteurs ohmiques\n\nSituation - problème\n\nPour réaliser les 13.2  devant protéger la lampe témoin de l’alarme de sa maison, un\n\nélectricien ne dispose que de deux conducteurs de résistances respectives R1 = 22  et R2 =\n\n33 . Quel montage devra-t-il réaliser pour répondre à cette exigence du constructeur ?\n\n1 - Conducteurs en série\n\n1-1 Rappels.\n\nDans un circuit - série,\n\nle courant est partout le\n\nmême : l'intensité du\n\ncourant est constante\n\nI = I1 = I2\n\nLa tension aux bornes\n\nd'un\n\ngroupement\n\nen\n\nsérie est égale à la\n\nsomme des tensions\n\nU = U1 + U2\n\n1-2 La résistance équivalente du groupement.\n\nOn vérifie à l'ohmmètre que la résistance Re du groupement que l'on appelle résistance équivalente est\n\négale à la somme des résistances respectives des conducteurs en série.\n\nRe = R1 + R2\n\nN.B. Vérification théorique.\n\nAppliquons la loi d'ohm au circuit.\n\nU = Re . I\n\nOr nous savons que\n\nU1 = R1 . I1 ; U2 = R2 . I2\n\nEt que\n\nU = U1 + U2\n\nQue l'on peut écrire\n\nRe. I = R1 . I1 + R2 . I2 = (R1 + R2) I\n\nOn trouve donc\n\nRe = R1 + R2\n\n2 - Conducteurs en parallèle\n\n2-1 Rappels.\n\nDans un groupement en\n\nparallèle,\n\nl'intensité\n\ndu\n\ncourant principal est égale\n\nà la somme des intensités\n\ndes courants circulant dans\n\nchacune des dérivations.\n\nI = I1 + I2\n\nDans un groupement\n\nen parallèle, la tension\n\nest\n\nla\n\nmême\n\naux\n\nbornes des différentes\n\ndérivations\n\nU = U1 = U2\n\n2-2 La résistance équivalente à un groupement de conducteurs en parallèle.\n\nLa mesure à l'ohmmètre montre que la résistance équivalente est inférieure à la plus petite des\n\nrésistances respectives des conducteurs associés en parallèle.\n\nN.B. Expression théorique\n\nEn appliquant la loi d'ohm, on trouve\n\nI =\n\ne\n\nU ; I1 =\n\nU ; I2 =\n\n2\n\nU\n\nNous savons que\n\nI = I1 + I2\n\nCours de physique troisième\n\nQu'on peut alors écrire :\n\ne\n\nU =\n\nU +\n\n2\n\nU = U(\n\n+\n\n2\n\n)\n\nCe qui donne :\n\ne\n\n1 =\n\n+\n\n2\n\nRemarque : La résistance équivalente est celle du conducteur équivalent. Le conducteur équivalent est\n\nle conducteur qui, mis à la place du groupement, ne modifie ni la tension ni le courant dans le circuit.",
+  "metadata": {
+    "source": "fomesoutra",
+    "pdfFile": "t_l_charger_99_kb.pdf",
+    "year": null,
+    "zone": null,
+    "hasCorrection": false
+  }
+}
