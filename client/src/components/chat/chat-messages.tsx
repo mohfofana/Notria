@@ -34,8 +34,8 @@ export function ChatMessages({
     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
       {visible.length === 0 && !isStreaming && (
         <div className="flex flex-col items-center justify-center h-full text-center gap-4">
-          <div className="h-20 w-20 rounded-2xl border-2 border-primary/20 bg-primary/5 grid place-items-center">
-            <GraduationCap className="h-8 w-8 text-primary" />
+          <div className="h-20 w-20 rounded-2xl bg-primary grid place-items-center">
+            <GraduationCap className="h-8 w-8 text-white" />
           </div>
           <div>
             <h2 className="text-xl font-semibold mb-1">
@@ -97,20 +97,20 @@ function MessageBubble({
     <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : ""}`}>
       <div
         className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-          isUser ? "bg-foreground/10" : "border border-primary/20 bg-primary/5"
+          isUser ? "bg-accent/15" : "bg-primary"
         }`}
       >
         {isUser ? (
-          <User className="h-4 w-4 text-foreground/70" />
+          <User className="h-4 w-4 text-accent" />
         ) : (
-          <GraduationCap className="h-4 w-4 text-primary" />
+          <GraduationCap className="h-4 w-4 text-white" />
         )}
       </div>
       <div
         className={`max-w-[82%] rounded-2xl px-4 py-3 text-base leading-relaxed ${
           isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted"
+            ? "bg-accent text-white"
+            : "bg-white border border-border shadow-sm"
         }`}
       >
         {isUser ? (

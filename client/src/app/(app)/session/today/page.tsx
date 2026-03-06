@@ -250,8 +250,7 @@ function SessionTodayPage() {
 
   useEffect(() => {
     const sidFromQuery = searchParams.get("sid");
-    const sidFromStorage = typeof window !== "undefined" ? window.localStorage.getItem("notria.guidedSessionId") : null;
-    const sid = sidFromQuery || sidFromStorage;
+    const sid = sidFromQuery;
     if (!sid) return;
 
     async function resumeSession() {
@@ -261,9 +260,7 @@ function SessionTodayPage() {
         setStep(data.step);
         setProgress(data.progress);
       } catch {
-        if (typeof window !== "undefined") {
-          window.localStorage.removeItem("notria.guidedSessionId");
-        }
+        // Ignore invalid/expired sid from URL; user can start a fresh session.
       }
     }
 
@@ -296,9 +293,6 @@ function SessionTodayPage() {
       setStep(data.step);
       setProgress(data.progress);
       setTextAnswer("");
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("notria.guidedSessionId", data.sessionId);
-      }
       router.replace(`/session/today?sid=${data.sessionId}`);
     } catch (e: any) {
       setError(e?.response?.data?.error || "Impossible de demarrer la seance guidee.");
@@ -332,9 +326,6 @@ function SessionTodayPage() {
     setError(null);
     try {
       await api.post(`/guided-sessions/${sessionId}/complete`);
-      if (typeof window !== "undefined") {
-        window.localStorage.removeItem("notria.guidedSessionId");
-      }
       router.push("/dashboard");
     } catch (e: any) {
       setError(e?.response?.data?.error || "Impossible de finaliser la session.");
@@ -655,14 +646,15 @@ function ClassroomBoardFrame({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="relative rounded-[1.25rem] border border-[#aeb5c0] bg-[#e7ebf1] p-3 shadow-[0_24px_42px_-22px_rgba(13,18,26,0.28)]">
+    <div className="relative rounded-[1.25rem] border border-[#5f3b1c] bg-gradient-to-b from-[#9d6a3a] to-[#6f4727] p-3 shadow-[0_24px_42px_-22px_rgba(13,18,26,0.45)]">
       {screws.map((position) => (
         <span
           key={position}
-          className={`absolute ${position} h-3 w-3 rounded-full border border-[#bfc4cc] bg-gradient-to-br from-[#f3f5f7] to-[#cbd1d9] shadow-sm`}
+          className={`absolute ${position} h-3 w-3 rounded-full border border-[#9ca3af] bg-gradient-to-br from-[#f8fafc] to-[#cbd5e1] shadow-sm`}
         />
       ))}
-      <div className="relative min-h-[560px] overflow-hidden rounded-[0.82rem] border border-[#d9dee6] bg-white p-4 shadow-[inset_0_0_18px_rgba(0,0,0,0.04)] sm:p-5">
+      <div className="relative min-h-[560px] overflow-hidden rounded-[0.82rem] border border-[#0f3e31] bg-[#123d33] p-4 shadow-[inset_0_0_40px_rgba(0,0,0,0.35)] sm:p-5">
+        <div className="pointer-events-none absolute inset-0 opacity-40 [background:radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.08),transparent_38%),radial-gradient(circle_at_76%_26%,rgba(255,255,255,0.06),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))]" />
         <div className="relative z-10 h-full">
           {children}
         </div>
@@ -749,15 +741,15 @@ function QuickDrawBoard() {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-semibold text-slate-700">Ton tableau</p>
-      <div className="relative overflow-hidden rounded-xl border border-slate-300 bg-white p-0 shadow-[inset_0_0_14px_rgba(71,85,105,0.06)]">
-        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 p-2">
-          <Badge variant="outline" className="border-slate-300 text-slate-700">Outils</Badge>
+      <p className="text-sm font-semibold text-emerald-100">Ton tableau</p>
+      <div className="relative overflow-hidden rounded-xl border border-emerald-900/70 bg-[#0f352d] p-0 shadow-[inset_0_0_14px_rgba(0,0,0,0.35)]">
+        <div className="flex flex-wrap items-center gap-2 border-b border-emerald-900/70 bg-emerald-950/40 p-2">
+          <Badge variant="outline" className="border-emerald-200/30 text-emerald-100">Outils</Badge>
           <Button
             type="button"
             variant={tool === "draw" && color === "#f2f1e8" ? "default" : "outline"}
             size="sm"
-            className={tool === "draw" && color !== "#f2f1e8" ? "border-slate-300 bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900" : ""}
+            className={tool === "draw" && color !== "#f2f1e8" ? "border-emerald-200/30 bg-emerald-950/35 text-emerald-100 hover:bg-emerald-900/60" : ""}
             onClick={() => {
               setTool("draw");
               setColor("#f2f1e8");
@@ -769,7 +761,7 @@ function QuickDrawBoard() {
             type="button"
             variant={tool === "draw" && color === "#ef4444" ? "default" : "outline"}
             size="sm"
-            className={tool === "draw" && color !== "#ef4444" ? "border-slate-300 bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900" : ""}
+            className={tool === "draw" && color !== "#ef4444" ? "border-emerald-200/30 bg-emerald-950/35 text-emerald-100 hover:bg-emerald-900/60" : ""}
             onClick={() => {
               setTool("draw");
               setColor("#ef4444");
@@ -781,7 +773,7 @@ function QuickDrawBoard() {
             type="button"
             variant={tool === "draw" && color === "#22c55e" ? "default" : "outline"}
             size="sm"
-            className={tool === "draw" && color !== "#22c55e" ? "border-slate-300 bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900" : ""}
+            className={tool === "draw" && color !== "#22c55e" ? "border-emerald-200/30 bg-emerald-950/35 text-emerald-100 hover:bg-emerald-900/60" : ""}
             onClick={() => {
               setTool("draw");
               setColor("#22c55e");
@@ -793,13 +785,13 @@ function QuickDrawBoard() {
             type="button"
             variant={tool === "erase" ? "default" : "outline"}
             size="sm"
-            className={tool !== "erase" ? "border-slate-300 bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900" : ""}
+            className={tool !== "erase" ? "border-emerald-200/30 bg-emerald-950/35 text-emerald-100 hover:bg-emerald-900/60" : ""}
             onClick={() => setTool("erase")}
           >
             <Eraser className="mr-1 h-4 w-4" />
             Gomme
           </Button>
-          <Button type="button" variant="secondary" size="sm" className="bg-slate-200 text-slate-800 hover:bg-slate-300" onClick={clearBoard}>
+          <Button type="button" variant="secondary" size="sm" className="bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onClick={clearBoard}>
             Effacer
           </Button>
         </div>
@@ -813,7 +805,7 @@ function QuickDrawBoard() {
           aria-label="Tableau de dessin"
         />
       </div>
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-emerald-100/80">
         Pose tes calculs ici pendant que Prof Ada explique sur le tableau principal.
       </p>
     </div>
@@ -856,17 +848,22 @@ function AiChalkBoard({
   }, [step.id, step.visual?.steps?.length]);
 
   return (
-    <div className="relative h-full overflow-hidden rounded-[0.65rem] border border-slate-200 bg-transparent p-5">
-      <p className="mb-3 text-xs uppercase tracking-wider text-slate-500">
+    <div className="relative h-full overflow-hidden rounded-[0.65rem] border border-emerald-900/70 bg-transparent p-5">
+      <div className="pointer-events-none absolute right-4 top-4 flex items-center gap-2 rounded-full bg-emerald-950/55 px-2.5 py-1">
+        <span className="h-2 w-2 animate-pulse rounded-full bg-amber-200" />
+        <span className="text-[10px] uppercase tracking-wide text-emerald-100">Prof Ada ecrit...</span>
+      </div>
+
+      <p className="mb-3 text-xs uppercase tracking-wider text-emerald-100/70">
         {boardTitle}
       </p>
 
       {step.feedback && (
-        <div className="mb-3 rounded-lg border border-indigo-200 bg-indigo-50/80 px-3 py-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">
+        <div className="mb-3 rounded-lg border border-emerald-200/30 bg-emerald-950/45 px-3 py-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">
             Prof Ada
           </p>
-          <p className="text-sm leading-relaxed text-indigo-950">{step.feedback}</p>
+          <p className="text-sm leading-relaxed text-emerald-50">{step.feedback}</p>
         </div>
       )}
 
@@ -876,13 +873,14 @@ function AiChalkBoard({
             visibleCoachLines.map((line, index) => (
               <p
                 key={`coach-board-${step.id}-${index}`}
-                className={`text-[1.08rem] leading-relaxed ${index === visibleCoachLines.length - 1 ? "font-semibold text-slate-900" : "text-slate-700"}`}
+                className={`chalk-line text-[1.08rem] leading-relaxed ${index === visibleCoachLines.length - 1 ? "font-semibold text-[#f7f7e6]" : "text-[#f1efd7]"}`}
+                style={{ animationDelay: `${0.35 + index * 0.18}s` }}
               >
                 {line}
               </p>
             ))
           ) : (
-            <p className="text-lg font-medium text-slate-700">
+            <p className="text-lg font-medium text-[#f1efd7]">
               Lis bien l'explication de Prof Ada, puis utilise les boutons en bas.
             </p>
           )}
@@ -890,11 +888,11 @@ function AiChalkBoard({
       )}
 
       {step.visual?.type === "formula" && contentLines.length > 0 && (
-        <div className="mt-3 rounded-xl border border-slate-200 bg-white/80 p-3 space-y-1">
+        <div className="mt-3 rounded-xl border border-emerald-200/25 bg-emerald-950/25 p-3 space-y-1">
           {contentLines.map((line, index) => (
             <p
               key={`formula-${step.id}-${index}`}
-              className={`chalk-line text-[1.14rem] font-medium leading-relaxed ${index % 2 === 0 ? "text-slate-900" : "text-slate-700"}`}
+              className={`chalk-line text-[1.14rem] font-medium leading-relaxed ${index % 2 === 0 ? "text-[#fffce8]" : "text-[#f4f1d8]"}`}
               style={{ animationDelay: `${0.7 + index * 0.25}s` }}
             >
               {line}
@@ -904,11 +902,11 @@ function AiChalkBoard({
       )}
 
       {step.visual?.steps && step.visual.steps.length > 0 && (
-        <div className="mt-3 rounded-xl border border-slate-200 bg-white/70 p-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Etapes</p>
+        <div className="mt-3 rounded-xl border border-emerald-200/25 bg-emerald-950/25 p-3">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-100/70">Etapes</p>
           <div className="space-y-1">
             {step.visual.steps.slice(0, animatedStepCount).map((line, index) => (
-              <p key={`${step.id}-s-${index}`} className="text-sm text-slate-800 chalk-line" style={{ animationDelay: `${index * 0.15}s` }}>
+              <p key={`${step.id}-s-${index}`} className="text-sm text-[#f7f3de] chalk-line" style={{ animationDelay: `${index * 0.15}s` }}>
                 {index + 1}. {line}
               </p>
             ))}
@@ -917,19 +915,19 @@ function AiChalkBoard({
       )}
 
       {step.visual?.type === "diagram" && (
-        <div className="mt-3 rounded-lg border border-slate-300 bg-slate-50 p-2">
+        <div className="mt-3 rounded-lg border border-emerald-200/25 bg-emerald-950/25 p-2">
           <ContextualIllustration kind={illustrationKind} />
         </div>
       )}
 
       {step.visual?.type === "exercise_card" && step.visual.content && (
-        <p className="mt-3 whitespace-pre-wrap text-[1.08rem] font-medium leading-relaxed text-slate-900">
+        <p className="mt-3 whitespace-pre-wrap text-[1.08rem] font-medium leading-relaxed text-[#fdfae9] chalk-line">
           Exercice: {step.visual.content}
         </p>
       )}
 
       {showIllustration && (
-        <div className="mt-3 rounded-lg border border-slate-300 bg-slate-50 p-2">
+        <div className="mt-3 rounded-lg border border-emerald-200/25 bg-emerald-950/25 p-2">
           <ContextualIllustration kind={illustrationKind} />
         </div>
       )}
@@ -941,68 +939,69 @@ function ContextualIllustration({ kind }: { kind: IllustrationKind }) {
   if (kind === "vector") {
     return (
       <svg viewBox="0 0 320 180" className="chalk-geometry" role="img" aria-label="Schema vecteur AB">
-        <circle cx="60" cy="130" r="3" fill="#000000" />
-        <circle cx="250" cy="60" r="3" fill="#000000" />
-        <line x1="60" y1="130" x2="250" y2="60" className="chalk-draw" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <polygon points="250,60 238,62 244,72" fill="#000000" />
-        <text x="48" y="146" fill="#1f2937" fontSize="12">A(1,2)</text>
-        <text x="256" y="58" fill="#1f2937" fontSize="12">B(5,4)</text>
-        <text x="142" y="88" fill="#1f2937" fontSize="12">AB = (4,2)</text>
+        <circle cx="60" cy="130" r="3" fill="#f4f1d8" />
+        <circle cx="250" cy="60" r="3" fill="#f4f1d8" />
+        <line x1="60" y1="130" x2="250" y2="60" className="chalk-draw" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <polygon points="250,60 238,62 244,72" fill="#f4f1d8" />
+        <text x="48" y="146" fill="#f4f1d8" fontSize="12">A(1,2)</text>
+        <text x="256" y="58" fill="#f4f1d8" fontSize="12">B(5,4)</text>
+        <text x="142" y="88" fill="#f4f1d8" fontSize="12">AB = (4,2)</text>
       </svg>
     );
   }
   if (kind === "triangle") {
     return (
       <svg viewBox="0 0 320 180" className="chalk-geometry" role="img" aria-label="Schema triangle rectangle">
-        <line x1="40" y1="145" x2="210" y2="145" className="chalk-draw" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <line x1="40" y1="145" x2="40" y2="55" className="chalk-draw chalk-draw-2" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <line x1="40" y1="55" x2="210" y2="145" className="chalk-draw chalk-draw-3" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <text x="30" y="50" fill="#1f2937" fontSize="12">A</text>
-        <text x="28" y="160" fill="#1f2937" fontSize="12">B</text>
-        <text x="214" y="160" fill="#1f2937" fontSize="12">C</text>
+        <line x1="40" y1="145" x2="210" y2="145" className="chalk-draw" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <line x1="40" y1="145" x2="40" y2="55" className="chalk-draw chalk-draw-2" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <line x1="40" y1="55" x2="210" y2="145" className="chalk-draw chalk-draw-3" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <text x="30" y="50" fill="#f4f1d8" fontSize="12">A</text>
+        <text x="28" y="160" fill="#f4f1d8" fontSize="12">B</text>
+        <text x="214" y="160" fill="#f4f1d8" fontSize="12">C</text>
       </svg>
     );
   }
   if (kind === "equation") {
     return (
       <svg viewBox="0 0 320 180" className="chalk-geometry" role="img" aria-label="Etapes resolution equation">
-        <text x="34" y="48" fill="#111827" fontSize="16">2x + 5 = 17</text>
-        <text x="34" y="86" fill="#111827" fontSize="16">2x = 12</text>
-        <text x="34" y="124" fill="#111827" fontSize="16">x = 6</text>
-        <line x1="26" y1="56" x2="290" y2="56" className="chalk-draw" stroke="#000000" style={{ strokeWidth: 2.5 }} />
+        <text x="34" y="48" fill="#f4f1d8" fontSize="16">2x + 5 = 17</text>
+        <text x="34" y="86" fill="#f4f1d8" fontSize="16">2x = 12</text>
+        <text x="34" y="124" fill="#f4f1d8" fontSize="16">x = 6</text>
+        <line x1="26" y1="56" x2="290" y2="56" className="chalk-draw" stroke="#f4f1d8" style={{ strokeWidth: 2.5 }} />
       </svg>
     );
   }
   if (kind === "repere") {
     return (
       <svg viewBox="0 0 320 180" className="chalk-geometry" role="img" aria-label="Schema repere cartesien">
-        <line x1="30" y1="145" x2="290" y2="145" className="chalk-draw" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <line x1="160" y1="20" x2="160" y2="165" className="chalk-draw chalk-draw-2" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <polyline points="60,140 110,110 160,95 220,70 270,45" className="chalk-draw chalk-draw-3" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <text x="293" y="148" fill="#1f2937" fontSize="12">x</text>
-        <text x="165" y="22" fill="#1f2937" fontSize="12">y</text>
+        <line x1="30" y1="145" x2="290" y2="145" className="chalk-draw" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <line x1="160" y1="20" x2="160" y2="165" className="chalk-draw chalk-draw-2" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <polyline points="60,140 110,110 160,95 220,70 270,45" className="chalk-draw chalk-draw-3" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <text x="293" y="148" fill="#f4f1d8" fontSize="12">x</text>
+        <text x="165" y="22" fill="#f4f1d8" fontSize="12">y</text>
       </svg>
     );
   }
   if (kind === "fraction") {
     return (
       <svg viewBox="0 0 320 180" className="chalk-geometry" role="img" aria-label="Schema fractions">
-        <rect x="40" y="48" width="95" height="84" rx="6" className="chalk-draw" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <line x1="40" y1="90" x2="135" y2="90" className="chalk-draw chalk-draw-2" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <rect x="185" y="48" width="95" height="84" rx="6" className="chalk-draw chalk-draw-3" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <line x1="232" y1="48" x2="232" y2="132" className="chalk-draw" stroke="#000000" style={{ strokeWidth: 3 }} />
-        <text x="75" y="160" fill="#1f2937" fontSize="12">1/2</text>
-        <text x="218" y="160" fill="#1f2937" fontSize="12">1/4</text>
+        <rect x="40" y="48" width="95" height="84" rx="6" className="chalk-draw" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <line x1="40" y1="90" x2="135" y2="90" className="chalk-draw chalk-draw-2" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <rect x="185" y="48" width="95" height="84" rx="6" className="chalk-draw chalk-draw-3" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <line x1="232" y1="48" x2="232" y2="132" className="chalk-draw" stroke="#f4f1d8" style={{ strokeWidth: 3 }} />
+        <text x="75" y="160" fill="#f4f1d8" fontSize="12">1/2</text>
+        <text x="218" y="160" fill="#f4f1d8" fontSize="12">1/4</text>
       </svg>
     );
   }
 
   return (
     <svg viewBox="0 0 320 180" className="chalk-geometry" role="img" aria-label="Methode en etapes">
-      <text x="30" y="48" fill="#111827" fontSize="15">1. Lire l'enonce</text>
-      <text x="30" y="85" fill="#111827" fontSize="15">2. Choisir la formule</text>
-      <text x="30" y="122" fill="#111827" fontSize="15">3. Calculer puis verifier</text>
-      <line x1="26" y1="56" x2="292" y2="56" className="chalk-draw" stroke="#000000" style={{ strokeWidth: 2.5 }} />
+      <text x="30" y="48" fill="#f4f1d8" fontSize="15">1. Lire l'enonce</text>
+      <text x="30" y="85" fill="#f4f1d8" fontSize="15">2. Choisir la formule</text>
+      <text x="30" y="122" fill="#f4f1d8" fontSize="15">3. Calculer puis verifier</text>
+      <line x1="26" y1="56" x2="292" y2="56" className="chalk-draw" stroke="#f4f1d8" style={{ strokeWidth: 2.5 }} />
     </svg>
   );
 }
+

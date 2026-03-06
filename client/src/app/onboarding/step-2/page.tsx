@@ -77,13 +77,13 @@ export default function OnboardingStep2() {
               disabled={isSubmitting}
               className={`relative rounded-xl border-2 p-4 text-left text-sm font-medium transition-colors ${
                 isSelected
-                  ? "border-primary bg-primary/5 text-primary"
-                  : "border-border text-foreground hover:border-primary/40"
+                  ? "border-accent bg-accent/10 text-accent shadow-sm"
+                  : "border-border text-foreground hover:border-accent/40"
               }`}
             >
               {subject}
               {isSelected && (
-                <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />
+                <Check className="absolute top-2 right-2 h-4 w-4 text-accent" />
               )}
             </button>
           );
@@ -98,7 +98,7 @@ export default function OnboardingStep2() {
 
       {error && <p className="text-sm text-destructive font-medium">{error}</p>}
 
-      <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || selected.length === 0}>
+      <Button type="submit" variant="accent" className="w-full" size="xl" disabled={isSubmitting || selected.length === 0}>
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

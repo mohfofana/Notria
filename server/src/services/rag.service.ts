@@ -60,7 +60,7 @@ const EMBEDDING_MAX_TOKENS = 8192;
 const EMBEDDING_SAFE_TOKENS = 7000;
 const EMBEDDING_BATCH_SIZE = 20;
 const EMBEDDING_BATCH_PAUSE_MS = 200;
-const SIMILARITY_THRESHOLD = 0.45;
+const SIMILARITY_THRESHOLD = 0.55;
 const DEFAULT_CHUNK_CONFIG: ChunkConfig = {
   minTokens: 500,
   targetTokens: 650,
@@ -452,14 +452,15 @@ export const RagService = {
       return strictMatches.slice(0, normalizedLimit);
     }
 
-    // Fallback: return best available matches to avoid empty RAG responses
-    // when corpus is small or embeddings are less discriminative.
-    const relaxedMatches = normalizedRows.filter((row) => row.similarity > 0.35);
+    // Fallback: return top match only if it's reasonably close (above 0.45).
+    // Below that threshold the content is likely off-topic and would confuse the AI.
+    const relaxedMatches = normalizedRows.filter((row) => row.similarity > 0.45);
     if (relaxedMatches.length > 0) {
-      return relaxedMatches.slice(0, normalizedLimit);
+      return relaxedMatches.slice(0, Math.min(2, normalizedLimit));
     }
 
-    return normalizedRows.slice(0, normalizedLimit);
+    // No relevant content found — return empty rather than noise
+    return [];
   },
 
   async getMathCoverage() {

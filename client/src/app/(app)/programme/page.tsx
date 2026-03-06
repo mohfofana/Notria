@@ -258,18 +258,8 @@ export default function ProgrammePage() {
 
   if (!program) {
     return (
-      <div className="min-h-screen bg-background p-4">
+      <div className="px-4 py-6 md:px-8">
         <div className="max-w-2xl mx-auto">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push("/dashboard")}
-            className="mb-6"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Retour
-          </Button>
-
           <div className="text-center space-y-6">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
               <Sparkles className="h-10 w-10 text-primary" />
@@ -293,18 +283,11 @@ export default function ProgrammePage() {
   const recs = program.recommendations;
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="px-4 py-6 md:px-8">
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push("/dashboard")}
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Dashboard
-          </Button>
+          <h1 className="text-2xl font-bold">Mon Programme</h1>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="h-4 w-4" />
             <span>{program.totalWeeks} semaines</span>
@@ -448,7 +431,7 @@ export default function ProgrammePage() {
             const weekPercent = weekTotal > 0 ? Math.round((weekCompleted / weekTotal) * 100) : 0;
 
             return (
-              <div key={week.weekNumber} className="soft-card rounded-2xl overflow-hidden">
+              <div key={week.weekNumber} className="rounded-2xl border bg-card overflow-hidden">
                 {/* Week Header - Clickable */}
                 <button
                   type="button"

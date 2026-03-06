@@ -20,6 +20,75 @@ const DOMAIN_TO_TOPIC: Record<string, string> = {
   "Problemes de la vie courante": "Problemes de la vie courante",
 };
 
+const TOPIC_KEYWORD_SUBJECT_HINTS: Array<{ subject: string; keywords: string[] }> = [
+  {
+    subject: "SVT",
+    keywords: [
+      "cellule",
+      "nutrition",
+      "digestion",
+      "reproduction",
+      "genetique",
+      "ecosysteme",
+      "ecologie",
+      "respiration",
+      "sang",
+      "organisme",
+      "microbe",
+    ],
+  },
+  {
+    subject: "Physique-Chimie",
+    keywords: [
+      "electricite",
+      "optique",
+      "chimie",
+      "acide",
+      "base",
+      "atome",
+      "molecule",
+      "reaction",
+      "energie",
+      "force",
+      "mouvement",
+      "circuit",
+    ],
+  },
+  {
+    subject: "Français",
+    keywords: [
+      "grammaire",
+      "conjugaison",
+      "orthographe",
+      "vocabulaire",
+      "redaction",
+      "resume",
+      "texte",
+      "narration",
+      "discours",
+      "verbe",
+      "phrase",
+    ],
+  },
+  {
+    subject: "Mathématiques",
+    keywords: [
+      "equation",
+      "inequation",
+      "fraction",
+      "fonction",
+      "statistique",
+      "probabilite",
+      "pythagore",
+      "thales",
+      "trigonometrie",
+      "geometrie",
+      "calcul",
+      "algebre",
+    ],
+  },
+];
+
 type Difficulty = "facile" | "moyen" | "difficile";
 type ProgramSessionType = "lesson" | "exercise" | "quiz" | "recap" | "revision" | "evaluation";
 type EngagementMode = "discovery" | "quick_win" | "challenge" | "exam_drill";
@@ -296,7 +365,7 @@ export const CourseProgramService = {
     tips: string[];
     motivation: string;
   }> {
-    const prioritySubjects = (student.prioritySubjects as string[] | null) ?? ["MathÃ©matiques"];
+    const prioritySubjects = (student.prioritySubjects as string[] | null) ?? ["Mathématiques"];
     const curriculumContexts = await Promise.all(
       prioritySubjects.map((subject) =>
         PedagogicalContentService.getCurriculumContext(subject, student.examType as "BEPC" | "BAC"),
@@ -698,13 +767,75 @@ Format strict JSON:
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
-    if (normalized.includes("francais")) return "FranÃ§ais";
+    if (normalized.includes("francais")) return "Français";
     if (normalized.includes("svt")) return "SVT";
     if (normalized.includes("physique") || normalized.includes("chimie")) return "Physique-Chimie";
-    if (normalized.includes("math")) return "MathÃ©matiques";
+    if (normalized.includes("math")) return "Mathématiques";
+    for (const hint of TOPIC_KEYWORD_SUBJECT_HINTS) {
+      if (hint.keywords.some((keyword) => normalized.includes(keyword))) return hint.subject;
+    }
     return undefined;
   },
 
+  extractTopicKeywords(topic: string): string[] {
+    const stopwords = new Set(["de", "des", "du", "la", "le", "les", "et", "ou", "sur", "en", "au", "aux"]);
+    return topic
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .map((word) => word.trim())
+      .filter((word) => word.length >= 4 && !stopwords.has(word));
+  },
+
+  keepRelevantResults(
+    results: Array<{ title: string; chapter: string | null; content: string }>,
+    topic: string,
+  ): Array<{ title: string; chapter: string | null; content: string }> {
+    const keywords = this.extractTopicKeywords(topic);
+    if (keywords.length === 0) return results;
+
+    return results.filter((result) => {
+      const haystack = `${result.title} ${result.chapter ?? ""} ${result.content.substring(0, 600)}`
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+      return keywords.some((keyword) => haystack.includes(keyword));
+    });
+  },
+
+  isLikelyOffTopicSnippet(topic: string, text: string): boolean {
+    const normalizedText = text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+    const hardNoiseMarkers = [
+      "liste des sigles",
+      "chef de l'etat",
+      "horizon 2020",
+      "vive l'ecole ivoirienne",
+      "page ",
+    ];
+    if (hardNoiseMarkers.some((marker) => normalizedText.includes(marker))) return true;
+
+    const keywords = this.extractTopicKeywords(topic);
+    if (keywords.length === 0) return false;
+    return !keywords.some((keyword) => normalizedText.includes(keyword));
+  },
+
+  shouldRefreshSessionContent(
+    topic: string,
+    content: unknown,
+  ): boolean {
+    const candidate = (content ?? {}) as { keyConcepts?: unknown; exercises?: unknown };
+    const keyConcepts = Array.isArray(candidate.keyConcepts) ? candidate.keyConcepts.filter((x): x is string => typeof x === "string") : [];
+    const exercises = Array.isArray(candidate.exercises) ? candidate.exercises.filter((x): x is string => typeof x === "string") : [];
+    const firstSnippet = [keyConcepts[0], exercises[0]].filter(Boolean).join(" ");
+
+    if (!firstSnippet.trim()) return true;
+    return this.isLikelyOffTopicSnippet(topic, firstSnippet);
+  },
   async fetchRagContent(
     topic: string,
     type: ProgramSessionType,
@@ -718,11 +849,12 @@ Format strict JSON:
 
     try {
       if (type === "lesson" || type === "revision" || type === "recap") {
-        const coursResults = await RagService.search(
+        const coursResultsRaw = await RagService.search(
           `cours ${topic} BEPC 3eme ${subjectHint}programme ivoirien`,
           3,
           { sourceType: "cours", grade: "3eme", ...subjectFilter },
         );
+        const coursResults = this.keepRelevantResults(coursResultsRaw, topic);
         for (const result of coursResults) {
           keyConcepts.push(result.content.substring(0, 500));
           ragSources.push(result.title);
@@ -730,11 +862,12 @@ Format strict JSON:
       }
 
       if (type === "exercise" || type === "revision" || type === "evaluation" || type === "quiz") {
-        const exerciseResults = await RagService.search(
+        const exerciseResultsRaw = await RagService.search(
           `exercice ${topic} BEPC 3eme ${subjectHint}`,
           3,
           { sourceType: "exercice", grade: "3eme", ...subjectFilter },
         );
+        const exerciseResults = this.keepRelevantResults(exerciseResultsRaw, topic);
         for (const result of exerciseResults) {
           exercises.push(result.content.substring(0, 500));
           ragSources.push(result.title);
@@ -742,11 +875,12 @@ Format strict JSON:
       }
 
       if (type === "evaluation") {
-        const annaleResults = await RagService.search(
+        const annaleResultsRaw = await RagService.search(
           `annale BEPC ${subjectHint}${topic}`,
           2,
           { sourceType: "annale", grade: "3eme", ...subjectFilter },
         );
+        const annaleResults = this.keepRelevantResults(annaleResultsRaw, topic);
         for (const result of annaleResults) {
           exercises.push(result.content.substring(0, 500));
           ragSources.push(result.title);
@@ -1019,6 +1153,30 @@ Format strict JSON:
       startedSession = updated ?? session;
     }
 
+    if (this.shouldRefreshSessionContent(startedSession.topic, startedSession.content)) {
+      try {
+        const refreshedContent = await this.fetchRagContent(
+          startedSession.topic,
+          startedSession.type as ProgramSessionType,
+        );
+
+        const [updatedWithFreshContent] = await db
+          .update(schema.courseProgramSessions)
+          .set({
+            content: sanitizeJsonValue(refreshedContent),
+            updatedAt: new Date(),
+          })
+          .where(eq(schema.courseProgramSessions.id, startedSession.id))
+          .returning();
+
+        if (updatedWithFreshContent) {
+          startedSession = updatedWithFreshContent;
+        }
+      } catch (error) {
+        console.warn(`Failed to refresh off-topic session content for session ${startedSession.id}:`, error);
+      }
+    }
+
     return {
       programId: program.id,
       weekNumber: week.weekNumber,
@@ -1125,3 +1283,6 @@ Format strict JSON:
     return { success: true };
   },
 };
+
+
+

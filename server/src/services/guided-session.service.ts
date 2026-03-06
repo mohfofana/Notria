@@ -229,7 +229,9 @@ function fallbackScript(input: GuidedSessionStartInput): GuidedScript {
   const topic = input.topic?.trim() || "seance du jour";
   const title = input.title?.trim() || `Micro-session: ${topic}`;
   const objective = input.objectives?.[0] || `Comprendre les points cles de ${topic}`;
-  const conceptHint = input.content?.keyConcepts?.[0] || "";
+  // Use the first RAG concept (truncated to a reasonable size for coach lines)
+  const rawConcept = input.content?.keyConcepts?.[0] || "";
+  const conceptHint = rawConcept.length > 300 ? rawConcept.substring(0, 300) + "..." : rawConcept;
   const exerciseHint = input.content?.exercises?.[0] || "";
   const description = input.description?.trim() || "";
 
@@ -658,17 +660,29 @@ async function generateScript(input: GuidedSessionStartInput): Promise<Generated
   }).partial();
 
   try {
+    // Build RAG content block if available
+    const ragBlock = keyConcepts
+      ? [
+          "",
+          "CONTENU PEDAGOGIQUE REEL (issu du programme ivoirien — UTILISE ce contenu pour generer le cours):",
+          keyConcepts,
+          exercises ? `Exercices de reference: ${exercises}` : "",
+        ].filter(Boolean).join("\n")
+      : "";
+
     const userContent = [
       `MICRO-COURS sur "${topic}" pour un eleve de 3eme en Cote d'Ivoire.`,
       `Matiere: ${officialMeta.subject}. Examen: ${officialMeta.examType}.`,
       title ? `Titre: ${title}.` : "",
       description ? `Description: ${description}.` : "",
       objectives ? `Objectifs: ${objectives}.` : "",
-      keyConcepts ? `Concepts cles: ${keyConcepts}.` : "",
-      exercises ? `Exercices de reference: ${exercises}.` : "",
+      ragBlock,
       "",
       "REFERENTIEL OFFICIEL A RESPECTER (DPFC):",
       truncateContext(officialMeta.officialContext),
+      "",
+      "IMPORTANT: Le cours DOIT etre base sur le CONTENU PEDAGOGIQUE REEL ci-dessus.",
+      "Ne parle PAS de sujets hors du topic demande. Reste STRICTEMENT sur le sujet.",
       "",
       "GENERE un JSON avec ces champs (chaque champ = une phrase que Prof Ada dit a l'eleve):",
       "",
@@ -698,7 +712,7 @@ async function generateScript(input: GuidedSessionStartInput): Promise<Generated
       userContent,
       retries: 3,
       temperature: 0.5,
-      maxTokens: 1200,
+      maxTokens: 1800,
     });
 
     return {
@@ -773,7 +787,7 @@ async function generateHelpResponse(
     ].join(" "),
     ask_question: [
       `L'eleve pose cette question: "${questionText || ""}".`,
-      "Reponds en rapport avec le cours sur ${session.topic}.",
+      `Reponds en rapport avec le cours sur ${session.topic}.`,
       "Reponse directe et simple. Maximum 3 phrases.",
     ].join(" "),
   };
@@ -900,6 +914,39 @@ function fallbackEvaluation(
     return { correct: true, feedback: `Bonne reponse. Tu as bien compris l'idee sur ${session.topic}. On continue.` };
   }
   return { correct: false, feedback: "Ce n'est pas encore suffisant. Ajoute au moins une notion du cours dans ta reponse." };
+}
+
+function isFeedbackClearlyOffTopic(session: GuidedSessionInstance, feedback: string): boolean {
+  const text = normalizeText(feedback);
+  if (!text) return true;
+
+  // Known noisy patterns seen in bad generations.
+  const hardNoiseMarkers = [
+    "banane",
+    "manioc",
+    "calorie",
+    "horizon 2020",
+    "liste des sigles",
+    "chef de l'etat",
+  ];
+  if (hardNoiseMarkers.some((marker) => text.includes(marker))) return true;
+
+  const keywords = session.topicKeywords.slice(0, 10);
+  if (keywords.length === 0) return false;
+  return !keywords.some((keyword) => text.includes(keyword));
+}
+
+function buildConfusedStepFeedback(
+  session: GuidedSessionInstance,
+  stepType: "check" | "practice" | "recap",
+): string {
+  if (stepType === "check") {
+    return `Pas grave. On revoit vite: ${session.script.contextLine1} Relis le cours, puis reponds a la question: ${session.script.checkPrompt}`;
+  }
+  if (stepType === "practice") {
+    return `Pas de stress. Commence par la premiere etape de la methode. Exercice: ${session.script.practicePrompt}`;
+  }
+  return "Ce n'est pas grave. Redonne la methode en 3 etapes: lire, appliquer, verifier.";
 }
 
 function buildChoices(choices: Array<{ id: string; label: string }>): GuidedChoiceOption[] {
@@ -1226,10 +1273,13 @@ export const GuidedSessionService = {
 
     switch (session.currentStepId) {
       case "intro-level":
-        if (payload.choiceId === "confident") {
-          session.currentStepId = "concept-check";
-        } else if (payload.choiceId === "not-at-all" || payload.choiceId === "a-bit") {
+        if (payload.choiceId === "confident" || payload.choiceId === "not-at-all" || payload.choiceId === "a-bit") {
+          // ALWAYS go through EXPLAIN — never skip the teaching phase.
+          // Even "confident" students benefit from a quick review.
           session.currentStepId = "explain-context";
+          if (payload.choiceId === "confident") {
+            feedback = "Super ! On fait quand meme un petit rappel rapide avant de passer aux exercices.";
+          }
         } else {
           feedback = "Choisis une option pour qu'on continue.";
         }
@@ -1247,9 +1297,16 @@ export const GuidedSessionService = {
         }
         break;
       case "concept-check": {
+        const answer = String(payload.response ?? "");
+        if (isConfusedAnswer(answer)) {
+          feedback = buildConfusedStepFeedback(session, "check");
+          break;
+        }
         session.totalChecks += 1;
-        const checkEval = await evaluateAnswer(session, String(payload.response ?? ""), "check");
-        feedback = checkEval.feedback;
+        const checkEval = await evaluateAnswer(session, answer, "check");
+        feedback = isFeedbackClearlyOffTopic(session, checkEval.feedback)
+          ? fallbackEvaluation(session, answer, "check").feedback
+          : checkEval.feedback;
         if (checkEval.correct) {
           session.correctAnswers += 1;
           session.currentStepId = "practice";
@@ -1257,9 +1314,16 @@ export const GuidedSessionService = {
         break;
       }
       case "practice": {
+        const answer = String(payload.response ?? "");
+        if (isConfusedAnswer(answer)) {
+          feedback = buildConfusedStepFeedback(session, "practice");
+          break;
+        }
         session.totalChecks += 1;
-        const practiceEval = await evaluateAnswer(session, String(payload.response ?? ""), "practice");
-        feedback = practiceEval.feedback;
+        const practiceEval = await evaluateAnswer(session, answer, "practice");
+        feedback = isFeedbackClearlyOffTopic(session, practiceEval.feedback)
+          ? fallbackEvaluation(session, answer, "practice").feedback
+          : practiceEval.feedback;
         if (practiceEval.correct) {
           session.correctAnswers += 1;
           session.currentStepId = "recap-check";
@@ -1267,9 +1331,16 @@ export const GuidedSessionService = {
         break;
       }
       case "recap-check": {
+        const answer = String(payload.response ?? "");
+        if (isConfusedAnswer(answer)) {
+          feedback = buildConfusedStepFeedback(session, "recap");
+          break;
+        }
         session.totalChecks += 1;
-        const recapEval = await evaluateAnswer(session, String(payload.response ?? ""), "recap");
-        feedback = recapEval.feedback;
+        const recapEval = await evaluateAnswer(session, answer, "recap");
+        feedback = isFeedbackClearlyOffTopic(session, recapEval.feedback)
+          ? fallbackEvaluation(session, answer, "recap").feedback
+          : recapEval.feedback;
         if (recapEval.correct) {
           session.correctAnswers += 1;
           session.currentStepId = "recap";

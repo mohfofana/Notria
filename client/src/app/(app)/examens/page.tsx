@@ -175,7 +175,7 @@ export default function ExamensPage() {
                 Suivi automatique
               </p>
               <p className="mt-2">
-                {completedCount}/{overview?.exams.length ?? 0} sujets terminés.
+                {completedCount}/{overview?.exams?.length ?? 0} sujets terminés.
                 {overview?.lastAssessment?.score !== null && overview?.lastAssessment?.score !== undefined
                   ? ` Dernière moyenne: ${overview.lastAssessment.score}%`
                   : " Commence un test pour générer ton premier bilan."}
@@ -187,3 +187,4 @@ export default function ExamensPage() {
     </main>
   );
 }
+

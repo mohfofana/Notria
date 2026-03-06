@@ -32,7 +32,7 @@ const configuredOrigins = process.env.CLIENT_URL
   : [];
 const allowedOrigins = Array.from(new Set([...configuredOrigins, ...defaultOrigins]));
 const isDev = (process.env.NODE_ENV || "development") !== "production";
-const devLanOriginPattern = /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:(3000|4000)$/;
+const devLanOriginPattern = /^http:\/\/(?:(?:10|127)\.\d{1,3}\.\d{1,3}\.\d{1,3}|(?:172\.(?:1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3})|(?:192\.168\.\d{1,3}\.\d{1,3})):(3000|4000)$/;
 
 // Middleware
 app.use(helmet());

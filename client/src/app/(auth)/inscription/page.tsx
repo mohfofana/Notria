@@ -109,7 +109,7 @@ export default function InscriptionPage() {
         <button
           type="button"
           onClick={() => setForm((p) => ({ ...p, role: "student" }))}
-          className={`rounded-lg border-2 p-3 text-center text-sm font-medium transition-colors ${
+          className={`rounded-lg border-2 p-3 text-center text-sm font-medium transition-all ${
             form.role === "student"
               ? "border-primary bg-primary/5 text-primary"
               : "border-border text-muted-foreground hover:border-primary/40"
@@ -120,7 +120,7 @@ export default function InscriptionPage() {
         <button
           type="button"
           onClick={() => setForm((p) => ({ ...p, role: "parent" }))}
-          className={`rounded-lg border-2 p-3 text-center text-sm font-medium transition-colors ${
+          className={`rounded-lg border-2 p-3 text-center text-sm font-medium transition-all ${
             form.role === "parent"
               ? "border-primary bg-primary/5 text-primary"
               : "border-border text-muted-foreground hover:border-primary/40"

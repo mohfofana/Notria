@@ -48,8 +48,8 @@ export default function OnboardingStep1() {
         </p>
       </div>
 
-      <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-5">
-        <p className="text-sm font-semibold text-primary">Examen cible: BEPC</p>
+      <div className="rounded-2xl border-2 border-accent/30 bg-accent/5 p-5">
+        <p className="text-sm font-semibold text-accent">Examen cible: BEPC</p>
         <p className="mt-1 text-sm text-muted-foreground">
           Niveau configure: classe de 3eme.
         </p>
@@ -69,7 +69,7 @@ export default function OnboardingStep1() {
 
       {error && <p className="text-sm text-destructive font-medium">{error}</p>}
 
-      <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+      <Button type="submit" variant="accent" className="w-full" size="xl" disabled={isSubmitting}>
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -87,7 +87,7 @@ export default function OnboardingStep4() {
 
       <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <CalendarDays className="h-5 w-5 text-primary" />
+          <CalendarDays className="h-5 w-5 text-accent" />
           <h2 className="font-semibold">Jours d'étude</h2>
         </div>
         <div className="flex gap-2">
@@ -101,8 +101,8 @@ export default function OnboardingStep4() {
                 disabled={isSubmitting}
                 className={`flex-1 rounded-xl border-2 py-3 text-sm font-semibold transition-colors ${
                   isSelected
-                    ? "border-primary bg-primary/5 text-primary"
-                    : "border-border text-foreground hover:border-primary/40"
+                    ? "border-accent bg-accent/10 text-accent shadow-sm"
+                    : "border-border text-foreground hover:border-accent/40"
                 }`}
               >
                 {day.label}
@@ -114,14 +114,14 @@ export default function OnboardingStep4() {
 
       <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <Clock className="h-5 w-5 text-primary" />
+          <Clock className="h-5 w-5 text-accent" />
           <h2 className="font-semibold">Heure de début</h2>
         </div>
         <select
           value={startTime}
           onChange={(e) => setStartTime(e.target.value)}
           disabled={isSubmitting}
-          className="w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm font-medium focus:border-primary focus:outline-none"
+          className="w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm font-medium focus:border-accent focus:outline-none"
         >
           {START_TIMES.map((time) => (
             <option key={time} value={time}>
@@ -133,7 +133,7 @@ export default function OnboardingStep4() {
 
       <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <Timer className="h-5 w-5 text-primary" />
+          <Timer className="h-5 w-5 text-accent" />
           <h2 className="font-semibold">Durée de chaque session</h2>
         </div>
         <div className="grid grid-cols-3 gap-3">
@@ -143,10 +143,10 @@ export default function OnboardingStep4() {
               type="button"
               onClick={() => setDuration(option.value)}
               disabled={isSubmitting}
-              className={`rounded-xl border-2 p-4 text-center transition-colors ${
+              className={`rounded-xl border-2 p-4 text-center transition-all ${
                 duration === option.value
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/40"
+                  ? "border-accent bg-accent/10 shadow-sm"
+                  : "border-border hover:border-accent/40"
               }`}
             >
               <div className="text-lg font-bold">{option.label}</div>
@@ -162,8 +162,9 @@ export default function OnboardingStep4() {
 
       <Button
         type="submit"
+        variant="accent"
         className="w-full"
-        size="lg"
+        size="xl"
         disabled={isSubmitting || selectedDays.length === 0 || !duration}
       >
         {isSubmitting ? (
@@ -172,7 +173,7 @@ export default function OnboardingStep4() {
             Configuration...
           </>
         ) : (
-          "Commencer à étudier"
+          "Commencer a etudier"
         )}
       </Button>
     </form>

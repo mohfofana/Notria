@@ -38,7 +38,20 @@ export const GuidedSessionController = {
           ? req.body.topic.trim()
           : "seance du jour";
 
-      const result = await GuidedSessionService.start({ topic });
+      const subject =
+        typeof req.body?.subject === "string" && req.body.subject.trim().length > 0
+          ? req.body.subject.trim()
+          : undefined;
+
+      // Fetch RAG content for standalone sessions so the AI has real curriculum material
+      let content: { keyConcepts?: string[]; exercises?: string[]; ragSources?: string[] } | undefined;
+      try {
+        content = await CourseProgramService.fetchRagContent(topic, "lesson");
+      } catch {
+        // RAG fetch is best-effort; continue without it
+      }
+
+      const result = await GuidedSessionService.start({ topic, subject, content });
       return res.status(201).json(result);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to start session";

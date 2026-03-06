@@ -272,8 +272,8 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="h-screen flex bg-background p-3 gap-3">
-      <div className="hidden md:flex md:w-80 soft-shell rounded-2xl overflow-hidden flex-col">
+    <div className="h-[calc(100vh-0px)] md:h-screen flex bg-background p-3 gap-3 pb-20 md:pb-3">
+      <div className="hidden md:flex md:w-72 rounded-2xl border bg-card overflow-hidden flex-col">
         <ChatSidebar
           conversations={conversations}
           activeId={activeId}
@@ -301,40 +301,25 @@ export default function ChatPage() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0 soft-shell rounded-2xl overflow-hidden">
-        <header className="border-b border-border/70 px-4 py-3 flex items-center gap-3 bg-white/55">
+      <div className="flex-1 flex flex-col min-w-0 rounded-2xl border bg-card overflow-hidden">
+        <header className="border-b px-4 py-3 flex items-center gap-3 bg-card">
           <button
             onClick={() => setSidebarOpen(true)}
             className="md:hidden text-muted-foreground hover:text-foreground"
           >
             <Menu className="h-5 w-5" />
           </button>
-          <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")} className="hidden md:flex">
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Retour
-          </Button>
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <GraduationCap className="h-5 w-5 text-primary shrink-0" />
-              <span className="font-semibold truncate tracking-wide">
-                {activeConv ? activeConv.title || activeConv.subject : "Prof Ada"}
-              </span>
+            <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center shrink-0">
+              <GraduationCap className="h-3.5 w-3.5 text-white" />
             </div>
+            <span className="font-semibold truncate">
+              {activeConv ? activeConv.title || activeConv.subject : "Prof Ada"}
+            </span>
+          </div>
           <div className="hidden sm:flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push("/notria-vision")}
-            >
-              <Camera className="h-4 w-4 mr-1" />
-              Notria Vision
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push("/chat?voice=1")}
-            >
-              <Mic className="h-4 w-4 mr-1" />
-              Vocal
+            <Button variant="outline" size="sm" onClick={() => router.push("/notria-vision")}>
+              <Camera className="h-4 w-4 mr-1" /> Vision
             </Button>
           </div>
         </header>

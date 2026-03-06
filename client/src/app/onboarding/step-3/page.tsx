@@ -52,7 +52,7 @@ export default function OnboardingStep3() {
       {/* Target Score */}
       <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <Target className="h-5 w-5 text-primary" />
+          <Target className="h-5 w-5 text-accent" />
           <h2 className="font-semibold">Quelle note vises-tu au BEPC ?</h2>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -64,8 +64,8 @@ export default function OnboardingStep3() {
               disabled={isSubmitting}
               className={`rounded-xl border-2 px-5 py-3 text-sm font-semibold transition-colors ${
                 targetScore === score
-                  ? "border-primary bg-primary/5 text-primary"
-                  : "border-border text-foreground hover:border-primary/40"
+                  ? "border-accent bg-accent/10 text-accent shadow-sm"
+                  : "border-border text-foreground hover:border-accent/40"
               }`}
             >
               {score}/20
@@ -78,8 +78,9 @@ export default function OnboardingStep3() {
 
       <Button
         type="submit"
+        variant="accent"
         className="w-full"
-        size="lg"
+        size="xl"
         disabled={isSubmitting || !targetScore}
       >
         {isSubmitting ? (
